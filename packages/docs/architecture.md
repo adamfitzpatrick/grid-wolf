@@ -1,3 +1,4 @@
 # Architecture
 
-![Actors, actions & data items](./user-storyboard.drawio.svg)
+## User Journeys
+![Actors, actions & data items](./assets/user-journey.drawio.svg)
