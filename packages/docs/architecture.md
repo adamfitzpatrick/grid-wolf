@@ -1,4 +1,8 @@
 # Architecture
 
-## User Journeys
-![Actors, actions & data items](./assets/user-journey.drawio.svg)
+## User Actions
+
+<center>
+
+![Actors, actions & data items](./assets/user-actions.drawio.svg)
+</center>
