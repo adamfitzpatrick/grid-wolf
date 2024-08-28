@@ -1,4 +1,10 @@
 {
   "name": "grid-wolf",
-  "packageManager": "yarn@4.2.2"
+  "packageManager": "yarn@4.4.1",
+  "workspaces": [
+    "./packages/**"
+  ],
+  "dependencies": {
+    "typescript": "^5.5.4"
+  }
 }

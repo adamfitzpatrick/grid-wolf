@@ -1,0 +1,49 @@
+{
+    "folders": [
+        {
+            "name": "grid-wolf",
+            "path": "."
+        },
+        {
+            "name": "docs",
+            "path": "./packages/docs"
+        },
+        {
+            "name": "constructs",
+            "path": "./packages/constructs"
+        },
+        {
+            "name": "common-infra",
+            "path": "./projects/common-infra"
+        }
+    ],
+    "settings": {
+        "search.exclude": {
+            "**/.yarn": true,
+            "**/.pnp.*": true
+        },
+        "typescript.tsdk": "grid-wolf/.yarn/sdks/typescript/lib",
+        "typescript.enablePromptUseWorkspaceTsdk": true,
+        "files.exclude": {
+            "**/.git": true,
+            "**/.svn": true,
+            "**/.hg": true,
+            "**/CVS": true,
+            "**/.DS_Store": true,
+            "**/Thumbs.db": true,
+            "**/*.d.ts": true,
+            "**/*.js": true,
+            ".yarn": true
+        },
+        "jest.disabledWorkspaceFolders": [
+            "grid-wolf",
+            "docs",
+        ]
+    },
+    "extensions": {
+        "recommendations": [
+            "arcanis.vscode-zipfs",
+            "hediet.vscode-drawio"
+        ]
+    }
+}
