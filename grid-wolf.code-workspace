@@ -38,12 +38,14 @@
         "jest.disabledWorkspaceFolders": [
             "grid-wolf",
             "docs",
-        ]
+        ],
+        "markdown-preview-github-styles.colorTheme": "light"
     },
     "extensions": {
         "recommendations": [
             "arcanis.vscode-zipfs",
-            "hediet.vscode-drawio"
+            "hediet.vscode-drawio",
+            "bierner.markdown-preview-github-styles"
         ]
     }
 }
