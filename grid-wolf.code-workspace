@@ -14,7 +14,7 @@
         },
         {
             "name": "common-infra",
-            "path": "./projects/common-infra"
+            "path": "./packages/common-infra"
         }
     ],
     "settings": {
@@ -35,11 +35,11 @@
             "**/*.js": true,
             ".yarn": true
         },
+        "markdown-preview-github-styles.colorTheme": "light",
         "jest.disabledWorkspaceFolders": [
             "grid-wolf",
-            "docs",
-        ],
-        "markdown-preview-github-styles.colorTheme": "light"
+            "docs"
+        ]
     },
     "extensions": {
         "recommendations": [
