@@ -1,0 +1,7 @@
+{
+  "private": true,
+  "packageManager": "yarn@4.4.1",
+  "dependencies": {
+    "aws-xray-sdk": "^3.9.0"
+  }
+}

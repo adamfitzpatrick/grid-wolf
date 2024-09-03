@@ -13,3 +13,10 @@
 .pnp.*
 
 .vscode
+
+# dotenv values
+.env.local
+
+# CDK
+cdk.out
+.cdk.staging

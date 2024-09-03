@@ -4,19 +4,26 @@
   "bin": "bin/common-infra.js",
   "scripts": {
     "build": "tsc",
-    "watch": "tsc -w",
+    "build:depLayer": "cd lib/dependency-layer/nodejs/node20 && yarn install",
     "test": "jest",
-    "cdk": "cdk"
+    "cdk": "cdk",
+    "deploy": "yarn build && yarn build:depLayer && yarn cdk deploy --require-approval never"
   },
   "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.637.0",
+    "@aws-sdk/util-dynamodb": "^3.637.0",
     "@grid-wolf/constructs": "workspace:^",
-    "aws-cdk-lib": "2.155.0",
-    "constructs": "^10.3.0",
-    "source-map-support": "^0.5.21",
+    "@grid-wolf/library": "workspace:^",
+    "@types/aws-lambda": "^8.10.145",
     "@types/jest": "^29.5.12",
     "@types/node": "20.14.9",
     "aws-cdk": "2.152.0",
+    "aws-cdk-lib": "2.155.0",
+    "aws-xray-sdk": "^3.9.0",
+    "cdk": "^2.155.0",
+    "constructs": "^10.3.0",
     "jest": "^29.7.0",
+    "source-map-support": "^0.5.21",
     "ts-jest": "^29.1.5",
     "ts-node": "^10.9.2",
     "typescript": "~5.5.3"
