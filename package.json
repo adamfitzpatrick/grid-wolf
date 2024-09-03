@@ -4,6 +4,10 @@
   "workspaces": [
     "./packages/**"
   ],
+  "scripts": {
+    "deploy:shared": "yarn workspace @grid-wolf/shared deploy",
+    "deploy:central-infra": "yarn workspace @grid-wolf/central-infra deploy"
+  },
   "dependencies": {
     "@types/jest": "^29.5.12",
     "@types/node": "^22.5.1",

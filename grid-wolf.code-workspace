@@ -9,16 +9,12 @@
             "path": "./packages/docs"
         },
         {
-            "name": "constructs",
-            "path": "./packages/constructs"
+            "name": "shared",
+            "path": "./packages/shared"
         },
         {
-            "name": "library",
-            "path": "./packages/library"
-        },
-        {
-            "name": "common-infra",
-            "path": "./packages/common-infra"
+            "name": "central-infra",
+            "path": "./packages/central-infra"
         }
     ],
     "settings": {

@@ -1,6 +1,0 @@
-{
-  "extends": "../../tsconfig.json",
-  "compilerOptions": {
-    "outDir": "./layer/nodejs/node20/node_modules/@grid-wolf/library"
-  }
-}
