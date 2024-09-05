@@ -48,12 +48,8 @@ describe('CentralInfraStack', () => {
     })
   });
 
-  test('should upload a lambda layer for packaged dependencies', () => {
-    template.hasResourceProperties('AWS::Lambda::LayerVersion', {
-      LayerName: 'tst-grid-wolf-dependency-layer'
-    });
-  });
-
+  /*
+  // TODO move to session package
   test('should create a record handler lambda', () => {
     template.hasResourceProperties('AWS::IAM::Role', {
       RoleName: 'tst-grid-wolf-record-handler-exec-role',
@@ -87,9 +83,9 @@ describe('CentralInfraStack', () => {
         Mode: 'Active'
       },
       Layers: [{
-        Ref: Match.stringLikeRegexp('tstGridWolfDependencyLayer')
+        'Fn::ImportValue': 'tst-grid-wolf-dependency-layer'
       }, {
-        'Fn::ImportValue': 'tst-grid-wolf-library-layer'
+        'Fn::ImportValue': 'tst-grid-wolf-shared-layer'
       }]
     });
   });
@@ -106,4 +102,5 @@ describe('CentralInfraStack', () => {
       }
     });
   });
+  */
 });

@@ -29,6 +29,14 @@ describe('loadEnv utility function', () => {
     });
   });
 
+  test('should load standard environment vars if none are specified', () => {
+    expect(loadEnv()).toEqual({
+      [EnvironmentVariableName.ACCOUNT]: 'account',
+      [EnvironmentVariableName.REGION]: 'region',
+      [EnvironmentVariableName.PREFIX]: 'tst'
+    })
+  });
+
   test('should throw an error if any required environment variable is not available', () => {
     delete process.env[EnvironmentVariableName.ACCOUNT];
     expect(() => loadEnv([EnvironmentVariableName.ACCOUNT]))

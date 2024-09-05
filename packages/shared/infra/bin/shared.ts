@@ -1,15 +1,11 @@
 #!/usr/bin/env node
 import 'source-map-support/register';
 import { App }from 'aws-cdk-lib';
-import { LibraryStack } from '../lib/library-stack';
+import { SharedStack } from '../lib/shared-stack';
 import { loadEnv, EnvironmentVariableName } from '../../utils'
 import { GridWolfStackProps } from '../../constructs/grid-wolf-stack';
 
-const envMap = loadEnv([
-  EnvironmentVariableName.ACCOUNT,
-  EnvironmentVariableName.REGION,
-  EnvironmentVariableName.PREFIX
-]);
+const envMap = loadEnv();
 const app = new App();
 
 const props: GridWolfStackProps = {
@@ -19,4 +15,4 @@ const props: GridWolfStackProps = {
     prefix: envMap[EnvironmentVariableName.PREFIX]
   }
 };
-new LibraryStack(app, 'LibraryStack', props);
+new SharedStack(app, `${props.env.prefix}SharedStack`, props);

@@ -1,15 +1,7 @@
-import { CfnOutput, Fn, RemovalPolicy } from 'aws-cdk-lib';
+import { CfnOutput } from 'aws-cdk-lib';
 import { AttributeType, BillingMode, StreamViewType, Table } from 'aws-cdk-lib/aws-dynamodb';
 import { Construct } from 'constructs';
 import { GridWolfStack, GridWolfStackProps, outputs } from '@grid-wolf/shared/constructs';
-import { Effect, PolicyDocument, PolicyStatement, Role, ServicePrincipal } from 'aws-cdk-lib/aws-iam';
-import { Code, Function as LambdaFunction, LayerVersion, Runtime, StartingPosition, Tracing } from 'aws-cdk-lib/aws-lambda';
-import { resolve } from 'path';
-import { Stream, StreamEncryption, StreamMode } from 'aws-cdk-lib/aws-kinesis';
-import { KinesisEventSource } from 'aws-cdk-lib/aws-lambda-event-sources';
-
-const DEPENDENCY_LAYER_PATH = resolve(__dirname, '../../lib/dependency-layer/');
-const RECORD_HANDLER_PATH = resolve(__dirname, '../../lib/kinesis-record-handler/');
 
 export class CentralInfraStack extends GridWolfStack {
   constructor(scope: Construct, id: string, props: GridWolfStackProps) {
@@ -17,13 +9,13 @@ export class CentralInfraStack extends GridWolfStack {
     super(scope, id, props);
 
     const table = this.createDataTable();
-    const dependencyLayer = this.createDependencyLayer();
-    const recordHandler = this.createRecordHandler(table, dependencyLayer);
-    this.createStream(recordHandler);
+    // TODO move to session package
+    // const recordHandler = this.createRecordHandler(table, dependencyLayer);
+    //this.createStream(recordHandler);
   }
 
   createDataTable() {
-    const table = new Table(this, this.generateId(this.generateId(outputs.DATA_TABLE_NAME)), {
+    const table = new Table(this, this.generateId(outputs.DATA_TABLE_NAME), {
       tableName:this.generateName(outputs.DATA_TABLE_NAME),
       partitionKey: {
         name: 'pk',
@@ -46,19 +38,12 @@ export class CentralInfraStack extends GridWolfStack {
     return table
   }
 
-  createDependencyLayer() {
-    const unique = `${this.appName}-dependency-layer`
-    return new LayerVersion(this, this.generateId(unique), {
-      removalPolicy: RemovalPolicy.DESTROY,
-      layerVersionName: this.generateName(unique),
-      code: Code.fromAsset(DEPENDENCY_LAYER_PATH)
-    });
-  }
-
+  /*
+  // TODO move to session package
   createRecordHandler(table: Table, dependencyLayer: LayerVersion) {
-    const libraryLayerArn = Fn.importValue(this.generateName(outputs.LIBRARY_LAYER_NAME));
-    const libraryLayer = LayerVersion
-      .fromLayerVersionArn(this, this.generateId(outputs.LIBRARY_LAYER_NAME), libraryLayerArn);
+    const sharedLayerArn = Fn.importValue(this.generateName(outputs.SHARED_LAYER_NAME));
+    const sharedLayer = LayerVersion
+      .fromLayerVersionArn(this, this.generateId(outputs.SHARED_LAYER_NAME), sharedLayerArn);
     const handlerUnique = `${this.appName}-record-handler`;
     const loggingPolicy = new PolicyDocument({
       statements: [new PolicyStatement({
@@ -112,7 +97,7 @@ export class CentralInfraStack extends GridWolfStack {
       },
       layers: [
         dependencyLayer,
-        libraryLayer
+        sharedLayer
       ]
     });
     lambda.addPermission(this.generateId(`${handlerUnique}-eventsource-permission`), {
@@ -133,4 +118,5 @@ export class CentralInfraStack extends GridWolfStack {
       startingPosition: StartingPosition.TRIM_HORIZON
     }));
   }
+  */
 }

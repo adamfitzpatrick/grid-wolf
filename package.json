@@ -5,8 +5,10 @@
     "./packages/**"
   ],
   "scripts": {
-    "deploy:shared": "yarn workspace @grid-wolf/shared deploy",
-    "deploy:central-infra": "yarn workspace @grid-wolf/central-infra deploy"
+    "clean": "yarn workspace @grid-wolf/shared clean",
+    "deploy:shared": "yarn clean && yarn workspace @grid-wolf/shared deploy",
+    "deploy:central-infra": "yarn clean && yarn workspace @grid-wolf/central-infra deploy",
+    "deploy:user": "yarn clean && yarn workspace @grid-wolf/user deploy"
   },
   "dependencies": {
     "@types/jest": "^29.5.12",

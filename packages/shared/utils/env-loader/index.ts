@@ -10,19 +10,28 @@ config({
 });
 
 export enum EnvironmentVariableName {
-  ACCOUNT = 'GRID_WOLF_COMMON_TARGET_ACCOUNT_ID',
-  REGION = 'GRID_WOLF_COMMON_TARGET_REGION',
-  PREFIX = 'GRID_WOLF_COMMON_TARGET_ENV_PREFIX'
+  ACCOUNT          = 'GRID_WOLF_COMMON_TARGET_ACCOUNT_ID',
+  REGION           = 'GRID_WOLF_COMMON_TARGET_REGION',
+  PREFIX           = 'GRID_WOLF_COMMON_TARGET_ENV_PREFIX',
+  USER_AUTH_DOMAIN = 'GRID_WOLF_USER_AUTH_DOMAIN'
 }
+
+const standardEnvironmentVars = [
+  EnvironmentVariableName.ACCOUNT,
+  EnvironmentVariableName.REGION,
+  EnvironmentVariableName.PREFIX,
+  EnvironmentVariableName.USER_AUTH_DOMAIN
+]
 
 interface EnvironmentMap {
   [key: string]: string
 }
 
-export function loadEnv(variableName: EnvironmentVariableName[]) {
+export function loadEnv(variableName?: EnvironmentVariableName[]) {
   let envMap: EnvironmentMap = {};
   let errors = [];
-
+  variableName = variableName || standardEnvironmentVars;
+  
   variableName.forEach(envVar => {
     envMap[envVar] = process.env[envVar]!
     if (!envMap[envVar]) { errors.push(envVar) }

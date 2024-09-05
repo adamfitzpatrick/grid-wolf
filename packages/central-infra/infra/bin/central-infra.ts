@@ -5,11 +5,7 @@ import { CentralInfraStack } from '../lib/central-infra-stack';
 import { loadEnv, EnvironmentVariableName } from '@grid-wolf/shared/utils'
 import { GridWolfStackProps } from '@grid-wolf/shared/constructs';
 
-const envMap = loadEnv([
-  EnvironmentVariableName.ACCOUNT,
-  EnvironmentVariableName.REGION,
-  EnvironmentVariableName.PREFIX
-]);
+const envMap = loadEnv();
 const app = new cdk.App();
 
 const props: GridWolfStackProps = {
@@ -19,4 +15,4 @@ const props: GridWolfStackProps = {
     prefix: envMap[EnvironmentVariableName.PREFIX]
   }
 };
-new CentralInfraStack(app, 'CentralInfraStack', props);
+new CentralInfraStack(app, `${props.env.prefix}CentralInfraStack`, props);

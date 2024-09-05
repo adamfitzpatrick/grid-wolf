@@ -4,11 +4,9 @@
   "bin": "bin/central-infra.js",
   "scripts": {
     "build": "tsc",
-    "buildDepLayer": "cd lib/dependency-layer/nodejs/node20 && yarn install",
     "test": "jest",
     "cdk": "cdk",
-    "clean": "rimraf cdk.out",
-    "deploy": "yarn clean && yarn build && yarn buildDepLayer && yarn cdk deploy --require-approval never"
+    "deploy": "yarn build && yarn cdk deploy --require-approval never"
   },
   "dependencies": {
     "@aws-sdk/client-dynamodb": "^3.637.0",
@@ -23,7 +21,6 @@
     "cdk": "^2.155.0",
     "constructs": "^10.3.0",
     "jest": "^29.7.0",
-    "rimraf": "^6.0.1",
     "source-map-support": "^0.5.21",
     "ts-jest": "^29.1.5",
     "ts-node": "^10.9.2",

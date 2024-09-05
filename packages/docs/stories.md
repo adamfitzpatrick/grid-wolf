@@ -14,3 +14,6 @@
 dependency ordering and deploy successfully
 
 ## Bugfix
+- I want to remove the kinesis stream from `central-infra` and only implement as part of `session`
+
+## Maint
