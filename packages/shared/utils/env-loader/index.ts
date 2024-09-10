@@ -13,26 +13,27 @@ export enum EnvironmentVariableName {
   ACCOUNT          = 'GRID_WOLF_COMMON_TARGET_ACCOUNT_ID',
   REGION           = 'GRID_WOLF_COMMON_TARGET_REGION',
   PREFIX           = 'GRID_WOLF_COMMON_TARGET_ENV_PREFIX',
-  USER_AUTH_DOMAIN = 'GRID_WOLF_USER_AUTH_DOMAIN'
+  USER_AUTH_DOMAIN = 'GRID_WOLF_USER_AUTH_DOMAIN',
+  DATA_TABLE_NAME  = 'GRID_WOLF_DYNAMO_DATA_TABLE_NAME',
+  DEFAULT_API_KEY  = 'GRID_WOLF_DEFAULT_API_KEY'
 }
 
 const standardEnvironmentVars = [
   EnvironmentVariableName.ACCOUNT,
   EnvironmentVariableName.REGION,
-  EnvironmentVariableName.PREFIX,
-  EnvironmentVariableName.USER_AUTH_DOMAIN
+  EnvironmentVariableName.PREFIX
 ]
 
 interface EnvironmentMap {
   [key: string]: string
 }
 
-export function loadEnv(variableName?: EnvironmentVariableName[]) {
+export function loadEnv(variableNames?: EnvironmentVariableName[]) {
   let envMap: EnvironmentMap = {};
   let errors = [];
-  variableName = variableName || standardEnvironmentVars;
+  const names = standardEnvironmentVars.concat(variableNames || []);
   
-  variableName.forEach(envVar => {
+  names.forEach(envVar => {
     envMap[envVar] = process.env[envVar]!
     if (!envMap[envVar]) { errors.push(envVar) }
   });

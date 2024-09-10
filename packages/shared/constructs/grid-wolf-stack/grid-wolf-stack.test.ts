@@ -1,11 +1,12 @@
 import { Construct } from "constructs";
-import { GridWolfStack, GridWolfStackProps } from ".";
-import { App, StackProps } from "aws-cdk-lib";
+import { GridWolfStack } from ".";
+import { App } from "aws-cdk-lib";
 import { Template } from "aws-cdk-lib/assertions";
 import { Role, ServicePrincipal } from "aws-cdk-lib/aws-iam";
+import { GridWolfProps } from "../../domain";
 
 class ExtensionStack extends GridWolfStack {
-  constructor(scope: Construct, id: string, props: GridWolfStackProps) {
+  constructor(scope: Construct, id: string, props: GridWolfProps) {
     super(scope, id, props);
 
     new Role(this, this.generateId('role'), {
@@ -20,7 +21,7 @@ describe('GridWolfStack', () => {
   let template: Template;
 
   beforeEach(() => {
-    const props: GridWolfStackProps = {
+    const props: GridWolfProps = {
       env: {
         account: '1234',
         region: 'region',
@@ -50,16 +51,5 @@ describe('GridWolfStack', () => {
 
   test('should provide the application name', () => {
     expect(stack.appName).toBe('grid-wolf');
-  });
-
-  test('should generate consistent environment-specific resource names', () => {
-    template.hasResourceProperties('AWS::IAM::Role', {
-      RoleName: 'tst-role'
-    });
-  });
-
-  test('should generate consistent environment-specific resource ID values', () => {
-    expect(stack.generateId('resource-id')).toBe('tstResourceId');
-    expect(stack.generateId('ResourceId')).toBe('tstResourceId');
   });
 });

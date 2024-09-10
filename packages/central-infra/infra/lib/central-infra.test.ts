@@ -1,10 +1,9 @@
 import { App } from 'aws-cdk-lib';
-import { Match, Template } from 'aws-cdk-lib/assertions';
-import { CentralInfraStack } from './central-infra-stack';
-import { GridWolfStackProps } from '@grid-wolf/shared/constructs';
+import { Template } from 'aws-cdk-lib/assertions';
+import { CentralInfraStack, CentralInfraStackProps } from './central-infra-stack';
 
 describe('CentralInfraStack', () => {
-  let props: GridWolfStackProps;
+  let props: CentralInfraStackProps;
   let template: Template
 
   beforeEach(() => {
@@ -13,7 +12,8 @@ describe('CentralInfraStack', () => {
         account: '1234',
         region: 'us-west-2',
         prefix: 'tst'
-      }
+      },
+      dataTableName: 'table'
     }
     const app = new App();
     const stack = new CentralInfraStack(app, 'testStack', props);
@@ -22,7 +22,7 @@ describe('CentralInfraStack', () => {
 
   test('should create a shared DynamoDB data table', () => {
     template.hasResourceProperties('AWS::DynamoDB::Table', {
-      TableName: `${props.env.prefix}-grid-wolf-data-table`,
+      TableName: `${props.env.prefix}-table`,
       AttributeDefinitions: [{
         AttributeName: 'pk',
         AttributeType: 'S'

@@ -3,9 +3,6 @@ import { loadEnv, EnvironmentVariableName } from '@grid-wolf/shared/utils';
 import { UserStack, UserStackProps } from '../lib/user-stack';
 
 const environmentVars = loadEnv([
-  EnvironmentVariableName.ACCOUNT,
-  EnvironmentVariableName.REGION,
-  EnvironmentVariableName.PREFIX,
   EnvironmentVariableName.USER_AUTH_DOMAIN
 ]);
 

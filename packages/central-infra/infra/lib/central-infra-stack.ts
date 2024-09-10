@@ -3,20 +3,23 @@ import { AttributeType, BillingMode, StreamViewType, Table } from 'aws-cdk-lib/a
 import { Construct } from 'constructs';
 import { GridWolfStack, GridWolfStackProps, outputs } from '@grid-wolf/shared/constructs';
 
+export interface CentralInfraStackProps extends GridWolfStackProps {
+  dataTableName: string;
+}
+
 export class CentralInfraStack extends GridWolfStack {
-  constructor(scope: Construct, id: string, props: GridWolfStackProps) {
-    
+  constructor(scope: Construct, id: string, props: CentralInfraStackProps) {
     super(scope, id, props);
 
-    const table = this.createDataTable();
+    const table = this.createDataTable(props.dataTableName);
     // TODO move to session package
     // const recordHandler = this.createRecordHandler(table, dependencyLayer);
     //this.createStream(recordHandler);
   }
 
-  createDataTable() {
+  createDataTable(dataTableName: string) {
     const table = new Table(this, this.generateId(outputs.DATA_TABLE_NAME), {
-      tableName:this.generateName(outputs.DATA_TABLE_NAME),
+      tableName: this.generateName(dataTableName),
       partitionKey: {
         name: 'pk',
         type: AttributeType.STRING
@@ -32,7 +35,7 @@ export class CentralInfraStack extends GridWolfStack {
     });
 
     new CfnOutput(this, 'DataTableName', {
-      exportName: outputs.DATA_TABLE_NAME,
+      exportName: this.generateName(outputs.DATA_TABLE_NAME),
       value: table.tableName
     });
     return table

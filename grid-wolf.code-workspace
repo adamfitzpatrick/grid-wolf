@@ -16,6 +16,9 @@
             "name": "central-infra",
             "path": "./packages/central-infra"
         }, {
+            "name": "game",
+            "path": "./packages/game"
+        }, {
             "name": "user",
             "path": "./packages/user"
         }, {

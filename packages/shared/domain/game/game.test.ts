@@ -6,14 +6,16 @@ describe('Game utils', () => {
 
   beforeEach(() => {
     dao = {
-      pk: { S: 'game#aaaa' },
-      sk: { S: 'time#1234' },
+      pk: { S: 'user#user' },
+      sk: { S: 'game#aaaa' },
+      userId: { S: 'user'},
       id: { S: 'aaaa'},
       name: { S: 'game' },
       timestamp: { N: '1234' }
     };
     dto = {
       id: 'aaaa',
+      userId: 'user',
       name: 'game',
       timestamp: 1234
     };
