@@ -9,6 +9,6 @@ describe('Landing', () => {
   });
 
   test('should show generated Landing page', () => {
-    expect(screen.getByText('landing')).toBeInTheDocument();
+    expect(screen.getByTitle('Log in')).toBeInTheDocument();
   });
 })
