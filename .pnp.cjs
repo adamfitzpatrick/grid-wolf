@@ -96,6 +96,56 @@ const RAW_RUNTIME_STATE =
         "linkType": "HARD"\
       }]\
     ]],\
+    ["@ant-design/colors", [\
+      ["npm:7.1.0", {\
+        "packageLocation": "./.yarn/cache/@ant-design-colors-npm-7.1.0-58bcca5a08-057fa10e1d.zip/node_modules/@ant-design/colors/",\
+        "packageDependencies": [\
+          ["@ant-design/colors", "npm:7.1.0"],\
+          ["@ctrl/tinycolor", "npm:3.6.1"]\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
+    ["@ant-design/icons", [\
+      ["npm:5.4.0", {\
+        "packageLocation": "./.yarn/cache/@ant-design-icons-npm-5.4.0-9c910f0eae-fcd310c0f9.zip/node_modules/@ant-design/icons/",\
+        "packageDependencies": [\
+          ["@ant-design/icons", "npm:5.4.0"]\
+        ],\
+        "linkType": "SOFT"\
+      }],\
+      ["virtual:6dd2d6e2b6598e245fcf76c1ee18eee46d06812ee73311cb86d279ae5cd7e5f6e13d02320792834cc023b41d7c0f03ba9385a54f91eef0c1066e835d3c0eda7c#npm:5.4.0", {\
+        "packageLocation": "./.yarn/__virtual__/@ant-design-icons-virtual-5b3bb23bbf/0/cache/@ant-design-icons-npm-5.4.0-9c910f0eae-fcd310c0f9.zip/node_modules/@ant-design/icons/",\
+        "packageDependencies": [\
+          ["@ant-design/icons", "virtual:6dd2d6e2b6598e245fcf76c1ee18eee46d06812ee73311cb86d279ae5cd7e5f6e13d02320792834cc023b41d7c0f03ba9385a54f91eef0c1066e835d3c0eda7c#npm:5.4.0"],\
+          ["@ant-design/colors", "npm:7.1.0"],\
+          ["@ant-design/icons-svg", "npm:4.4.2"],\
+          ["@babel/runtime", "npm:7.25.6"],\
+          ["@types/react", "npm:18.3.5"],\
+          ["@types/react-dom", "npm:18.3.0"],\
+          ["classnames", "npm:2.5.1"],\
+          ["rc-util", "virtual:5b3bb23bbfc2ca81e3cdd89d32229cb66c9b3653a7476699caaa9bd51b7b4df0ce0f58b826cf93b6ef9944d6f7d721f6680d5d1647c8a6612df0fd4eae3a4905#npm:5.43.0"],\
+          ["react", "npm:18.3.1"],\
+          ["react-dom", "virtual:6dd2d6e2b6598e245fcf76c1ee18eee46d06812ee73311cb86d279ae5cd7e5f6e13d02320792834cc023b41d7c0f03ba9385a54f91eef0c1066e835d3c0eda7c#npm:18.3.1"]\
+        ],\
+        "packagePeers": [\
+          "@types/react-dom",\
+          "@types/react",\
+          "react-dom",\
+          "react"\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
+    ["@ant-design/icons-svg", [\
+      ["npm:4.4.2", {\
+        "packageLocation": "./.yarn/cache/@ant-design-icons-svg-npm-4.4.2-a4055393f1-d08f051824.zip/node_modules/@ant-design/icons-svg/",\
+        "packageDependencies": [\
+          ["@ant-design/icons-svg", "npm:4.4.2"]\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
     ["@apideck/better-ajv-errors", [\
       ["npm:0.3.6", {\
         "packageLocation": "./.yarn/cache/@apideck-better-ajv-errors-npm-0.3.6-8c1868a017-f89a1e16ec.zip/node_modules/@apideck/better-ajv-errors/",\
@@ -4554,6 +4604,15 @@ const RAW_RUNTIME_STATE =
         "linkType": "HARD"\
       }]\
     ]],\
+    ["@ctrl/tinycolor", [\
+      ["npm:3.6.1", {\
+        "packageLocation": "./.yarn/cache/@ctrl-tinycolor-npm-3.6.1-069c7f7e08-444d81612c.zip/node_modules/@ctrl/tinycolor/",\
+        "packageDependencies": [\
+          ["@ctrl/tinycolor", "npm:3.6.1"]\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
     ["@eslint-community/eslint-utils", [\
       ["npm:4.4.0", {\
         "packageLocation": "./.yarn/cache/@eslint-community-eslint-utils-npm-4.4.0-d1791bd5a3-7e559c4ce5.zip/node_modules/@eslint-community/eslint-utils/",\
@@ -4709,6 +4768,7 @@ const RAW_RUNTIME_STATE =
         "packageLocation": "./packages/user-ui/",\
         "packageDependencies": [\
           ["@grid-wolf/user-ui", "workspace:packages/user-ui"],\
+          ["@ant-design/icons", "virtual:6dd2d6e2b6598e245fcf76c1ee18eee46d06812ee73311cb86d279ae5cd7e5f6e13d02320792834cc023b41d7c0f03ba9385a54f91eef0c1066e835d3c0eda7c#npm:5.4.0"],\
           ["@testing-library/dom", "npm:10.4.0"],\
           ["@testing-library/jest-dom", "npm:6.5.0"],\
           ["@testing-library/react", "virtual:6dd2d6e2b6598e245fcf76c1ee18eee46d06812ee73311cb86d279ae5cd7e5f6e13d02320792834cc023b41d7c0f03ba9385a54f91eef0c1066e835d3c0eda7c#npm:16.0.1"],\
@@ -9153,6 +9213,15 @@ const RAW_RUNTIME_STATE =
         "packageLocation": "./.yarn/cache/cjs-module-lexer-npm-1.4.0-c2c0710dfb-b5ef03e102.zip/node_modules/cjs-module-lexer/",\
         "packageDependencies": [\
           ["cjs-module-lexer", "npm:1.4.0"]\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
+    ["classnames", [\
+      ["npm:2.5.1", {\
+        "packageLocation": "./.yarn/cache/classnames-npm-2.5.1-c7273f3423-afff4f77e6.zip/node_modules/classnames/",\
+        "packageDependencies": [\
+          ["classnames", "npm:2.5.1"]\
         ],\
         "linkType": "HARD"\
       }]\
@@ -18370,6 +18439,34 @@ const RAW_RUNTIME_STATE =
           ["http-errors", "npm:2.0.0"],\
           ["iconv-lite", "npm:0.4.24"],\
           ["unpipe", "npm:1.0.0"]\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
+    ["rc-util", [\
+      ["npm:5.43.0", {\
+        "packageLocation": "./.yarn/cache/rc-util-npm-5.43.0-028e40ee1d-39f7904c98.zip/node_modules/rc-util/",\
+        "packageDependencies": [\
+          ["rc-util", "npm:5.43.0"]\
+        ],\
+        "linkType": "SOFT"\
+      }],\
+      ["virtual:5b3bb23bbfc2ca81e3cdd89d32229cb66c9b3653a7476699caaa9bd51b7b4df0ce0f58b826cf93b6ef9944d6f7d721f6680d5d1647c8a6612df0fd4eae3a4905#npm:5.43.0", {\
+        "packageLocation": "./.yarn/__virtual__/rc-util-virtual-4079895dc3/0/cache/rc-util-npm-5.43.0-028e40ee1d-39f7904c98.zip/node_modules/rc-util/",\
+        "packageDependencies": [\
+          ["rc-util", "virtual:5b3bb23bbfc2ca81e3cdd89d32229cb66c9b3653a7476699caaa9bd51b7b4df0ce0f58b826cf93b6ef9944d6f7d721f6680d5d1647c8a6612df0fd4eae3a4905#npm:5.43.0"],\
+          ["@babel/runtime", "npm:7.25.6"],\
+          ["@types/react", "npm:18.3.5"],\
+          ["@types/react-dom", "npm:18.3.0"],\
+          ["react", "npm:18.3.1"],\
+          ["react-dom", "virtual:6dd2d6e2b6598e245fcf76c1ee18eee46d06812ee73311cb86d279ae5cd7e5f6e13d02320792834cc023b41d7c0f03ba9385a54f91eef0c1066e835d3c0eda7c#npm:18.3.1"],\
+          ["react-is", "npm:18.3.1"]\
+        ],\
+        "packagePeers": [\
+          "@types/react-dom",\
+          "@types/react",\
+          "react-dom",\
+          "react"\
         ],\
         "linkType": "HARD"\
       }]\

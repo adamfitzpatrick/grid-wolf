@@ -1,0 +1,30 @@
+.left-right-template {
+    --header-height: 75px;
+    --sidebar-width: 200px;
+    --main-inset: var(--layout-standard-spacing);
+
+    margin: auto;
+    box-shadow: var(--shadow-heavy-right), var(--shadow-heavy-left);
+    width: var(--layout-standard-width);
+    display: flex;
+    flex-direction: row;
+    flex-flow: wrap;
+    background-color: var(--color-light-grey);
+}
+
+.left-right-template>header {
+    width: var(--layout-standard-width);
+    height: var(--header-height);
+    background-color: var(--color-background);
+    box-shadow: var(--shadow-light-down);
+}
+
+.left-right-template>section {
+    min-width: var(--sidebar-width);
+    height: calc(100vh - var(--header-height));
+}
+
+.left-right-template>main {
+    flex-grow: 1;
+    padding: var(--main-inset);
+}

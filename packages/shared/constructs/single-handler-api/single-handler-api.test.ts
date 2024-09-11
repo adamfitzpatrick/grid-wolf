@@ -46,7 +46,7 @@ describe('SingleHandlerApi construct', () => {
     setLambdaPermissionSpy = jest.fn();
     handlerSpy = jest.fn().mockReturnValue({
       lambda: {
-        functionName: 'function'
+        functionArn: 'function'
       },
       setLambdaPermission: setLambdaPermissionSpy
     });
@@ -115,7 +115,8 @@ describe('SingleHandlerApi construct', () => {
     });
     expect(compileSpy).toHaveBeenCalled();
     expect(evalSpy).toHaveBeenCalledWith({
-      handler: 'function'
+      handler: 'function',
+      region: 'region'
     });
     expect(parseSpy).toHaveBeenCalled();
     expect(setLambdaPermissionSpy).toHaveBeenCalledWith('apigateway.amazonaws.com')

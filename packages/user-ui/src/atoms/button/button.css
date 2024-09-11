@@ -1,0 +1,119 @@
+.button {
+    --font-size: 14px;
+    --font-size-lg: 16px;
+    --font-size-sm: 14px;
+    --base-dim: 32px;
+    --base-dim-lg: 40px;
+    --base-dim-sm: 24px;
+    --padding-vertical: 5px;
+    --padding-vertical-lg: 8px;
+    --padding-vertical-sm: 0;
+    --padding-horizontal: 16px;
+    --padding-horizontal-lg: 16px;
+    --padding-horizontal-sm: 7px;
+    --icon-gap: 6px;
+
+    display: inline-flex;
+    justify-content: center;
+    gap: var(--icon-gap);
+    box-sizing: border-box;
+    box-shadow: rgba(0, 0, 0, 0.02) 0px 2px 0px 0px;
+    border: solid;
+    border-radius: var(--border-radius);
+    border-width: 1px;
+    border-color: var(--color-grey);
+    background-color: var(--color-light);
+    height: var(--base-dim);
+    padding: var(--padding-vertical) var(--padding-horizontal);
+    font-size: var(--font-size);
+    cursor: pointer;
+    line-height: 1.3;
+}
+
+.button:focus-visible {
+    outline-color: var(--color-outline);
+    outline-style: solid;
+    outline-width: 4px;
+}
+
+.button.large {
+    padding: var(--padding-vertical-lg) var(--padding-horizontal-lg);
+    height: var(--base-dim-lg);
+    font-size: var(--font-size-lg);
+    border-radius: var(--border-radius-lg);
+}
+
+.button.small {
+    padding: var(--padding-vertical-sm) var(--padding-horizontal-sm);
+    height: var(--base-dim-sm);
+    border-radius: var(--border-radius-sm);
+    line-height: 1.5;
+}
+
+.button.default:hover {
+    color: var(--color-7);
+    border-color: var(--color-7);
+}
+
+.button.primary {
+    background-color: var(--color-foreground);
+    border-color: var(--color-foreground);
+    color: var(--color-foreground-text);
+}
+
+.button.primary:focus-visible {
+    border-color: var(--color-light);
+}
+
+.button.primary:hover {
+    background-color: var(--color-subtle);
+    border-color: var(--color-subtle);
+}
+
+.button.text {
+    border-color: var(--color-background);
+    box-shadow: none;
+}
+
+.button.text:hover {
+    background-color: var(--color-light-grey);
+}
+
+.button.link {
+    box-shadow: none;
+    border-color: transparent;
+    color: var(--color-bright-text);
+    font-weight: 500;
+}
+
+.button.link:hover {
+    color: var(--color-6);
+}
+
+.button.icon-only {
+    width: var(--base-dim);
+    border-radius: 50%;
+    gap: 0;
+    padding: var(--padding-vertical) 0;
+}
+
+.button.icon-only.large {
+    width: var(--base-dim-lg);
+    padding: var(--padding-vertical-lg) 0;
+}
+
+.button.icon-only.small {
+    width: var(--base-dim-sm);
+    padding: var(--padding-vertical-sm) 0;
+}
+
+.button.disabled, .button.disabled:hover {
+    background-color: transparent;
+    color: var(--color-disabled-fg);
+    cursor: not-allowed;
+}
+
+.button.disabled.primary, .button.disabled.default {
+    background-color: var(--color-disabled-bg);
+    border-color: var(--color-disabled-fg);
+}

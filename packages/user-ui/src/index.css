@@ -1,3 +1,80 @@
+:root {
+  --color-outline: rgb(145, 202, 255);
+
+  --color-volcano-1: rgb(255, 242, 232);
+  --color-volcano-2: rgb(255, 216, 191);
+  --color-volcano-3: rgb(255, 187, 150);
+  --color-volcano-4: rgb(255, 156, 110);
+  --color-volcano-5: rgb(255, 122, 69);
+  --color-volcano-6: rgb(250, 84, 28);
+  --color-volcano-7: rgb(212, 56, 13);
+  --color-volcano-8: rgb(173, 33, 2);
+  --color-volcano-9: rgb(135, 20, 0);
+  --color-volcano-10: rgb(97, 11, 0);
+
+  --color-cyan-1: rgb(230, 255, 251);
+  --color-cyan-2: rgb(181, 245, 236);
+  --color-cyan-3: rgb(135, 232, 222);
+  --color-cyan-4: rgb(92, 219, 211);
+  --color-cyan-5: rgb(54, 207, 201);
+  --color-cyan-6: rgb(19, 194, 194);
+  --color-cyan-7: rgb(8, 151, 156);
+  --color-cyan-8: rgb(0, 109, 117);
+  --color-cyan-9: rgb(0, 71, 79);
+  --color-cyan-10: rgb(0, 35, 41);
+
+  --color-light: rgb(255, 255, 255);
+  --color-dark: rgb(0, 0, 0);
+  --color-dark-grey: rgb(100, 100, 100);
+  --color-grey: rgb(180, 180, 180);
+  --color-light-grey: rgb(235, 235, 235);
+
+  --color-1: var(--color-cyan-1);
+  --color-2: var(--color-cyan-2);
+  --color-3: var(--color-cyan-3);
+  --color-4: var(--color-cyan-4);
+  --color-5: var(--color-cyan-5);
+  --color-6: var(--color-cyan-6);
+  --color-7: var(--color-cyan-7);
+  --color-8: var(--color-cyan-8);
+  --color-9: var(--color-cyan-9);
+  --color-10: var(--color-cyan-10);
+
+  --color-text-1: var(--color-dark);
+  --color-text-2: var(--color-dark);
+  --color-text-3: var(--color-dark);
+  --color-text-4: var(--color-dark);
+  --color-text-5: var(--color-dark);
+  --color-text-6: var(--color-light);
+  --color-text-7: var(--color-light);
+  --color-text-8: var(--color-light);
+  --color-text-9: var(--color-light);
+  --color-text-10: var(--color-light);
+
+  --color-foreground: var(--color-4);
+  --color-foreground-text: var(--color-text-4);
+  --color-background: var(--color-light);
+  --color-text: var(--color-dark);
+  --color-bright-text: var(--color-7);
+  --color-subtle: var(--color-2);
+  --color-disabled-bg: var(--color-light-grey);
+  --color-disabled-fg: var(--color-grey);
+
+  --layout-standard-width: 1440px;
+  --layout-standard-spacing: 16px;
+
+  --shadow-base-offset: 5px;
+  --shadow-heavy: calc(2 * var(--shadow-base-offset));
+  --shadow-color: rgba(0, 0, 0, 0.2);
+  --shadow-light-down: 0 var(--shadow-base-offset) var(--shadow-base-offset) 0 var(--shadow-color);
+  --shadow-heavy-right: var(--shadow-heavy) 0 var(--shadow-heavy) 0 var(--shadow-color);
+  --shadow-heavy-left: calc(-1 * var(--shadow-heavy)) 0 var(--shadow-heavy) 0 var(--shadow-color);
+
+  --border-radius: 5px;
+  --border-radius-lg: 6px;
+  --border-radius-sm: 4px;
+}
+
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
@@ -5,9 +82,11 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background-color: var(--color-grey);
 }
 
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+

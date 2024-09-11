@@ -48,7 +48,9 @@
         "jest.disabledWorkspaceFolders": [
             "grid-wolf",
             "docs"
-        ]
+        ],
+        "emmet.showExpandedAbbreviation": "never",
+        "liveServer.settings.multiRootWorkspaceName": "grid-wolf"
     },
     "extensions": {
         "recommendations": [
