@@ -4,6 +4,7 @@ import { EnvironmentVariableName } from "@grid-wolf/shared/utils";
 import { APIGatewayProxyEvent } from "aws-lambda";
 import { decode, JwtPayload } from 'jsonwebtoken';
 import { captureAWSv3Client } from 'aws-xray-sdk';
+import { CallApiGatewayRestApiEndpointProps } from "aws-cdk-lib/aws-stepfunctions-tasks";
 
 const client = captureAWSv3Client(new DynamoDBClient());
 let TableName: string;
@@ -16,6 +17,7 @@ const parseAuthToken = (event: APIGatewayProxyEvent) => {
 }
 
 const handlePutGameOperation = async (event: APIGatewayProxyEvent) => {
+  console.debug({ operationHandled: 'putGame' });
   const gameDTO = JSON.parse(event.body!) as GameDTO;
   const { username } = parseAuthToken(event);
 
@@ -25,7 +27,7 @@ const handlePutGameOperation = async (event: APIGatewayProxyEvent) => {
     )
     return {
       statusCode: 400,
-      message: 'bad request'
+      body: 'bad request'
     };
   }
   const command = new PutItemCommand({
@@ -34,11 +36,12 @@ const handlePutGameOperation = async (event: APIGatewayProxyEvent) => {
   });
   return client.send(command).then(() => ({
     statusCode: 202,
-    message: 'accepted'
+    body: 'accepted'
   }));
 }
 
 const handleGetGameOperation = async (event: APIGatewayProxyEvent) => {
+  console.debug({ operationHandled: 'getGame' });
   const gameId = event.pathParameters!['gameId'];
   const { username } = parseAuthToken(event);
 
@@ -57,6 +60,7 @@ const handleGetGameOperation = async (event: APIGatewayProxyEvent) => {
 }
 
 const handleGetGamesOperation = async (event: APIGatewayProxyEvent) => {
+  console.debug({ operationHandled: 'getGames' });
   const { username } = parseAuthToken(event);
 
   const command = new QueryCommand({
@@ -74,14 +78,21 @@ const handleGetGamesOperation = async (event: APIGatewayProxyEvent) => {
 }
 
 export async function handler(event: APIGatewayProxyEvent) {
+  console.info(JSON.stringify(event));
+
   TableName = process.env[EnvironmentVariableName.DATA_TABLE_NAME]!;
-  const { path, httpMethod } = event.requestContext;
-  if (path === '/game' && httpMethod === 'PUT') {
-    return handlePutGameOperation(event);
-  } else if (path === '/game' && httpMethod === 'GET') {
-    return handleGetGameOperation(event);
-  } else if (path === '/games' && httpMethod === 'GET') {
-    return handleGetGamesOperation(event);
+  const { resourcePath, httpMethod } = event.requestContext;
+
+  let returnValue: object | null = null;
+  if (resourcePath === '/game' && httpMethod === 'PUT') {
+    returnValue = await handlePutGameOperation(event);
+  } else if (resourcePath === '/game/{gameId}' && httpMethod === 'GET') {
+    returnValue = await handleGetGameOperation(event);
+  } else if (resourcePath === '/games' && httpMethod === 'GET') {
+    returnValue = await handleGetGamesOperation(event);
+  } else {
+    console.error(`No handler to invoke for path ${resourcePath} and method ${httpMethod}`)
   }
-  return null;
+  console.debug({ returnValue })
+  return returnValue;
 }

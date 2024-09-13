@@ -50,8 +50,8 @@ describe('api-handler construct', () => {
           Statement: [{
             Effect: 'Allow',
             Action: [
-              'logs:CreateLogGroups',
-              'logs:CreateLogStreams',
+              'logs:CreateLogGroup',
+              'logs:CreateLogStream',
               'logs:DescribeLogStreams',
               'logs:PutLogEvents'
             ],

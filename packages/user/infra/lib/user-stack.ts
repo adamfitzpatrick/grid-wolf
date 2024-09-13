@@ -1,9 +1,10 @@
-import { GridWolfStack, GridWolfStackProps } from "@grid-wolf/shared/constructs";
+import { GridWolfStack } from "@grid-wolf/shared/constructs";
+import { GridWolfProps } from "@grid-wolf/shared/domain";
 import { Duration } from "aws-cdk-lib";
 import { AccountRecovery, CfnUserPoolUser, OAuthScope, UserPool, UserPoolClient, UserPoolDomain } from "aws-cdk-lib/aws-cognito";
 import { Construct } from "constructs";
 
-export interface UserStackProps extends GridWolfStackProps {
+export interface UserStackProps extends GridWolfProps {
   domain: string;
 }
 

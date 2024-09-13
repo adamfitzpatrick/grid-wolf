@@ -1,7 +1,7 @@
 .header {
     display: flex;
     flex-direction: row;
-    justify-content: end;
+    justify-content: space-between;
     align-items: center;
     height: 100%;
     padding: 0 var(--layout-standard-spacing);

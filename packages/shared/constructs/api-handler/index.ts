@@ -1,7 +1,7 @@
 import { Construct } from "constructs";
 import { Effect, PolicyDocument, PolicyStatement, Role, ServicePrincipal } from "aws-cdk-lib/aws-iam";
-import { Code, Function as LambdaFunction, LayerVersion, Runtime, Tracing } from 'aws-cdk-lib/aws-lambda'
-import { Fn } from "aws-cdk-lib";
+import { Code, Function as LambdaFunction, LayerVersion, LoggingFormat, Runtime, Tracing } from 'aws-cdk-lib/aws-lambda'
+import { Duration, Fn } from "aws-cdk-lib";
 import { outputs } from "..";
 import { EnvironmentVariableName } from "../../utils";
 import { GridWolfConstruct, GridWolfConstructProps } from "../grid-wolf-construct";
@@ -21,8 +21,8 @@ export class ApiHandler extends GridWolfConstruct {
       statements: [new PolicyStatement({
         effect: Effect.ALLOW,
         actions: [
-          'logs:CreateLogGroups',
-          'logs:CreateLogStreams',
+          'logs:CreateLogGroup',
+          'logs:CreateLogStream',
           'logs:DescribeLogStreams',
           'logs:PutLogEvents'
         ],
@@ -67,7 +67,9 @@ export class ApiHandler extends GridWolfConstruct {
         sharedLayer,
         dependencyLayer
       ],
-      role
+      role,
+      timeout: Duration.minutes(1),
+      loggingFormat: LoggingFormat.JSON
     });
   }
 

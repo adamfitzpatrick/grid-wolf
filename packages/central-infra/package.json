@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "bin": "bin/central-infra.js",
   "scripts": {
-    "build": "&& tsc",
+    "build": "tsc",
     "test": "jest",
     "cdk": "cdk",
     "deploy": "yarn build && yarn cdk deploy --require-approval never"

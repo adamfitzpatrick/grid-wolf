@@ -27,6 +27,10 @@ const RAW_RUNTIME_STATE =
       "reference": "workspace:packages/shared"\
     },\
     {\
+      "name": "node20-840e81",\
+      "reference": "workspace:packages/shared/cdk.out/asset.6ef80870bc7b6a4403e2ee42622d5ae5c681d8d8cf773bfc8c9205844315885c/nodejs/node20"\
+    },\
+    {\
       "name": "node20-913ef5",\
       "reference": "workspace:packages/shared/dependencies/nodejs/node20"\
     },\
@@ -48,6 +52,7 @@ const RAW_RUNTIME_STATE =
     ["@grid-wolf/user", ["workspace:packages/user"]],\
     ["@grid-wolf/user-ui", ["workspace:packages/user-ui"]],\
     ["grid-wolf", ["workspace:."]],\
+    ["node20-840e81", ["workspace:packages/shared/cdk.out/asset.6ef80870bc7b6a4403e2ee42622d5ae5c681d8d8cf773bfc8c9205844315885c/nodejs/node20"]],\
     ["node20-913ef5", ["workspace:packages/shared/dependencies/nodejs/node20"]]\
   ],\
   "fallbackPool": [\
@@ -15819,12 +15824,24 @@ const RAW_RUNTIME_STATE =
         "linkType": "HARD"\
       }]\
     ]],\
+    ["node20-840e81", [\
+      ["workspace:packages/shared/cdk.out/asset.6ef80870bc7b6a4403e2ee42622d5ae5c681d8d8cf773bfc8c9205844315885c/nodejs/node20", {\
+        "packageLocation": "./packages/shared/cdk.out/asset.6ef80870bc7b6a4403e2ee42622d5ae5c681d8d8cf773bfc8c9205844315885c/nodejs/node20/",\
+        "packageDependencies": [\
+          ["node20-840e81", "workspace:packages/shared/cdk.out/asset.6ef80870bc7b6a4403e2ee42622d5ae5c681d8d8cf773bfc8c9205844315885c/nodejs/node20"],\
+          ["aws-xray-sdk", "npm:3.9.0"],\
+          ["dotenv", "npm:16.4.5"]\
+        ],\
+        "linkType": "SOFT"\
+      }]\
+    ]],\
     ["node20-913ef5", [\
       ["workspace:packages/shared/dependencies/nodejs/node20", {\
         "packageLocation": "./packages/shared/dependencies/nodejs/node20/",\
         "packageDependencies": [\
           ["node20-913ef5", "workspace:packages/shared/dependencies/nodejs/node20"],\
-          ["aws-xray-sdk", "npm:3.9.0"]\
+          ["aws-xray-sdk", "npm:3.9.0"],\
+          ["dotenv", "npm:16.4.5"]\
         ],\
         "linkType": "SOFT"\
       }]\

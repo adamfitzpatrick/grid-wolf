@@ -3,12 +3,12 @@ import 'source-map-support/register';
 import { App }from 'aws-cdk-lib';
 import { SharedStack } from '../lib/shared-stack';
 import { loadEnv, EnvironmentVariableName } from '../../utils'
-import { CdkProps } from '../../constructs/grid-wolf-stack';
+import { GridWolfProps } from '../../domain/';
 
 const envMap = loadEnv();
 const app = new App();
 
-const props: CdkProps = {
+const props: GridWolfProps = {
   env: {
     account: envMap[EnvironmentVariableName.ACCOUNT],
     region: envMap[EnvironmentVariableName.REGION],

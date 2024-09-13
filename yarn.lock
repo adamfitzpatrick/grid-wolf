@@ -12190,11 +12190,21 @@ __metadata:
   languageName: node
   linkType: hard
 
+"node20-840e81@workspace:packages/shared/cdk.out/asset.6ef80870bc7b6a4403e2ee42622d5ae5c681d8d8cf773bfc8c9205844315885c/nodejs/node20":
+  version: 0.0.0-use.local
+  resolution: "node20-840e81@workspace:packages/shared/cdk.out/asset.6ef80870bc7b6a4403e2ee42622d5ae5c681d8d8cf773bfc8c9205844315885c/nodejs/node20"
+  dependencies:
+    aws-xray-sdk: "npm:^3.9.0"
+    dotenv: "npm:^16.4.5"
+  languageName: unknown
+  linkType: soft
+
 "node20-913ef5@workspace:packages/shared/dependencies/nodejs/node20":
   version: 0.0.0-use.local
   resolution: "node20-913ef5@workspace:packages/shared/dependencies/nodejs/node20"
   dependencies:
     aws-xray-sdk: "npm:^3.9.0"
+    dotenv: "npm:^16.4.5"
   languageName: unknown
   linkType: soft
 

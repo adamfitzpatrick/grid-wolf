@@ -15,7 +15,7 @@ jest.mock('aws-xray-sdk', () => {
 });
 jest.mock('jsonwebtoken', () => {
   return {
-    decode: (token: string) => ({ username: 'user' })
+    decode: () => ({ username: 'user' })
   }
 })
 jest.mock('@aws-sdk/client-dynamodb', () => {
@@ -68,8 +68,8 @@ describe('game handler', () => {
     event = {
       body: JSON.stringify(gameDTO),
       requestContext: {
-        httpMethod: 'GET',
-        path: '/game'
+        httpMethod: 'PUT',
+        resourcePath: '/game'
       },
       headers: {
         Authorization
@@ -82,10 +82,9 @@ describe('game handler', () => {
   });
 
   test('/game PUT should save game data to dynamodb', async () => {
-    event.requestContext.httpMethod = 'PUT';
     await expect(handler(event)).resolves.toEqual({
       statusCode: 202,
-      message: 'accepted'
+      body: 'accepted'
     });
     expect(putCommandSpy).toHaveBeenCalledWith({
       TableName: 'table',
@@ -95,13 +94,12 @@ describe('game handler', () => {
   });
 
   test('/game PUT should return 401 if Authorized user does not match request body user', async () => {
-    event.requestContext.httpMethod = 'PUT';
     gameDTO.userId = 'otherperson';
     event.body = JSON.stringify(gameDTO);
 
     expect(await handler(event)).toEqual({
       statusCode: 400,
-      message: 'bad request'
+      body: 'bad request'
     });
 
     expect(putCommandSpy).not.toHaveBeenCalled();
@@ -109,6 +107,8 @@ describe('game handler', () => {
   });
 
   test('/game/{gameId} GET should return data obtained from dynamodb', async () => {
+    event.requestContext.httpMethod = 'GET';
+    event.requestContext.resourcePath = '/game/{gameId}';
     event.pathParameters = {
       gameId: 'id'
     };
@@ -130,7 +130,7 @@ describe('game handler', () => {
   });
 
   test('/games GET should return a list of game data for the user', async () => {
-    event.requestContext.path = '/games'
+    event.requestContext.resourcePath = '/games'
     event.requestContext.httpMethod = 'GET'
     sendSpy.mockReturnValue({ Items: [ gameDAO ] });
 

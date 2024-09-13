@@ -4,9 +4,10 @@ import { GridWolfConstruct } from "../grid-wolf-construct";
 import * as fs from 'fs';
 import { compile } from 'handlebars';
 import { parse } from 'yaml';
-import { ApiDefinition, ApiKey, Deployment, EndpointType, SpecRestApi, Stage, UsagePlan } from "aws-cdk-lib/aws-apigateway";
+import { AccessLogFormat, ApiDefinition, ApiKey, Deployment, EndpointType, LogGroupLogDestination, MethodLoggingLevel, SpecRestApi, Stage, UsagePlan } from "aws-cdk-lib/aws-apigateway";
 import { CfnOutput } from "aws-cdk-lib";
 import { outputs } from "..";
+import { LogGroup } from "aws-cdk-lib/aws-logs";
 
 export interface SingleHandlerApiProps extends ApiHandlerProps {
   apiSpecPath: string;
@@ -44,9 +45,15 @@ export class SingleHandlerApi extends GridWolfConstruct {
     const deployment = new Deployment(this, 'deployment', {
       api
     });
+
+    const accessLogGroup = new LogGroup(this, this.generateId('access-log-group'), {});
     const stage = new Stage(this, 'stage', {
+      accessLogDestination: new LogGroupLogDestination(accessLogGroup),
+      accessLogFormat: AccessLogFormat.jsonWithStandardFields(),
+      loggingLevel: MethodLoggingLevel.INFO,
       deployment,
-      stageName: props.env.prefix
+      stageName: props.env.prefix,
+      tracingEnabled: true
     });
 
     const defaultApiKey = new ApiKey(this, 'default-api-key', {

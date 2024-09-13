@@ -1,9 +1,10 @@
 import { CfnOutput } from 'aws-cdk-lib';
 import { AttributeType, BillingMode, StreamViewType, Table } from 'aws-cdk-lib/aws-dynamodb';
 import { Construct } from 'constructs';
-import { GridWolfStack, GridWolfStackProps, outputs } from '@grid-wolf/shared/constructs';
+import { GridWolfStack, outputs } from '@grid-wolf/shared/constructs';
+import { GridWolfProps } from '@grid-wolf/shared/domain';
 
-export interface CentralInfraStackProps extends GridWolfStackProps {
+export interface CentralInfraStackProps extends GridWolfProps {
   dataTableName: string;
 }
 

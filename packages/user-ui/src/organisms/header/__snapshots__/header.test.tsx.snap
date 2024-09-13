@@ -5,6 +5,33 @@ exports[`Header should contain the account menu button 1`] = `
   <div
     class="header"
   >
+    <svg
+      class="logo"
+      version="1.1"
+      viewBox="0 0 17.8 20.8"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <g
+        id="logo"
+        transform="translate(0,0)"
+      >
+        <path
+          d="M 0.3 5.3 l 8.66 -5 l 8.66 5 v 10 l -8.66 5 l -8.66 -5 v -10 z"
+          fill="none"
+          id="vert-hex"
+          stroke="#5cdbd3"
+          stroke-width="0.5"
+        />
+        <text
+          fill="#722ed1"
+          transform="scale(0.6)"
+          x="2"
+          y="22.5"
+        >
+          GW
+        </text>
+      </g>
+    </svg>
     <div
       class="account-menu"
     >

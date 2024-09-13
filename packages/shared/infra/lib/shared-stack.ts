@@ -1,4 +1,5 @@
-import { GridWolfStack, GridWolfStackProps, outputs } from "@grid-wolf/shared/constructs";
+import { GridWolfStack, outputs } from "@grid-wolf/shared/constructs";
+import { GridWolfProps } from "../../domain";
 import { CfnOutput, RemovalPolicy } from "aws-cdk-lib";
 import { Code, LayerVersion } from "aws-cdk-lib/aws-lambda";
 import { Construct } from "constructs";
@@ -8,7 +9,7 @@ const DEPENDENCY_LAYER_PATH = resolve(__dirname, '../../dependencies/');
 const SHARED_LAYER_PATH = resolve(__dirname, '../../layer/');
 
 export class SharedStack extends GridWolfStack {
-  constructor(scope: Construct, id: string, props: GridWolfStackProps) {
+  constructor(scope: Construct, id: string, props: GridWolfProps) {
     super(scope, id, props);
 
     const dependencyLayer = new LayerVersion(this, this.generateId(outputs.DEPENDENCY_LAYER_NAME), {

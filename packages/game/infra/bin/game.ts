@@ -2,8 +2,7 @@
 import 'source-map-support/register';
 import * as cdk from 'aws-cdk-lib';
 import { GameStack, GameStackProps } from '../lib/game-stack';
-import { loadEnv, EnvironmentVariableName } from '@grid-wolf/shared/utils'
-import { GridWolfProps } from '@grid-wolf/shared/domain';
+import { loadEnv, EnvironmentVariableName } from '@grid-wolf/shared/utils';
 
 const envMap = loadEnv([
   EnvironmentVariableName.DATA_TABLE_NAME,
@@ -20,4 +19,4 @@ const props: GameStackProps = {
   dataTableName: process.env[EnvironmentVariableName.DATA_TABLE_NAME]!,
   defaultApiKey: process.env[EnvironmentVariableName.DEFAULT_API_KEY]!
 };
-new GameStack(app, `${props.env.prefix}CentralInfraStack`, props);
+new GameStack(app, `${props.env.prefix}GameStack`, props);

@@ -1,10 +1,10 @@
-import { GridWolfStackProps } from "@grid-wolf/shared/constructs";
+import { GridWolfProps } from "@grid-wolf/shared/domain";
 import { SharedStack } from "./shared-stack";
 import { Template } from "aws-cdk-lib/assertions";
 import { App } from "aws-cdk-lib";
 
 describe('SharedStack', () => {
-  let props: GridWolfStackProps;
+  let props: GridWolfProps;
   let template: Template;
 
   beforeEach(() => {
