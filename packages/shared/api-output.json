@@ -1,1 +1,1 @@
-{"openapi":"3.0.0"}
+{"openapi":"3.0.0","paths":{"/resource":{"get":{"x-amazon-apigateway-authorizer":{"type":"cognito_user_pools","identitySource":"Authorization","providerArns":["arn"]}}}}}

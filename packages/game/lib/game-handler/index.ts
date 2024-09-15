@@ -53,6 +53,12 @@ const handleGetGameOperation = async (event: APIGatewayProxyEvent) => {
     }
   });
   const response = await client.send(command);
+  if (!response.Item) {
+    return {
+      statusCode: 403,
+      body: 'forbidden'
+    }
+  }
   return {
     statusCode: 200,
     body: JSON.stringify(marshallToDTO(response.Item as any as GameDAO))

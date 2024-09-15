@@ -1,6 +1,6 @@
-import { GridWolfStack } from "@grid-wolf/shared/constructs";
+import { GridWolfStack, outputs } from "@grid-wolf/shared/constructs";
 import { GridWolfProps } from "@grid-wolf/shared/domain";
-import { Duration } from "aws-cdk-lib";
+import { CfnOutput, Duration } from "aws-cdk-lib";
 import { AccountRecovery, CfnUserPoolUser, OAuthScope, UserPool, UserPoolClient, UserPoolDomain } from "aws-cdk-lib/aws-cognito";
 import { Construct } from "constructs";
 
@@ -53,6 +53,11 @@ export class UserStack extends GridWolfStack {
       cognitoDomain: {
         domainPrefix: this.generateName('grid-wolf-stepinto')
       }
+    });
+
+    new CfnOutput(this, this.generateId(unique('arn-output')), {
+      exportName: this.generateName(outputs.USER_POOL_ARN),
+      value: userPool.userPoolArn
     });
   }
 }

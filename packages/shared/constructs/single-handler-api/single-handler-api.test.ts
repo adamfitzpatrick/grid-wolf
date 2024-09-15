@@ -1,11 +1,25 @@
-import { Template } from "aws-cdk-lib/assertions";
+import { Match, Template } from "aws-cdk-lib/assertions";
 import { SingleHandlerApi, SingleHandlerApiProps } from ".";
 import { App, Stack } from "aws-cdk-lib";
 import { Construct } from "constructs";
 import { ApiHandlerProps } from "../api-handler";
 import { AssetCode, Code } from "aws-cdk-lib/aws-lambda";
-import fs, { read } from 'fs';
+import fs from 'fs';
 
+const apiSpec = {
+  openapi: '3.0.0',
+  paths: {
+    '/resource': {
+      get: {
+        'x-amazon-apigateway-authorizer': {
+          type: 'cognito_user_pools',
+          identitySource: 'Authorization',
+          providerArns: [ 'arn' ]
+        }
+      }
+    }
+  }
+}
 let handlerSpy: jest.Mock;
 jest.mock('../api-handler', () => {
   return {
@@ -52,7 +66,7 @@ describe('SingleHandlerApi construct', () => {
     });
     evalSpy = jest.fn().mockReturnValue('')
     compileSpy = jest.fn().mockReturnValue(evalSpy);
-    parseSpy = jest.fn().mockReturnValue({ openapi: '3.0.0' });
+    parseSpy = jest.fn().mockReturnValue(apiSpec);
     jest.spyOn(Code, 'fromAsset').mockReturnValue(Code.fromInline('code') as any as AssetCode);
     readFileSpy = jest.spyOn(fs, 'readFileSync').mockReturnValue('');
 
@@ -63,9 +77,10 @@ describe('SingleHandlerApi construct', () => {
         prefix: 'tst'
       },
       dataTableName: 'table',
-      constructName: 'handler',
+      constructName: 'api',
       handlerPath: 'path',
       apiSpecPath: 'path',
+      authArnTemplateKey: 'authArn',
       handlerTemplateKey: 'handler',
       defaultApiKey: 'key',
     };
@@ -85,7 +100,7 @@ describe('SingleHandlerApi construct', () => {
 
   test('should create a rest API', () => {
     template.hasResourceProperties('AWS::ApiGateway::RestApi', {
-      Body: { openapi: '3.0.0' }
+      Body: apiSpec
     });
     template.hasResourceProperties('AWS::ApiGateway::ApiKey', {
       Value: 'key'
@@ -115,6 +130,7 @@ describe('SingleHandlerApi construct', () => {
     });
     expect(compileSpy).toHaveBeenCalled();
     expect(evalSpy).toHaveBeenCalledWith({
+      authArn: expect.anything(),
       handler: 'function',
       region: 'region'
     });

@@ -4,14 +4,16 @@ import { GridWolfConstruct } from "../grid-wolf-construct";
 import * as fs from 'fs';
 import { compile } from 'handlebars';
 import { parse } from 'yaml';
-import { AccessLogFormat, ApiDefinition, ApiKey, Deployment, EndpointType, LogGroupLogDestination, MethodLoggingLevel, SpecRestApi, Stage, UsagePlan } from "aws-cdk-lib/aws-apigateway";
-import { CfnOutput } from "aws-cdk-lib";
+import { AccessLogFormat, ApiDefinition, ApiKey, CognitoUserPoolsAuthorizer, Deployment, EndpointType, LogGroupLogDestination, MethodLoggingLevel, SpecRestApi, Stage, UsagePlan } from "aws-cdk-lib/aws-apigateway";
+import { CfnOutput, Duration, Fn } from "aws-cdk-lib";
 import { outputs } from "..";
 import { LogGroup } from "aws-cdk-lib/aws-logs";
+import { UserPool } from "aws-cdk-lib/aws-cognito";
 
 export interface SingleHandlerApiProps extends ApiHandlerProps {
   apiSpecPath: string;
   handlerTemplateKey: string;
+  authArnTemplateKey: string;
   defaultApiKey: string;
 }
 
@@ -25,8 +27,10 @@ export class SingleHandlerApi extends GridWolfConstruct {
   }
 
   createApi(props: SingleHandlerApiProps, apiHandler: ApiHandler) {
+    const userPoolArn = Fn.importValue(this.generateEnvGeneralName(outputs.USER_POOL_ARN));
     const specTemplate = compile(fs.readFileSync(props.apiSpecPath, { encoding: 'utf-8'}));
     const apiDefinition = parse(specTemplate({
+      [props.authArnTemplateKey]: userPoolArn,
       [props.handlerTemplateKey]: apiHandler.lambda.functionArn,
       region: props.env.region
     }));
@@ -56,7 +60,7 @@ export class SingleHandlerApi extends GridWolfConstruct {
       tracingEnabled: true
     });
 
-    const defaultApiKey = new ApiKey(this, 'default-api-key', {
+    const defaultApiKey = new ApiKey(this, this.generateId('default-api-key'), {
       apiKeyName: 'default-api-key',
       description: 'Highly-rate-limited key useful for manual testing and development',
       value: props.defaultApiKey
@@ -66,7 +70,7 @@ export class SingleHandlerApi extends GridWolfConstruct {
       value: props.defaultApiKey
     });
 
-    const defaultUsagePlan = new UsagePlan(this, 'default-usage-plan', {
+    const defaultUsagePlan = new UsagePlan(this, this.generateId('default-usage-plan'), {
       name: 'default-usage-plan',
       throttle: {
         burstLimit: 10,
@@ -74,6 +78,15 @@ export class SingleHandlerApi extends GridWolfConstruct {
       }
     });
     defaultUsagePlan.addApiKey(defaultApiKey);
-    defaultUsagePlan.addApiStage({stage})
+    defaultUsagePlan.addApiStage({stage});
+
+    /*new CognitoUserPoolsAuthorizer(this, this.generateId('authorizer'), {
+      cognitoUserPools: [
+        UserPool.fromUserPoolArn(this, this.generateEnvGeneralName('user-pool'), userPoolArn)
+      ],
+      authorizerName: this.generateName('authorizer'),
+      identitySource: 'Authorization',
+      resultsCacheTtl: Duration.seconds(300)
+    });*/
   }
 }

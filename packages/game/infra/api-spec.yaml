@@ -5,7 +5,9 @@ info:
     This API provides endpoints for updating game data for users of grid-wolf.
   version: 0.1.0
 security: 
-  - api_key: []
+  - apiKey: []
+  - cognitoPool:
+    - openid
 paths:
   '/game':
     put:
@@ -43,8 +45,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiResponse'
-      security:
-        - api_key: []
       x-amazon-apigateway-integration:
         type: aws_proxy
         uri: arn:aws:apigateway:{{region}}:lambda:path/2015-03-31/functions/{{handler}}/invocations
@@ -60,8 +60,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiResponse'
-      security:
-        - api_key: []
       x-amazon-apigateway-integration:
         type: aws_proxy
         uri: arn:aws:apigateway:{{region}}:lambda:path/2015-03-31/functions/{{handler}}/invocations
@@ -98,7 +96,18 @@ components:
           schema:
             $ref: '#/components/schemas/Game'
   securitySchemes:
-    api_key:
+    apiKey:
       type: apiKey
       name: x-api-key
       in: header
+    cognitoPool:
+      type: apiKey
+      name: Authorization
+      in: header
+      x-amazon-apigateway-authtype: cognito_user_pools
+      x-amazon-apigateway-authorizer:
+        type: cognito_user_pools
+        identitySource: Authorization
+        authorizerResultTtlInSeconds: 300
+        providerARNs:
+          - {{authArn}}

@@ -21,6 +21,7 @@ export class GameStack extends GridWolfStack {
       constructName: 'game',
       apiSpecPath: SPEC_PATH,
       handlerPath: HANDLER_PATH,
+      authArnTemplateKey: 'authArn',
       handlerTemplateKey: 'handler',
       defaultApiKey: props.defaultApiKey
     })

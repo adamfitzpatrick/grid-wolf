@@ -129,6 +129,20 @@ describe('game handler', () => {
     expect(sendSpy).toHaveBeenCalledWith({});
   });
 
+  test('/game/{gameId} GET should return 403 error when game not found', async () => {
+    event.requestContext.httpMethod = 'GET';
+    event.requestContext.resourcePath = '/game/{gameId}';
+    event.pathParameters = {
+      gameId: 'id'
+    };
+    sendSpy.mockReturnValue({});
+
+    await expect(handler(event)).resolves.toEqual({
+      statusCode: 403,
+      body: 'forbidden'
+    })
+  });
+
   test('/games GET should return a list of game data for the user', async () => {
     event.requestContext.resourcePath = '/games'
     event.requestContext.httpMethod = 'GET'
