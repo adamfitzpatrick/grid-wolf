@@ -1,6 +1,9 @@
 {
   "name": "@grid-wolf/map",
   "packageManager": "yarn@4.4.1",
+  "scripts": {
+    "test": "yarn jest"
+  },
   "dependencies": {
     "@grid-wolf/shared": "workspace:^",
     "@types/aws-lambda": "^8.10.145",

@@ -1,7 +1,5 @@
 import { handler } from '.';
-import { DynamodbSpies, EnvironmentVariableName } from '@grid-wolf/shared/utils';
-
-const dynamoSpies = new DynamodbSpies();
+import { EnvironmentVariableName } from '@grid-wolf/shared/utils';
 
 describe('map handler', () => {
   let oldConsole: Console;

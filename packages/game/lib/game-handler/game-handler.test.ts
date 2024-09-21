@@ -1,15 +1,33 @@
 import { APIGatewayProxyEvent } from "aws-lambda";
-import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { handler } from ".";
-import { GameDTO } from "@grid-wolf/shared/domain";
-import { EnvironmentVariableName, DynamodbSpies } from "@grid-wolf/shared/utils";
-import { AttributeValue } from "@aws-sdk/client-dynamodb";
+import { GameDAO, GameDTO } from "@grid-wolf/shared/domain";
+import { EnvironmentVariableName } from "@grid-wolf/shared/utils";
 
-const dynamoSpies = new DynamodbSpies();
+let sendSpy: jest.Mock;
+let putCommandSpy: jest.Mock;
+let getCommandSpy: jest.Mock;
+let queryCommandSpy: jest.Mock;
 
+jest.mock('aws-xray-sdk', () => {
+  return {
+    captureAWSv3Client: (client: any) => client
+  };
+});
 jest.mock('jsonwebtoken', () => {
   return {
     decode: () => ({ username: 'user' })
+  };
+})
+jest.mock('@aws-sdk/client-dynamodb', () => {
+  return {
+    PutItemCommand: function (params: any) { return putCommandSpy(params); },
+    GetItemCommand: function (params: any) { return getCommandSpy(params); },
+    QueryCommand: function (params: any) { return queryCommandSpy(params); },
+    DynamoDBClient: function () {
+      return {
+        send: (command: any) => sendSpy(command)
+      }
+    },
   }
 });
 
@@ -17,7 +35,7 @@ describe('game handler', () => {
   let oldConsole: Console;
   let Authorization: string;
   let gameDTO: GameDTO;
-  let gameDAO: Record<string, AttributeValue>;
+  let gameDAO: GameDAO;
   let event: APIGatewayProxyEvent;
 
   beforeAll(() => {
@@ -28,6 +46,11 @@ describe('game handler', () => {
   });
 
   beforeEach(() => {
+    sendSpy = jest.fn().mockResolvedValue({});
+    putCommandSpy = jest.fn().mockReturnValue({});
+    getCommandSpy = jest.fn().mockReturnValue({});
+    queryCommandSpy = jest.fn().mockReturnValue({});
+    
     process.env[EnvironmentVariableName.DATA_TABLE_NAME] = 'table';
     Authorization = `Bearer TOKEN`;
     gameDTO = {
@@ -35,10 +58,10 @@ describe('game handler', () => {
       userId: 'user',
       name: 'name',
       timestamp: 1234
-    }
+    };
     gameDAO = {
-      pk: { S: 'user#user' },
-      sk: { S: 'game#id' },
+      pk: { S: 'user#user'},
+      sk: { S: 'game#id'},
       id: { S: 'id' },
       userId: { S: 'user' },
       name: { S: 'name' },
@@ -67,11 +90,11 @@ describe('game handler', () => {
       statusCode: 202,
       body: 'accepted'
     });
-    expect(dynamoSpies.putCommand).toHaveBeenCalledWith({
+    expect(putCommandSpy).toHaveBeenCalledWith({
       TableName: 'table',
       Item: gameDAO
     });
-    expect(dynamoSpies.send).toHaveBeenCalledWith({});
+    expect(sendSpy).toHaveBeenCalledWith({});
   });
 
   test('/game PUT should return 401 if Authorized user does not match request body user', async () => {
@@ -83,8 +106,8 @@ describe('game handler', () => {
       body: 'bad request'
     });
 
-    expect(dynamoSpies.putCommand).not.toHaveBeenCalled();
-    expect(dynamoSpies.send).not.toHaveBeenCalled();
+    expect(putCommandSpy).not.toHaveBeenCalled();
+    expect(sendSpy).not.toHaveBeenCalled();
   });
 
   test('/game/{gameId} GET should return data obtained from dynamodb', async () => {
@@ -93,21 +116,21 @@ describe('game handler', () => {
     event.pathParameters = {
       gameId: 'id'
     };
-    dynamoSpies.send.mockReturnValue({ Item: gameDAO });
+    sendSpy.mockReturnValue({ Item: gameDAO });
 
     await expect(handler(event)).resolves.toEqual({
       statusCode: 200,
       body: JSON.stringify(gameDTO)
     });
 
-    expect(dynamoSpies.getCommand).toHaveBeenCalledWith({
+    expect(getCommandSpy).toHaveBeenCalledWith({
       TableName: 'table',
       Key: {
         pk: { S: 'user#user' },
-        sk: { S: 'game#id' }
+        sk: { S: 'game#id'}
       }
     });
-    expect(dynamoSpies.send).toHaveBeenCalledWith({});
+    expect(sendSpy).toHaveBeenCalledWith({});
   });
 
   test('/game/{gameId} GET should return 403 error when game not found', async () => {
@@ -116,7 +139,7 @@ describe('game handler', () => {
     event.pathParameters = {
       gameId: 'id'
     };
-    dynamoSpies.send.mockReturnValue({});
+    sendSpy.mockReturnValue({});
 
     await expect(handler(event)).resolves.toEqual({
       statusCode: 403,
@@ -127,19 +150,19 @@ describe('game handler', () => {
   test('/games GET should return a list of game data for the user', async () => {
     event.requestContext.resourcePath = '/games'
     event.requestContext.httpMethod = 'GET'
-    dynamoSpies.send.mockReturnValue({ Items: [gameDAO] });
+    sendSpy.mockReturnValue({ Items: [ gameDAO ] });
 
     await expect(handler(event)).resolves.toEqual({
       statusCode: 200,
-      body: JSON.stringify([gameDTO])
+      body: JSON.stringify([ gameDTO ])
     });
-    expect(dynamoSpies.queryCommand).toHaveBeenCalledWith({
+    expect(queryCommandSpy).toHaveBeenCalledWith({
       TableName: 'table',
       ExpressionAttributeValues: {
         ':pk': { S: 'user#user' }
       },
       KeyConditionExpression: 'pk = :pk'
     });
-    expect(dynamoSpies.send).toHaveBeenCalledWith({})
+    expect(sendSpy).toHaveBeenCalledWith({})
   });
 });
