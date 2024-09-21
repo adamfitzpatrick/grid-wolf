@@ -1,20 +1,22 @@
 openapi: 3.0.0
 info:
-  title: Game data API for grid-wolf
+  title: Map data API for grid-wolf
   description: |-
-    This API provides endpoints for updating game data for users of grid-wolf.
+    This API provides endpoints for updating and retrieving map data for users of grid-wolf.
   version: 0.1.0
 security: 
   - apiKey: []
   - cognitoPool:
     - openid
+x-amazon-binary-media-types:
+  - multipart/form-data
 paths:
-  '/game':
+  /map:
     put:
-      description: Upload a new or replacement game entry
-      operationId: putGame
+      description: Upload a new or replacement map data entry
+      operationId: putMap
       requestBody: 
-        $ref: '#/components/requestBodies/PutGameRequest'
+        $ref: '#/components/requestBodies/PutMapRequest'
       responses:
         '200':
           description: Successful operation
@@ -28,13 +30,43 @@ paths:
         type: aws_proxy
         uri: arn:aws:apigateway:{{region}}:lambda:path/2015-03-31/functions/{{handler}}/invocations
         httpMethod: POST
-  '/game/{gameId}':
+  /map/image/{filename}:
+    put:
+      description: Upload a new or replacement map image to associate with map data
+      operationId: putMapImage
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        '400':
+          description: Bad request
+      x-amazon-apigateway-integration:
+        type: aws_proxy
+        uri: arn:aws:apigateway:{{region}}:lambda:path/2015-03-31/functions/{{handler}}/invocations
+        httpMethod: POST
+        requestTemplates:
+          multipart/form-data: >
+            #set($authorizationHeader = $input.params().header.Authorization)\n
+            {\n
+              "body": $input.json('$'),\n
+              "headers": {\n
+                "Authorization": "$authorizationHeader"\n
+              },\n
+              "context" : {\n
+                "httpMethod" : "$context.httpMethod",\n
+                "resourcePath" : "$context.resourcePath"\n
+              }\n
+            }
+  /map/{mapId}:
     get:
-      description: Retrieve an existing game entry
+      description: Retrieve an existing map data entry
       operationId: getGame
       parameters: 
         - in: path
-          name: gameId
+          name: mapId
           required: true
           schema:
             type: string
@@ -55,10 +87,10 @@ paths:
         type: aws_proxy
         uri: arn:aws:apigateway:{{region}}:lambda:path/2015-03-31/functions/{{handler}}/invocations
         httpMethod: POST
-  '/games':
+  /maps:
     get:
-      description: Retrieve a list of all games belonging to the authorized user
-      operationId: getGames
+      description: Retrieve a list of all map data belonging to the authorized user
+      operationId: getMaps
       responses:
         '200':
           description: Successful operation
@@ -72,7 +104,7 @@ paths:
         httpMethod: POST
 components:
   schemas:
-    Game:
+    Map:
       type: object
       required:
         - id
@@ -88,6 +120,8 @@ components:
           type: string
         timestamp:
           type: string
+        imageFilename:
+          type: string
     ApiResponse:
       type: object
       properties:
@@ -96,11 +130,11 @@ components:
         message:
           type: string
   requestBodies:
-    PutGameRequest:
+    PutMapRequest:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/Game'
+            $ref: '#/components/schemas/Map'
   securitySchemes:
     apiKey:
       type: apiKey

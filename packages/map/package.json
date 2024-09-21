@@ -1,0 +1,14 @@
+{
+  "name": "@grid-wolf/map",
+  "packageManager": "yarn@4.4.1",
+  "dependencies": {
+    "@grid-wolf/shared": "workspace:^",
+    "@types/aws-lambda": "^8.10.145",
+    "@types/jest": "^29.5.13",
+    "@types/node": "^22.5.5",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.2.5",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.6.2"
+  }
+}

@@ -6,6 +6,9 @@ export default async function () {
       transform: {
         '^.+\\.tsx?$': 'ts-jest'
       },
+      testPathIgnorePatterns: [
+        'cdk.out'
+      ],
       watchPathIgnorePatterns: [
         '<rootDir>/.+\.js$',
         '<rootDir>/.+\.d.ts$'

@@ -23,12 +23,16 @@ const RAW_RUNTIME_STATE =
       "reference": "workspace:packages/game"\
     },\
     {\
+      "name": "@grid-wolf/map",\
+      "reference": "workspace:packages/map"\
+    },\
+    {\
       "name": "@grid-wolf/shared",\
       "reference": "workspace:packages/shared"\
     },\
     {\
-      "name": "node20-840e81",\
-      "reference": "workspace:packages/shared/cdk.out/asset.6ef80870bc7b6a4403e2ee42622d5ae5c681d8d8cf773bfc8c9205844315885c/nodejs/node20"\
+      "name": "node20-38ce75",\
+      "reference": "workspace:packages/shared/cdk.out/asset.b0669e72fee45090cc2ad107f2c0fc693d5c3bf41f800a733fdaa504bb09d5eb/nodejs/node20"\
     },\
     {\
       "name": "node20-913ef5",\
@@ -48,11 +52,12 @@ const RAW_RUNTIME_STATE =
   "fallbackExclusionList": [\
     ["@grid-wolf/central-infra", ["workspace:packages/central-infra"]],\
     ["@grid-wolf/game", ["workspace:packages/game"]],\
+    ["@grid-wolf/map", ["workspace:packages/map"]],\
     ["@grid-wolf/shared", ["workspace:packages/shared"]],\
     ["@grid-wolf/user", ["workspace:packages/user"]],\
     ["@grid-wolf/user-ui", ["workspace:packages/user-ui"]],\
     ["grid-wolf", ["workspace:."]],\
-    ["node20-840e81", ["workspace:packages/shared/cdk.out/asset.6ef80870bc7b6a4403e2ee42622d5ae5c681d8d8cf773bfc8c9205844315885c/nodejs/node20"]],\
+    ["node20-38ce75", ["workspace:packages/shared/cdk.out/asset.b0669e72fee45090cc2ad107f2c0fc693d5c3bf41f800a733fdaa504bb09d5eb/nodejs/node20"]],\
     ["node20-913ef5", ["workspace:packages/shared/dependencies/nodejs/node20"]]\
   ],\
   "fallbackPool": [\
@@ -4725,6 +4730,23 @@ const RAW_RUNTIME_STATE =
         "linkType": "SOFT"\
       }]\
     ]],\
+    ["@grid-wolf/map", [\
+      ["workspace:packages/map", {\
+        "packageLocation": "./packages/map/",\
+        "packageDependencies": [\
+          ["@grid-wolf/map", "workspace:packages/map"],\
+          ["@grid-wolf/shared", "workspace:packages/shared"],\
+          ["@types/aws-lambda", "npm:8.10.145"],\
+          ["@types/jest", "npm:29.5.13"],\
+          ["@types/node", "npm:22.5.5"],\
+          ["jest", "virtual:267ffbf5908befb35b00b39d392f9fa12a96a916c46b4fed0a82cc132623f09d91d294f334f84a6249cc808d3e990f1415d434121f418306941e45e7449a6187#npm:29.7.0"],\
+          ["ts-jest", "virtual:abd13c9e0b0007bed8cadc46587c862d29ace3b80f668f439df2ec1b7a55526b2588e029e8832dc5a54c561ea21914cae01299d975bc83cfd601a4417a81737a#npm:29.2.5"],\
+          ["ts-node", "virtual:abd13c9e0b0007bed8cadc46587c862d29ace3b80f668f439df2ec1b7a55526b2588e029e8832dc5a54c561ea21914cae01299d975bc83cfd601a4417a81737a#npm:10.9.2"],\
+          ["typescript", "patch:typescript@npm%3A5.6.2#optional!builtin<compat/typescript>::version=5.6.2&hash=8c6c40"]\
+        ],\
+        "linkType": "SOFT"\
+      }]\
+    ]],\
     ["@grid-wolf/shared", [\
       ["workspace:packages/shared", {\
         "packageLocation": "./packages/shared/",\
@@ -4733,13 +4755,16 @@ const RAW_RUNTIME_STATE =
           ["@aws-sdk/client-dynamodb", "npm:3.637.0"],\
           ["@aws-sdk/util-dynamodb", "virtual:267ffbf5908befb35b00b39d392f9fa12a96a916c46b4fed0a82cc132623f09d91d294f334f84a6249cc808d3e990f1415d434121f418306941e45e7449a6187#npm:3.637.0"],\
           ["@types/jest", "npm:29.5.12"],\
+          ["@types/jsonwebtoken", "npm:9.0.6"],\
           ["@types/node", "npm:22.5.2"],\
           ["aws-cdk-lib", "virtual:c73109d04e45c3be521e72bb35f9204f68b982132f09fd94d92b070b853e131470c590a162ba223894913f62f605426db03cd67074972e8dcbcb50b9b16be8e1#npm:2.155.0"],\
+          ["aws-xray-sdk", "npm:3.10.1"],\
           ["cdk", "npm:2.155.0"],\
           ["constructs", "npm:10.3.0"],\
           ["dotenv", "npm:16.4.5"],\
           ["handlebars", "npm:4.7.8"],\
           ["jest", "virtual:267ffbf5908befb35b00b39d392f9fa12a96a916c46b4fed0a82cc132623f09d91d294f334f84a6249cc808d3e990f1415d434121f418306941e45e7449a6187#npm:29.7.0"],\
+          ["jsonwebtoken", "npm:9.0.2"],\
           ["rimraf", "npm:6.0.1"],\
           ["ts-jest", "virtual:267ffbf5908befb35b00b39d392f9fa12a96a916c46b4fed0a82cc132623f09d91d294f334f84a6249cc808d3e990f1415d434121f418306941e45e7449a6187#npm:29.2.5"],\
           ["ts-node", "virtual:c73109d04e45c3be521e72bb35f9204f68b982132f09fd94d92b070b853e131470c590a162ba223894913f62f605426db03cd67074972e8dcbcb50b9b16be8e1#npm:10.9.2"],\
@@ -6838,6 +6863,15 @@ const RAW_RUNTIME_STATE =
           ["pretty-format", "npm:29.7.0"]\
         ],\
         "linkType": "HARD"\
+      }],\
+      ["npm:29.5.13", {\
+        "packageLocation": "./.yarn/cache/@types-jest-npm-29.5.13-b43d0e7497-9c31af0b15.zip/node_modules/@types/jest/",\
+        "packageDependencies": [\
+          ["@types/jest", "npm:29.5.13"],\
+          ["expect", "npm:29.7.0"],\
+          ["pretty-format", "npm:29.7.0"]\
+        ],\
+        "linkType": "HARD"\
       }]\
     ]],\
     ["@types/json-schema", [\
@@ -6908,6 +6942,14 @@ const RAW_RUNTIME_STATE =
         "packageLocation": "./.yarn/cache/@types-node-npm-22.5.4-50cd3ae186-b445daa7ee.zip/node_modules/@types/node/",\
         "packageDependencies": [\
           ["@types/node", "npm:22.5.4"],\
+          ["undici-types", "npm:6.19.8"]\
+        ],\
+        "linkType": "HARD"\
+      }],\
+      ["npm:22.5.5", {\
+        "packageLocation": "./.yarn/cache/@types-node-npm-22.5.5-e8a43f7042-ead9495cfc.zip/node_modules/@types/node/",\
+        "packageDependencies": [\
+          ["@types/node", "npm:22.5.5"],\
           ["undici-types", "npm:6.19.8"]\
         ],\
         "linkType": "HARD"\
@@ -8283,6 +8325,17 @@ const RAW_RUNTIME_STATE =
       }]\
     ]],\
     ["aws-xray-sdk", [\
+      ["npm:3.10.1", {\
+        "packageLocation": "./.yarn/cache/aws-xray-sdk-npm-3.10.1-befa0d1b10-4c0a2c6581.zip/node_modules/aws-xray-sdk/",\
+        "packageDependencies": [\
+          ["aws-xray-sdk", "npm:3.10.1"],\
+          ["aws-xray-sdk-core", "npm:3.10.1"],\
+          ["aws-xray-sdk-express", "virtual:befa0d1b103566b542b7b7fbf2183b9d4a2edf37d57410e803b39846b22761e735937c16eb03174dbfee4dafbdb41b046caf70741ab5761e50fce3625d323c6d#npm:3.10.1"],\
+          ["aws-xray-sdk-mysql", "virtual:befa0d1b103566b542b7b7fbf2183b9d4a2edf37d57410e803b39846b22761e735937c16eb03174dbfee4dafbdb41b046caf70741ab5761e50fce3625d323c6d#npm:3.10.1"],\
+          ["aws-xray-sdk-postgres", "virtual:befa0d1b103566b542b7b7fbf2183b9d4a2edf37d57410e803b39846b22761e735937c16eb03174dbfee4dafbdb41b046caf70741ab5761e50fce3625d323c6d#npm:3.10.1"]\
+        ],\
+        "linkType": "HARD"\
+      }],\
       ["npm:3.9.0", {\
         "packageLocation": "./.yarn/cache/aws-xray-sdk-npm-3.9.0-afe42032c4-d3f57e504b.zip/node_modules/aws-xray-sdk/",\
         "packageDependencies": [\
@@ -8296,6 +8349,19 @@ const RAW_RUNTIME_STATE =
       }]\
     ]],\
     ["aws-xray-sdk-core", [\
+      ["npm:3.10.1", {\
+        "packageLocation": "./.yarn/cache/aws-xray-sdk-core-npm-3.10.1-3e6b677df1-e7a084e084.zip/node_modules/aws-xray-sdk-core/",\
+        "packageDependencies": [\
+          ["aws-xray-sdk-core", "npm:3.10.1"],\
+          ["@aws-sdk/types", "npm:3.609.0"],\
+          ["@smithy/service-error-classification", "npm:2.1.5"],\
+          ["@types/cls-hooked", "npm:4.3.8"],\
+          ["atomic-batcher", "npm:1.0.2"],\
+          ["cls-hooked", "npm:4.2.2"],\
+          ["semver", "npm:7.6.3"]\
+        ],\
+        "linkType": "HARD"\
+      }],\
       ["npm:3.9.0", {\
         "packageLocation": "./.yarn/cache/aws-xray-sdk-core-npm-3.9.0-5e1ef4e6c7-b54a1690f0.zip/node_modules/aws-xray-sdk-core/",\
         "packageDependencies": [\
@@ -8311,6 +8377,13 @@ const RAW_RUNTIME_STATE =
       }]\
     ]],\
     ["aws-xray-sdk-express", [\
+      ["npm:3.10.1", {\
+        "packageLocation": "./.yarn/cache/aws-xray-sdk-express-npm-3.10.1-08288bc6a5-495b9bf99b.zip/node_modules/aws-xray-sdk-express/",\
+        "packageDependencies": [\
+          ["aws-xray-sdk-express", "npm:3.10.1"]\
+        ],\
+        "linkType": "SOFT"\
+      }],\
       ["npm:3.9.0", {\
         "packageLocation": "./.yarn/cache/aws-xray-sdk-express-npm-3.9.0-f5d149f0f7-c5a8d4ab08.zip/node_modules/aws-xray-sdk-express/",\
         "packageDependencies": [\
@@ -8331,9 +8404,30 @@ const RAW_RUNTIME_STATE =
           "aws-xray-sdk-core"\
         ],\
         "linkType": "HARD"\
+      }],\
+      ["virtual:befa0d1b103566b542b7b7fbf2183b9d4a2edf37d57410e803b39846b22761e735937c16eb03174dbfee4dafbdb41b046caf70741ab5761e50fce3625d323c6d#npm:3.10.1", {\
+        "packageLocation": "./.yarn/__virtual__/aws-xray-sdk-express-virtual-e6b3acc285/0/cache/aws-xray-sdk-express-npm-3.10.1-08288bc6a5-495b9bf99b.zip/node_modules/aws-xray-sdk-express/",\
+        "packageDependencies": [\
+          ["aws-xray-sdk-express", "virtual:befa0d1b103566b542b7b7fbf2183b9d4a2edf37d57410e803b39846b22761e735937c16eb03174dbfee4dafbdb41b046caf70741ab5761e50fce3625d323c6d#npm:3.10.1"],\
+          ["@types/aws-xray-sdk-core", null],\
+          ["@types/express", "npm:4.17.21"],\
+          ["aws-xray-sdk-core", "npm:3.10.1"]\
+        ],\
+        "packagePeers": [\
+          "@types/aws-xray-sdk-core",\
+          "aws-xray-sdk-core"\
+        ],\
+        "linkType": "HARD"\
       }]\
     ]],\
     ["aws-xray-sdk-mysql", [\
+      ["npm:3.10.1", {\
+        "packageLocation": "./.yarn/cache/aws-xray-sdk-mysql-npm-3.10.1-1be370f385-b8f7f54ca2.zip/node_modules/aws-xray-sdk-mysql/",\
+        "packageDependencies": [\
+          ["aws-xray-sdk-mysql", "npm:3.10.1"]\
+        ],\
+        "linkType": "SOFT"\
+      }],\
       ["npm:3.9.0", {\
         "packageLocation": "./.yarn/cache/aws-xray-sdk-mysql-npm-3.9.0-859f8a5e51-718397fdc3.zip/node_modules/aws-xray-sdk-mysql/",\
         "packageDependencies": [\
@@ -8354,9 +8448,30 @@ const RAW_RUNTIME_STATE =
           "aws-xray-sdk-core"\
         ],\
         "linkType": "HARD"\
+      }],\
+      ["virtual:befa0d1b103566b542b7b7fbf2183b9d4a2edf37d57410e803b39846b22761e735937c16eb03174dbfee4dafbdb41b046caf70741ab5761e50fce3625d323c6d#npm:3.10.1", {\
+        "packageLocation": "./.yarn/__virtual__/aws-xray-sdk-mysql-virtual-9c01c3ec81/0/cache/aws-xray-sdk-mysql-npm-3.10.1-1be370f385-b8f7f54ca2.zip/node_modules/aws-xray-sdk-mysql/",\
+        "packageDependencies": [\
+          ["aws-xray-sdk-mysql", "virtual:befa0d1b103566b542b7b7fbf2183b9d4a2edf37d57410e803b39846b22761e735937c16eb03174dbfee4dafbdb41b046caf70741ab5761e50fce3625d323c6d#npm:3.10.1"],\
+          ["@types/aws-xray-sdk-core", null],\
+          ["@types/mysql", "npm:2.15.26"],\
+          ["aws-xray-sdk-core", "npm:3.10.1"]\
+        ],\
+        "packagePeers": [\
+          "@types/aws-xray-sdk-core",\
+          "aws-xray-sdk-core"\
+        ],\
+        "linkType": "HARD"\
       }]\
     ]],\
     ["aws-xray-sdk-postgres", [\
+      ["npm:3.10.1", {\
+        "packageLocation": "./.yarn/cache/aws-xray-sdk-postgres-npm-3.10.1-b3120669f3-5e8c663f14.zip/node_modules/aws-xray-sdk-postgres/",\
+        "packageDependencies": [\
+          ["aws-xray-sdk-postgres", "npm:3.10.1"]\
+        ],\
+        "linkType": "SOFT"\
+      }],\
       ["npm:3.9.0", {\
         "packageLocation": "./.yarn/cache/aws-xray-sdk-postgres-npm-3.9.0-a84831377b-700e8e9de0.zip/node_modules/aws-xray-sdk-postgres/",\
         "packageDependencies": [\
@@ -8371,6 +8486,20 @@ const RAW_RUNTIME_STATE =
           ["@types/aws-xray-sdk-core", null],\
           ["@types/pg", "npm:8.11.8"],\
           ["aws-xray-sdk-core", "npm:3.9.0"]\
+        ],\
+        "packagePeers": [\
+          "@types/aws-xray-sdk-core",\
+          "aws-xray-sdk-core"\
+        ],\
+        "linkType": "HARD"\
+      }],\
+      ["virtual:befa0d1b103566b542b7b7fbf2183b9d4a2edf37d57410e803b39846b22761e735937c16eb03174dbfee4dafbdb41b046caf70741ab5761e50fce3625d323c6d#npm:3.10.1", {\
+        "packageLocation": "./.yarn/__virtual__/aws-xray-sdk-postgres-virtual-9d537fd619/0/cache/aws-xray-sdk-postgres-npm-3.10.1-b3120669f3-5e8c663f14.zip/node_modules/aws-xray-sdk-postgres/",\
+        "packageDependencies": [\
+          ["aws-xray-sdk-postgres", "virtual:befa0d1b103566b542b7b7fbf2183b9d4a2edf37d57410e803b39846b22761e735937c16eb03174dbfee4dafbdb41b046caf70741ab5761e50fce3625d323c6d#npm:3.10.1"],\
+          ["@types/aws-xray-sdk-core", null],\
+          ["@types/pg", "npm:8.11.8"],\
+          ["aws-xray-sdk-core", "npm:3.10.1"]\
         ],\
         "packagePeers": [\
           "@types/aws-xray-sdk-core",\
@@ -15824,13 +15953,15 @@ const RAW_RUNTIME_STATE =
         "linkType": "HARD"\
       }]\
     ]],\
-    ["node20-840e81", [\
-      ["workspace:packages/shared/cdk.out/asset.6ef80870bc7b6a4403e2ee42622d5ae5c681d8d8cf773bfc8c9205844315885c/nodejs/node20", {\
-        "packageLocation": "./packages/shared/cdk.out/asset.6ef80870bc7b6a4403e2ee42622d5ae5c681d8d8cf773bfc8c9205844315885c/nodejs/node20/",\
+    ["node20-38ce75", [\
+      ["workspace:packages/shared/cdk.out/asset.b0669e72fee45090cc2ad107f2c0fc693d5c3bf41f800a733fdaa504bb09d5eb/nodejs/node20", {\
+        "packageLocation": "./packages/shared/cdk.out/asset.b0669e72fee45090cc2ad107f2c0fc693d5c3bf41f800a733fdaa504bb09d5eb/nodejs/node20/",\
         "packageDependencies": [\
-          ["node20-840e81", "workspace:packages/shared/cdk.out/asset.6ef80870bc7b6a4403e2ee42622d5ae5c681d8d8cf773bfc8c9205844315885c/nodejs/node20"],\
+          ["node20-38ce75", "workspace:packages/shared/cdk.out/asset.b0669e72fee45090cc2ad107f2c0fc693d5c3bf41f800a733fdaa504bb09d5eb/nodejs/node20"],\
           ["aws-xray-sdk", "npm:3.9.0"],\
-          ["dotenv", "npm:16.4.5"]\
+          ["dotenv", "npm:16.4.5"],\
+          ["jsonwebtoken", "npm:9.0.2"],\
+          ["parse-multipart", "npm:1.0.4"]\
         ],\
         "linkType": "SOFT"\
       }]\
@@ -15841,7 +15972,9 @@ const RAW_RUNTIME_STATE =
         "packageDependencies": [\
           ["node20-913ef5", "workspace:packages/shared/dependencies/nodejs/node20"],\
           ["aws-xray-sdk", "npm:3.9.0"],\
-          ["dotenv", "npm:16.4.5"]\
+          ["dotenv", "npm:16.4.5"],\
+          ["jsonwebtoken", "npm:9.0.2"],\
+          ["parse-multipart", "npm:1.0.4"]\
         ],\
         "linkType": "SOFT"\
       }]\
@@ -16255,6 +16388,15 @@ const RAW_RUNTIME_STATE =
           ["error-ex", "npm:1.3.2"],\
           ["json-parse-even-better-errors", "npm:2.3.1"],\
           ["lines-and-columns", "npm:1.2.4"]\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
+    ["parse-multipart", [\
+      ["npm:1.0.4", {\
+        "packageLocation": "./.yarn/cache/parse-multipart-npm-1.0.4-8744271e56-9f1c41df83.zip/node_modules/parse-multipart/",\
+        "packageDependencies": [\
+          ["parse-multipart", "npm:1.0.4"]\
         ],\
         "linkType": "HARD"\
       }]\
@@ -20635,6 +20777,52 @@ const RAW_RUNTIME_STATE =
           "typescript"\
         ],\
         "linkType": "HARD"\
+      }],\
+      ["virtual:abd13c9e0b0007bed8cadc46587c862d29ace3b80f668f439df2ec1b7a55526b2588e029e8832dc5a54c561ea21914cae01299d975bc83cfd601a4417a81737a#npm:29.2.5", {\
+        "packageLocation": "./.yarn/__virtual__/ts-jest-virtual-6c3036ce8f/0/cache/ts-jest-npm-29.2.5-3012d53ff5-acb62d168f.zip/node_modules/ts-jest/",\
+        "packageDependencies": [\
+          ["ts-jest", "virtual:abd13c9e0b0007bed8cadc46587c862d29ace3b80f668f439df2ec1b7a55526b2588e029e8832dc5a54c561ea21914cae01299d975bc83cfd601a4417a81737a#npm:29.2.5"],\
+          ["@babel/core", null],\
+          ["@jest/transform", null],\
+          ["@jest/types", null],\
+          ["@types/babel-jest", null],\
+          ["@types/babel__core", null],\
+          ["@types/esbuild", null],\
+          ["@types/jest", "npm:29.5.13"],\
+          ["@types/jest__transform", null],\
+          ["@types/jest__types", null],\
+          ["@types/typescript", null],\
+          ["babel-jest", null],\
+          ["bs-logger", "npm:0.2.6"],\
+          ["ejs", "npm:3.1.10"],\
+          ["esbuild", null],\
+          ["fast-json-stable-stringify", "npm:2.1.0"],\
+          ["jest", "virtual:267ffbf5908befb35b00b39d392f9fa12a96a916c46b4fed0a82cc132623f09d91d294f334f84a6249cc808d3e990f1415d434121f418306941e45e7449a6187#npm:29.7.0"],\
+          ["jest-util", "npm:29.7.0"],\
+          ["json5", "npm:2.2.3"],\
+          ["lodash.memoize", "npm:4.1.2"],\
+          ["make-error", "npm:1.3.6"],\
+          ["semver", "npm:7.6.3"],\
+          ["typescript", "patch:typescript@npm%3A5.6.2#optional!builtin<compat/typescript>::version=5.6.2&hash=8c6c40"],\
+          ["yargs-parser", "npm:21.1.1"]\
+        ],\
+        "packagePeers": [\
+          "@babel/core",\
+          "@jest/transform",\
+          "@jest/types",\
+          "@types/babel-jest",\
+          "@types/babel__core",\
+          "@types/esbuild",\
+          "@types/jest",\
+          "@types/jest__transform",\
+          "@types/jest__types",\
+          "@types/typescript",\
+          "babel-jest",\
+          "esbuild",\
+          "jest",\
+          "typescript"\
+        ],\
+        "linkType": "HARD"\
       }]\
     ]],\
     ["ts-node", [\
@@ -20703,6 +20891,42 @@ const RAW_RUNTIME_STATE =
           ["diff", "npm:4.0.2"],\
           ["make-error", "npm:1.3.6"],\
           ["typescript", "patch:typescript@npm%3A5.5.4#optional!builtin<compat/typescript>::version=5.5.4&hash=379a07"],\
+          ["v8-compile-cache-lib", "npm:3.0.1"],\
+          ["yn", "npm:3.1.1"]\
+        ],\
+        "packagePeers": [\
+          "@swc/core",\
+          "@swc/wasm",\
+          "@types/node",\
+          "@types/swc__core",\
+          "@types/swc__wasm",\
+          "@types/typescript",\
+          "typescript"\
+        ],\
+        "linkType": "HARD"\
+      }],\
+      ["virtual:abd13c9e0b0007bed8cadc46587c862d29ace3b80f668f439df2ec1b7a55526b2588e029e8832dc5a54c561ea21914cae01299d975bc83cfd601a4417a81737a#npm:10.9.2", {\
+        "packageLocation": "./.yarn/__virtual__/ts-node-virtual-1afb5048eb/0/cache/ts-node-npm-10.9.2-3f3890b9ac-5f29938489.zip/node_modules/ts-node/",\
+        "packageDependencies": [\
+          ["ts-node", "virtual:abd13c9e0b0007bed8cadc46587c862d29ace3b80f668f439df2ec1b7a55526b2588e029e8832dc5a54c561ea21914cae01299d975bc83cfd601a4417a81737a#npm:10.9.2"],\
+          ["@cspotcode/source-map-support", "npm:0.8.1"],\
+          ["@swc/core", null],\
+          ["@swc/wasm", null],\
+          ["@tsconfig/node10", "npm:1.0.11"],\
+          ["@tsconfig/node12", "npm:1.0.11"],\
+          ["@tsconfig/node14", "npm:1.0.3"],\
+          ["@tsconfig/node16", "npm:1.0.4"],\
+          ["@types/node", "npm:22.5.5"],\
+          ["@types/swc__core", null],\
+          ["@types/swc__wasm", null],\
+          ["@types/typescript", null],\
+          ["acorn", "npm:8.12.1"],\
+          ["acorn-walk", "npm:8.3.3"],\
+          ["arg", "npm:4.1.3"],\
+          ["create-require", "npm:1.1.1"],\
+          ["diff", "npm:4.0.2"],\
+          ["make-error", "npm:1.3.6"],\
+          ["typescript", "patch:typescript@npm%3A5.6.2#optional!builtin<compat/typescript>::version=5.6.2&hash=8c6c40"],\
           ["v8-compile-cache-lib", "npm:3.0.1"],\
           ["yn", "npm:3.1.1"]\
         ],\
@@ -20952,6 +21176,13 @@ const RAW_RUNTIME_STATE =
         "packageLocation": "./.yarn/cache/typescript-patch-fe43cd9db9-73409d7b91.zip/node_modules/typescript/",\
         "packageDependencies": [\
           ["typescript", "patch:typescript@npm%3A5.5.4#optional!builtin<compat/typescript>::version=5.5.4&hash=379a07"]\
+        ],\
+        "linkType": "HARD"\
+      }],\
+      ["patch:typescript@npm%3A5.6.2#optional!builtin<compat/typescript>::version=5.6.2&hash=8c6c40", {\
+        "packageLocation": "./.yarn/cache/typescript-patch-9bf73ea0aa-94eb47e130.zip/node_modules/typescript/",\
+        "packageDependencies": [\
+          ["typescript", "patch:typescript@npm%3A5.6.2#optional!builtin<compat/typescript>::version=5.6.2&hash=8c6c40"]\
         ],\
         "linkType": "HARD"\
       }]\

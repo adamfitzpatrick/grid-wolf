@@ -19,6 +19,9 @@
             "name": "game",
             "path": "./packages/game"
         }, {
+            "name": "map",
+            "path": "./packages/map"
+        }, {
             "name": "user",
             "path": "./packages/user"
         }, {

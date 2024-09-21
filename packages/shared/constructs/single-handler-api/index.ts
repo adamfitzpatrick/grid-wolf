@@ -8,7 +8,6 @@ import { AccessLogFormat, ApiDefinition, ApiKey, CognitoUserPoolsAuthorizer, Dep
 import { CfnOutput, Duration, Fn } from "aws-cdk-lib";
 import { outputs } from "..";
 import { LogGroup } from "aws-cdk-lib/aws-logs";
-import { UserPool } from "aws-cdk-lib/aws-cognito";
 
 export interface SingleHandlerApiProps extends ApiHandlerProps {
   apiSpecPath: string;
@@ -79,14 +78,5 @@ export class SingleHandlerApi extends GridWolfConstruct {
     });
     defaultUsagePlan.addApiKey(defaultApiKey);
     defaultUsagePlan.addApiStage({stage});
-
-    /*new CognitoUserPoolsAuthorizer(this, this.generateId('authorizer'), {
-      cognitoUserPools: [
-        UserPool.fromUserPoolArn(this, this.generateEnvGeneralName('user-pool'), userPoolArn)
-      ],
-      authorizerName: this.generateName('authorizer'),
-      identitySource: 'Authorization',
-      resultsCacheTtl: Duration.seconds(300)
-    });*/
   }
 }

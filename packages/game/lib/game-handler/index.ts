@@ -1,12 +1,11 @@
 import { PutItemCommand, GetItemCommand, QueryCommand, DynamoDBClient } from "@aws-sdk/client-dynamodb";
-import { GameDTO, GameDAO, marshallToDAO, marshallToDTO } from "@grid-wolf/shared/domain";
+import { GameDTO, marshallToGameDAO, marshallToGameDTO } from "@grid-wolf/shared/domain";
 import { EnvironmentVariableName } from "@grid-wolf/shared/utils";
 import { APIGatewayProxyEvent } from "aws-lambda";
 import { decode, JwtPayload } from 'jsonwebtoken';
 import { captureAWSv3Client } from 'aws-xray-sdk';
-import { CallApiGatewayRestApiEndpointProps } from "aws-cdk-lib/aws-stepfunctions-tasks";
 
-const client = captureAWSv3Client(new DynamoDBClient());
+let client = captureAWSv3Client(new DynamoDBClient());
 let TableName: string;
 
 const parseAuthToken = (event: APIGatewayProxyEvent) => {
@@ -32,7 +31,7 @@ const handlePutGameOperation = async (event: APIGatewayProxyEvent) => {
   }
   const command = new PutItemCommand({
     TableName,
-    Item: marshallToDAO(gameDTO)
+    Item: marshallToGameDAO(gameDTO)
   });
   return client.send(command).then(() => ({
     statusCode: 202,
@@ -61,7 +60,7 @@ const handleGetGameOperation = async (event: APIGatewayProxyEvent) => {
   }
   return {
     statusCode: 200,
-    body: JSON.stringify(marshallToDTO(response.Item as any as GameDAO))
+    body: JSON.stringify(marshallToGameDTO(response.Item))
   };
 }
 
@@ -77,9 +76,10 @@ const handleGetGamesOperation = async (event: APIGatewayProxyEvent) => {
     KeyConditionExpression: 'pk = :pk'
   });
   const response = await client.send(command);
+  response.Items = response.Items || [];
   return {
     statusCode: 200,
-    body: JSON.stringify((response.Items as any as GameDAO[]).map(marshallToDTO))
+    body: JSON.stringify((response.Items).map(dao => marshallToGameDTO(dao)))
   }
 }
 

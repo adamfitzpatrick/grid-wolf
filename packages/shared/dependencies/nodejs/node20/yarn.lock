@@ -392,6 +392,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"parse-multipart@npm:^1.0.4":
+  version: 1.0.4
+  resolution: "parse-multipart@npm:1.0.4"
+  checksum: 10c0/9f1c41df83cd2d08001ce71a24b848b17f0291913c4d645ce8f2d833ddcbe3c3ec47dfbab6849cf6d9d414368229b2257bcaae276682fdf382482815e8d2a0de
+  languageName: node
+  linkType: hard
+
 "pg-int8@npm:1.0.1":
   version: 1.0.1
   resolution: "pg-int8@npm:1.0.1"
@@ -472,6 +479,7 @@ __metadata:
     aws-xray-sdk: "npm:^3.9.0"
     dotenv: "npm:^16.4.5"
     jsonwebtoken: "npm:^9.0.2"
+    parse-multipart: "npm:^1.0.4"
   languageName: unknown
   linkType: soft
 
