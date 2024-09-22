@@ -1,8 +1,5 @@
-import { Template } from 'aws-cdk-lib/assertions';
 import { GridWolfConstruct } from '.';
-import { GridWolfProps } from '../../domain';
-import { App, Stack } from 'aws-cdk-lib';
-import { Construct } from 'constructs';
+import { App } from 'aws-cdk-lib';
 
 
 describe('GridWolfConstuct construct', () => {

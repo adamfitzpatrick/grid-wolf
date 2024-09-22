@@ -30,36 +30,6 @@ paths:
         type: aws_proxy
         uri: arn:aws:apigateway:{{region}}:lambda:path/2015-03-31/functions/{{handler}}/invocations
         httpMethod: POST
-  /map/image/{filename}:
-    put:
-      description: Upload a new or replacement map image to associate with map data
-      operationId: putMapImage
-      responses:
-        '200':
-          description: Successful operation
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiResponse'
-        '400':
-          description: Bad request
-      x-amazon-apigateway-integration:
-        type: aws_proxy
-        uri: arn:aws:apigateway:{{region}}:lambda:path/2015-03-31/functions/{{handler}}/invocations
-        httpMethod: POST
-        requestTemplates:
-          multipart/form-data: >
-            #set($authorizationHeader = $input.params().header.Authorization)\n
-            {\n
-              "body": $input.json('$'),\n
-              "headers": {\n
-                "Authorization": "$authorizationHeader"\n
-              },\n
-              "context" : {\n
-                "httpMethod" : "$context.httpMethod",\n
-                "resourcePath" : "$context.resourcePath"\n
-              }\n
-            }
   /map/{mapId}:
     get:
       description: Retrieve an existing map data entry

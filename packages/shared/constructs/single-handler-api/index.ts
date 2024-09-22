@@ -5,7 +5,7 @@ import * as fs from 'fs';
 import { compile } from 'handlebars';
 import { parse } from 'yaml';
 import { AccessLogFormat, ApiDefinition, ApiKey, CognitoUserPoolsAuthorizer, Deployment, EndpointType, LogGroupLogDestination, MethodLoggingLevel, SpecRestApi, Stage, UsagePlan } from "aws-cdk-lib/aws-apigateway";
-import { CfnOutput, Duration, Fn } from "aws-cdk-lib";
+import { CfnOutput, Fn } from "aws-cdk-lib";
 import { outputs } from "..";
 import { LogGroup } from "aws-cdk-lib/aws-logs";
 
@@ -13,7 +13,6 @@ export interface SingleHandlerApiProps extends ApiHandlerProps {
   apiSpecPath: string;
   handlerTemplateKey: string;
   authArnTemplateKey: string;
-  defaultApiKey: string;
 }
 
 export class SingleHandlerApi extends GridWolfConstruct {
@@ -34,7 +33,6 @@ export class SingleHandlerApi extends GridWolfConstruct {
       region: props.env.region
     }));
 
-    fs.writeFileSync('./api-output.json', JSON.stringify(apiDefinition))
     const api = new SpecRestApi(this, this.generateId('rest-api'), {
       apiDefinition: ApiDefinition.fromInline(apiDefinition),
       cloudWatchRole: true,
@@ -60,13 +58,8 @@ export class SingleHandlerApi extends GridWolfConstruct {
     });
 
     const defaultApiKey = new ApiKey(this, this.generateId('default-api-key'), {
-      apiKeyName: 'default-api-key',
+      apiKeyName: this.generateId('default-api-key-arn'),
       description: 'Highly-rate-limited key useful for manual testing and development',
-      value: props.defaultApiKey
-    });
-    new CfnOutput(this, 'apiKey-output', {
-      exportName: this.generateEnvGeneralName(outputs.DEFAULT_API_KEY),
-      value: props.defaultApiKey
     });
 
     const defaultUsagePlan = new UsagePlan(this, this.generateId('default-usage-plan'), {

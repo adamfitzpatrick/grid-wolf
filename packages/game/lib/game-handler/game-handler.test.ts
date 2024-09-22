@@ -1,41 +1,33 @@
 import { APIGatewayProxyEvent } from "aws-lambda";
 import { handler } from ".";
-import { GameDAO, GameDTO } from "@grid-wolf/shared/domain";
-import { EnvironmentVariableName } from "@grid-wolf/shared/utils";
+import { GameDTO } from "@grid-wolf/shared/domain";
 
-let sendSpy: jest.Mock;
-let putCommandSpy: jest.Mock;
-let getCommandSpy: jest.Mock;
-let queryCommandSpy: jest.Mock;
+let getSpy: jest.Mock;
+let listSpy: jest.Mock;
+let putSpy: jest.Mock;
 
-jest.mock('aws-xray-sdk', () => {
+jest.mock('@grid-wolf/shared/utils', () => {
   return {
-    captureAWSv3Client: (client: any) => client
-  };
+    EnvironmentVariableName: { DATA_TABLE_NAME: 'table' },
+    DynamoClient: function () {
+      return {
+        get: (...params: any) => getSpy(...params),
+        list: (params: any) => listSpy(params),
+        put: (params: any) => putSpy(params)
+      }
+    }
+  }
 });
 jest.mock('jsonwebtoken', () => {
   return {
     decode: () => ({ username: 'user' })
   };
-})
-jest.mock('@aws-sdk/client-dynamodb', () => {
-  return {
-    PutItemCommand: function (params: any) { return putCommandSpy(params); },
-    GetItemCommand: function (params: any) { return getCommandSpy(params); },
-    QueryCommand: function (params: any) { return queryCommandSpy(params); },
-    DynamoDBClient: function () {
-      return {
-        send: (command: any) => sendSpy(command)
-      }
-    },
-  }
 });
 
 describe('game handler', () => {
   let oldConsole: Console;
   let Authorization: string;
   let gameDTO: GameDTO;
-  let gameDAO: GameDAO;
   let event: APIGatewayProxyEvent;
 
   beforeAll(() => {
@@ -45,27 +37,23 @@ describe('game handler', () => {
     console.info = (message: string) => {};
   });
 
+  afterAll(() => {
+    console.warn = oldConsole.warn;
+    console.debug = oldConsole.debug;
+    console.info = oldConsole.info;
+  });
+
   beforeEach(() => {
-    sendSpy = jest.fn().mockResolvedValue({});
-    putCommandSpy = jest.fn().mockReturnValue({});
-    getCommandSpy = jest.fn().mockReturnValue({});
-    queryCommandSpy = jest.fn().mockReturnValue({});
+    getSpy = jest.fn();
+    listSpy = jest.fn();
+    putSpy = jest.fn();
     
-    process.env[EnvironmentVariableName.DATA_TABLE_NAME] = 'table';
     Authorization = `Bearer TOKEN`;
     gameDTO = {
       id: 'id',
       userId: 'user',
       name: 'name',
       timestamp: 1234
-    };
-    gameDAO = {
-      pk: { S: 'user#user'},
-      sk: { S: 'game#id'},
-      id: { S: 'id' },
-      userId: { S: 'user' },
-      name: { S: 'name' },
-      timestamp: { N: '1234' }
     };
     event = {
       body: JSON.stringify(gameDTO),
@@ -77,12 +65,7 @@ describe('game handler', () => {
         Authorization
       }
     } as any as APIGatewayProxyEvent
-  });
-
-  afterAll(() => {
-    console.warn = oldConsole.warn;
-    console.debug = oldConsole.debug;
-    console.info = oldConsole.info;
+    putSpy.mockResolvedValue(gameDTO);
   });
 
   test('/game PUT should save game data to dynamodb', async () => {
@@ -90,11 +73,7 @@ describe('game handler', () => {
       statusCode: 202,
       body: 'accepted'
     });
-    expect(putCommandSpy).toHaveBeenCalledWith({
-      TableName: 'table',
-      Item: gameDAO
-    });
-    expect(sendSpy).toHaveBeenCalledWith({});
+    expect(putSpy).toHaveBeenCalledWith(gameDTO);
   });
 
   test('/game PUT should return 401 if Authorized user does not match request body user', async () => {
@@ -106,8 +85,7 @@ describe('game handler', () => {
       body: 'bad request'
     });
 
-    expect(putCommandSpy).not.toHaveBeenCalled();
-    expect(sendSpy).not.toHaveBeenCalled();
+    expect(putSpy).not.toHaveBeenCalled();
   });
 
   test('/game/{gameId} GET should return data obtained from dynamodb', async () => {
@@ -116,21 +94,13 @@ describe('game handler', () => {
     event.pathParameters = {
       gameId: 'id'
     };
-    sendSpy.mockReturnValue({ Item: gameDAO });
+    getSpy.mockResolvedValue(gameDTO);
 
     await expect(handler(event)).resolves.toEqual({
       statusCode: 200,
       body: JSON.stringify(gameDTO)
     });
-
-    expect(getCommandSpy).toHaveBeenCalledWith({
-      TableName: 'table',
-      Key: {
-        pk: { S: 'user#user' },
-        sk: { S: 'game#id'}
-      }
-    });
-    expect(sendSpy).toHaveBeenCalledWith({});
+    expect(getSpy).toHaveBeenCalledWith('user', 'id');
   });
 
   test('/game/{gameId} GET should return 403 error when game not found', async () => {
@@ -139,30 +109,25 @@ describe('game handler', () => {
     event.pathParameters = {
       gameId: 'id'
     };
-    sendSpy.mockReturnValue({});
+    getSpy.mockRejectedValue('not found')
 
     await expect(handler(event)).resolves.toEqual({
       statusCode: 403,
       body: 'forbidden'
-    })
+    });
+    expect(getSpy).toHaveBeenCalledWith('user', 'id');
   });
 
   test('/games GET should return a list of game data for the user', async () => {
     event.requestContext.resourcePath = '/games'
     event.requestContext.httpMethod = 'GET'
-    sendSpy.mockReturnValue({ Items: [ gameDAO ] });
+    listSpy.mockReturnValue([ gameDTO ]);
 
     await expect(handler(event)).resolves.toEqual({
       statusCode: 200,
       body: JSON.stringify([ gameDTO ])
     });
-    expect(queryCommandSpy).toHaveBeenCalledWith({
-      TableName: 'table',
-      ExpressionAttributeValues: {
-        ':pk': { S: 'user#user' }
-      },
-      KeyConditionExpression: 'pk = :pk'
-    });
-    expect(sendSpy).toHaveBeenCalledWith({})
+
+    expect(listSpy).toHaveBeenCalledWith('user');
   });
 });

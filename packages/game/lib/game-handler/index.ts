@@ -1,12 +1,9 @@
-import { PutItemCommand, GetItemCommand, QueryCommand, DynamoDBClient } from "@aws-sdk/client-dynamodb";
-import { GameDTO, marshallToGameDAO, marshallToGameDTO } from "@grid-wolf/shared/domain";
-import { EnvironmentVariableName } from "@grid-wolf/shared/utils";
+import { GameDTO } from "@grid-wolf/shared/domain";
+import { DynamoClient, EnvironmentVariableName } from "@grid-wolf/shared/utils";
 import { APIGatewayProxyEvent } from "aws-lambda";
 import { decode, JwtPayload } from 'jsonwebtoken';
-import { captureAWSv3Client } from 'aws-xray-sdk';
 
-let client = captureAWSv3Client(new DynamoDBClient());
-let TableName: string;
+let client = new DynamoClient<GameDTO>('GameDTO');
 
 const parseAuthToken = (event: APIGatewayProxyEvent) => {
   // Auth header is always present because requests are not accepted without it.
@@ -29,11 +26,7 @@ const handlePutGameOperation = async (event: APIGatewayProxyEvent) => {
       body: 'bad request'
     };
   }
-  const command = new PutItemCommand({
-    TableName,
-    Item: marshallToGameDAO(gameDTO)
-  });
-  return client.send(command).then(() => ({
+  return client.put(gameDTO).then(() => ({
     statusCode: 202,
     body: 'accepted'
   }));
@@ -41,18 +34,13 @@ const handlePutGameOperation = async (event: APIGatewayProxyEvent) => {
 
 const handleGetGameOperation = async (event: APIGatewayProxyEvent) => {
   console.debug({ operationHandled: 'getGame' });
-  const gameId = event.pathParameters!['gameId'];
+  const gameId = event.pathParameters!['gameId']!;
   const { username } = parseAuthToken(event);
 
-  const command = new GetItemCommand({
-    TableName,
-    Key: {
-      pk: { S: `user#${username}` },
-      sk: { S: `game#${gameId}` }
-    }
-  });
-  const response = await client.send(command);
-  if (!response.Item) {
+  let game: GameDTO;
+  try {
+    game = await client.get(username, gameId);
+  } catch (e) {
     return {
       statusCode: 403,
       body: 'forbidden'
@@ -60,7 +48,7 @@ const handleGetGameOperation = async (event: APIGatewayProxyEvent) => {
   }
   return {
     statusCode: 200,
-    body: JSON.stringify(marshallToGameDTO(response.Item))
+    body: JSON.stringify(game)
   };
 }
 
@@ -68,25 +56,24 @@ const handleGetGamesOperation = async (event: APIGatewayProxyEvent) => {
   console.debug({ operationHandled: 'getGames' });
   const { username } = parseAuthToken(event);
 
-  const command = new QueryCommand({
-    TableName,
-    ExpressionAttributeValues: {
-      ':pk': { S: `user#${username}`}
-    },
-    KeyConditionExpression: 'pk = :pk'
-  });
-  const response = await client.send(command);
-  response.Items = response.Items || [];
+  let games;
+  try {
+   games = await client.list(username);
+  } catch (e) {
+    console.error(`Error getting game list for ${username}: ${e}`)
+    return {
+      statusCode: 500,
+      body: 'Internal server error'
+    }
+  }
   return {
     statusCode: 200,
-    body: JSON.stringify((response.Items).map(dao => marshallToGameDTO(dao)))
+    body: JSON.stringify(games)
   }
 }
 
 export async function handler(event: APIGatewayProxyEvent) {
   console.info(JSON.stringify(event));
-
-  TableName = process.env[EnvironmentVariableName.DATA_TABLE_NAME]!;
   const { resourcePath, httpMethod } = event.requestContext;
 
   let returnValue: object | null = null;

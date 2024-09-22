@@ -82,7 +82,6 @@ describe('SingleHandlerApi construct', () => {
       apiSpecPath: 'path',
       authArnTemplateKey: 'authArn',
       handlerTemplateKey: 'handler',
-      defaultApiKey: 'key',
     };
     const app = new App();
     const stack = new TestStack(app, 'aTestStack', props);
@@ -102,9 +101,7 @@ describe('SingleHandlerApi construct', () => {
     template.hasResourceProperties('AWS::ApiGateway::RestApi', {
       Body: apiSpec
     });
-    template.hasResourceProperties('AWS::ApiGateway::ApiKey', {
-      Value: 'key'
-    });
+    template.hasResourceProperties('AWS::ApiGateway::ApiKey', {});
     template.hasResourceProperties('AWS::ApiGateway::UsagePlan', {
       Throttle: {
         BurstLimit: 10,

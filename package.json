@@ -16,14 +16,15 @@
     "test:user": "yarn workspace @grid-wolf/user test",
     "test:game": "yarn workspace @grid-wolf/game test",
     "test:map": "yarn workspace @grid-wolf/map test",
-    "test": "concurrently \"yarn test:shared\" \"yarn test:central-infra\" \"yarn test:user\" \"yarn test:game\" \"yarn test:map\""
+    "test": "jest"
   },
   "dependencies": {
     "@types/jest": "^29.5.12",
     "@types/node": "^22.5.1",
     "aws-cdk-lib": "^2.155.0",
-    "concurrently": "^9.0.1",
     "constructs": "^10.3.0",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.2.5",
     "ts-node": "^10.9.2",
     "typescript": "^5.5.4"
   }
