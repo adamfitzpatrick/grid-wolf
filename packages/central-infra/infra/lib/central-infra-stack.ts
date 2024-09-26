@@ -1,7 +1,7 @@
 import { CfnOutput } from 'aws-cdk-lib';
 import { AttributeType, BillingMode, StreamViewType, Table } from 'aws-cdk-lib/aws-dynamodb';
 import { Construct } from 'constructs';
-import { GridWolfStack, outputs } from '@grid-wolf/shared/constructs';
+import { GridWolfStack, parameterNames } from '@grid-wolf/shared/constructs';
 import { GridWolfProps } from '@grid-wolf/shared/domain';
 
 export interface CentralInfraStackProps extends GridWolfProps {
@@ -19,7 +19,7 @@ export class CentralInfraStack extends GridWolfStack {
   }
 
   createDataTable(dataTableName: string) {
-    const table = new Table(this, this.generateId(outputs.DATA_TABLE_NAME), {
+    const table = new Table(this, this.generateId(parameterNames.DATA_TABLE_NAME), {
       tableName: this.generateName(dataTableName),
       partitionKey: {
         name: 'pk',
@@ -36,7 +36,7 @@ export class CentralInfraStack extends GridWolfStack {
     });
 
     new CfnOutput(this, 'DataTableName', {
-      exportName: this.generateName(outputs.DATA_TABLE_NAME),
+      exportName: this.generateName(parameterNames.DATA_TABLE_NAME),
       value: table.tableName
     });
     return table
@@ -45,9 +45,9 @@ export class CentralInfraStack extends GridWolfStack {
   /*
   // TODO move to session package
   createRecordHandler(table: Table, dependencyLayer: LayerVersion) {
-    const sharedLayerArn = Fn.importValue(this.generateName(outputs.SHARED_LAYER_NAME));
+    const sharedLayerArn = Fn.importValue(this.generateName(parameterNames.SHARED_LAYER_NAME));
     const sharedLayer = LayerVersion
-      .fromLayerVersionArn(this, this.generateId(outputs.SHARED_LAYER_NAME), sharedLayerArn);
+      .fromLayerVersionArn(this, this.generateId(parameterNames.SHARED_LAYER_NAME), sharedLayerArn);
     const handlerUnique = `${this.appName}-record-handler`;
     const loggingPolicy = new PolicyDocument({
       statements: [new PolicyStatement({

@@ -6,7 +6,7 @@ import { compile } from 'handlebars';
 import { parse } from 'yaml';
 import { AccessLogFormat, ApiDefinition, ApiKey, CognitoUserPoolsAuthorizer, Deployment, EndpointType, LogGroupLogDestination, MethodLoggingLevel, SpecRestApi, Stage, UsagePlan } from "aws-cdk-lib/aws-apigateway";
 import { CfnOutput, Fn } from "aws-cdk-lib";
-import { outputs } from "..";
+import { parameterNames } from "..";
 import { LogGroup } from "aws-cdk-lib/aws-logs";
 
 export interface SingleHandlerApiProps extends ApiHandlerProps {
@@ -25,7 +25,7 @@ export class SingleHandlerApi extends GridWolfConstruct {
   }
 
   createApi(props: SingleHandlerApiProps, apiHandler: ApiHandler) {
-    const userPoolArn = Fn.importValue(this.generateEnvGeneralName(outputs.USER_POOL_ARN));
+    const userPoolArn = Fn.importValue(this.generateEnvGeneralName(parameterNames.USER_POOL_ARN));
     const specTemplate = compile(fs.readFileSync(props.apiSpecPath, { encoding: 'utf-8'}));
     const apiDefinition = parse(specTemplate({
       [props.authArnTemplateKey]: userPoolArn,

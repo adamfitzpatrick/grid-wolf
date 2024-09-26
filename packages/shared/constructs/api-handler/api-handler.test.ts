@@ -5,6 +5,7 @@ import { Construct } from "constructs";
 import { TracingConfig } from "aws-cdk-lib/aws-sns";
 import { AssetCode, Code, LogFormat } from "aws-cdk-lib/aws-lambda";
 import { EnvironmentVariableName } from "../../utils";
+import { Effect, PolicyStatement } from "aws-cdk-lib/aws-iam";
 
 class TestStack extends Stack {
   constructor(scope: Construct, id: string, props: ApiHandlerProps) {
@@ -18,6 +19,12 @@ describe('api-handler construct', () => {
   let props: ApiHandlerProps
   let template: Template
 
+  function generateStack() {
+    const app = new App();
+    const stack = new TestStack(app, 'TestStack', props);
+    template = Template.fromStack(stack);
+  }
+
   beforeEach(() => {
     jest.spyOn(Code, 'fromAsset').mockReturnValue(Code.fromInline('code') as any as AssetCode);
     props = {
@@ -30,9 +37,7 @@ describe('api-handler construct', () => {
       handlerPath: 'path',
       dataTableName: 'table'
     };
-    const app = new App();
-    const stack = new TestStack(app, 'TestStack', props);
-    template = Template.fromStack(stack);
+    generateStack();
   });
 
   test('should include an execution role', () => {
@@ -45,7 +50,7 @@ describe('api-handler construct', () => {
           }
         }]
       },
-      Policies : [{
+      Policies: [{
         PolicyDocument: {
           Statement: [{
             Effect: 'Allow',
@@ -88,10 +93,52 @@ describe('api-handler construct', () => {
         }
       },
       Layers: [
-        { 'Fn::ImportValue': Match.stringLikeRegexp('tst-grid-wolf-shared') },
-        { 'Fn::ImportValue': Match.stringLikeRegexp('tst-grid-wolf-dependency')}
+        Match.anyValue(),
+        Match.anyValue(),
+        Match.anyValue()
       ],
       Role: Match.anyValue()
+    });
+  });
+
+  test('should include any additional environment variables', () => {
+    props.additionalEnvironmentVariables = {
+      'FOO': 'bar'
+    };
+    generateStack();
+    template.hasResourceProperties('AWS::Lambda::Function', {
+      Environment: {
+        Variables: {
+          [EnvironmentVariableName.DATA_TABLE_NAME]: 'tst-table',
+          'FOO': 'bar'
+        }
+      },
+    });
+  });
+
+  test('should include any additional handler policies', () => {
+    props.additionalHandlerPolicies = [new PolicyStatement({
+      effect: Effect.ALLOW,
+      actions: ['service:Action'],
+      resources: ['*']
+    })];
+    generateStack();
+    template.hasResourceProperties('AWS::IAM::Role', {
+      Policies: [
+        Match.anyValue(),
+        {
+          PolicyDocument: {
+            Statement: [
+              Match.anyValue(),
+              {
+                Effect: 'Allow',
+                Action: 'service:Action',
+                Resource: '*'
+              }
+            ]
+          }
+        }
+      ]
     });
   });
 });

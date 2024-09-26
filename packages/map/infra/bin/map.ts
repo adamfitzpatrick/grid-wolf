@@ -5,7 +5,8 @@ import { MapStack, MapStackProps } from '../lib/map-stack';
 import { loadEnv, EnvironmentVariableName } from '@grid-wolf/shared/utils';
 
 const envMap = loadEnv([
-  EnvironmentVariableName.DATA_TABLE_NAME
+  EnvironmentVariableName.DATA_TABLE_NAME,
+  EnvironmentVariableName.DEPLOY_SECRETS_ARN
 ]);
 const app = new cdk.App();
 
@@ -15,6 +16,7 @@ const props: MapStackProps = {
     region: envMap[EnvironmentVariableName.REGION],
     prefix: envMap[EnvironmentVariableName.PREFIX]
   },
-  dataTableName: process.env[EnvironmentVariableName.DATA_TABLE_NAME]!,
+  dataTableName: envMap[EnvironmentVariableName.DATA_TABLE_NAME],
+  deploySecretsArn: envMap[EnvironmentVariableName.DEPLOY_SECRETS_ARN]
 };
 new MapStack(app, `${props.env.prefix}MapStack`, props);

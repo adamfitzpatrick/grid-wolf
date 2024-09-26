@@ -8,8 +8,6 @@ security:
   - apiKey: []
   - cognitoPool:
     - openid
-x-amazon-binary-media-types:
-  - multipart/form-data
 paths:
   /map:
     put:
@@ -33,7 +31,7 @@ paths:
   /map/{mapId}:
     get:
       description: Retrieve an existing map data entry
-      operationId: getGame
+      operationId: getMap
       parameters: 
         - in: path
           name: mapId
@@ -46,9 +44,68 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ApiResponse'
+                $ref: '#/components/schemas/Map'
         '403':
           description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+      x-amazon-apigateway-integration:
+        type: aws_proxy
+        uri: arn:aws:apigateway:{{region}}:lambda:path/2015-03-31/functions/{{handler}}/invocations
+        httpMethod: POST
+  /map/save-image-url/{userId}/{filename}:
+    get:
+      description: Retrieve pre-signed S3 URL to upload a map image
+      operationId: getMapSaveImageUrl
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: filename
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SaveImageUrl'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+      x-amazon-apigateway-integration:
+        type: aws_proxy
+        uri: arn:aws:apigateway:{{region}}:lambda:path/2015-03-31/functions/{{handler}}/invocations
+        httpMethod: POST
+  /map/image-url/{userId}:
+    get:
+      description: Retrieve URL signing parameters for map image retrieval
+      operationId: getMapImageUrl
+      parameters: 
+        - in: path
+          name: userId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ImageUrlSigningParameters'
+        '400':
+          description: Bad request
           content:
             application/json:
               schema:
@@ -67,7 +124,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ApiResponse'
+                type: array
+                items:
+                  $ref: '#/components/schemas/ApiResponse'
       x-amazon-apigateway-integration:
         type: aws_proxy
         uri: arn:aws:apigateway:{{region}}:lambda:path/2015-03-31/functions/{{handler}}/invocations
@@ -91,6 +150,35 @@ components:
         timestamp:
           type: string
         imageFilename:
+          type: string
+    ImageUrlSigningParameters:
+      type: object
+      required:
+        - userId
+        - keyPairId
+        - policy
+        - signature
+      properties:
+        userId:
+          type: string
+        keyPairId:
+          type: string
+        policy:
+          type: string
+        signature:
+          type: string
+    SaveImageUrl:
+      type: object
+      required:
+        - userId
+        - filename
+        - url
+      properties:
+        userId:
+          type: string
+        filename:
+          type: string
+        url:
           type: string
     ApiResponse:
       type: object

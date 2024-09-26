@@ -6,6 +6,7 @@
     "build": "tsc",
     "test": "jest",
     "cdk": "cdk",
+    "clean": "rm **/*.js",
     "deploy": "yarn build && yarn cdk deploy --require-approval never"
   },
   "dependencies": {

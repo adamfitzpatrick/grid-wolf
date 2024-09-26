@@ -14,8 +14,7 @@ describe('game-stack', () => {
         region: 'us-west-2',
         prefix: 'tst'
       },
-      dataTableName: 'table',
-      defaultApiKey: 'key'
+      dataTableName: 'table'
     }
     const app = new App();
     const stack = new GameStack(app, 'TestStack', props);
