@@ -1,6 +1,4 @@
-import { ForwardRefExoticComponent, MouseEventHandler, PropsWithChildren, ReactNode, RefAttributes } from 'react';
-import { WifiOutlined } from '@ant-design/icons';
-import { AntdIconProps } from '@ant-design/icons/lib/components/AntdIcon';
+import { MouseEventHandler, PropsWithChildren, ReactNode } from 'react';
 
 import './button.css';
 

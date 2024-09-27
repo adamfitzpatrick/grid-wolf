@@ -12,7 +12,7 @@ export function Logo() {
         v 10
         l -8.66 5
         l -8.66 -5
-        v -10 z' fill='none' stroke='#5cdbd3' stroke-width='0.5' />
+        v -10 z' fill='none' stroke='#5cdbd3' strokeWidth='0.5' />
         <text x='2' y='22.5' transform='scale(0.6)' fill='#722ed1'>GW</text>
       </g>
     </svg>

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Button } from "../../atoms/button";
 import { CloseOutlined, LogoutOutlined, ProfileOutlined, UserOutlined } from "@ant-design/icons";
-import { DropDown } from "../../molecules/drop-down";
+import { DropDown } from "../drop-down";
 
 import './account-menu.css'
 

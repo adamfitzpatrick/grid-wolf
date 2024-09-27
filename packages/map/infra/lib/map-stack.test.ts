@@ -88,6 +88,7 @@ describe('map-stack', () => {
         IgnorePublicAcls: true,
         RestrictPublicBuckets: true
       },
+      CorsConfiguration: Match.anyValue(),
       VersioningConfiguration: {
         Status: 'Enabled'
       }

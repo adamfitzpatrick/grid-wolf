@@ -1,0 +1,7 @@
+.maps-label {
+    margin: 1rem 0;
+}
+
+.maps-label>input {
+    margin-left: 1rem;
+}

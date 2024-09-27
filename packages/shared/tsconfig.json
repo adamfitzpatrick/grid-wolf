@@ -1,6 +1,8 @@
 {
   "extends": "../../tsconfig.json",
   "compilerOptions": {
+    "jsx": "react-jsx",
+    "allowSyntheticDefaultImports": true,
     "outDir": "./layer/nodejs/node20/node_modules/@grid-wolf/shared"
   }
 }

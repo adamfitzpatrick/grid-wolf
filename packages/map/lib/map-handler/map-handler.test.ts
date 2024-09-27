@@ -101,7 +101,12 @@ describe('map handler', () => {
 
     await expect(handler(event)).resolves.toEqual({
       statusCode: 202,
-      body: 'accepted'
+      body: 'accepted',
+      headers: {
+        'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key',
+        'Access-Control-Allow-Methods': '*',
+        'Access-Control-Allow-Origin': '*',
+      }
     });
     expect(putSpy).toHaveBeenCalledWith(mapDTO);
   });
@@ -116,7 +121,12 @@ describe('map handler', () => {
 
     await expect(handler(event)).resolves.toEqual({
       statusCode: 200,
-      body: JSON.stringify(mapDTO)
+      body: JSON.stringify(mapDTO),
+      headers: {
+        'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key',
+        'Access-Control-Allow-Methods': '*',
+        'Access-Control-Allow-Origin': '*',
+      }
     });
     expect(getSpy).toHaveBeenCalledWith('user', 'id');
   });
@@ -131,7 +141,12 @@ describe('map handler', () => {
 
     await expect(handler(event)).resolves.toEqual({
       statusCode: 403,
-      body: 'forbidden'
+      body: 'forbidden',
+      headers: {
+        'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key',
+        'Access-Control-Allow-Methods': '*',
+        'Access-Control-Allow-Origin': '*',
+      }
     });
     expect(getSpy).toHaveBeenCalledWith('user', 'id');
   });
@@ -158,21 +173,31 @@ describe('map handler', () => {
           userId: 'user',
           filename: 'filename.jpg',
           url: 'https://signed-url'
-        })
+        }),
+        headers: {
+          'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key',
+          'Access-Control-Allow-Methods': '*',
+          'Access-Control-Allow-Origin': '*',
+        }
       });
 
       expect(putObjectSpy).toHaveBeenCalledWith({
         Bucket: 'bucket',
         Key: 'user/filename.jpg'
       });
-      expect(getS3SignedUrlSpy).toHaveBeenCalledWith({}, {});
+      expect(getS3SignedUrlSpy).toHaveBeenCalledWith({}, {}, { expiresIn: 3600 });
     });
 
     test('should return 400 error if authenticated user does not match requested userId', async () => {
       event.pathParameters!.userId = 'otherUser';
       await expect(handler(event)).resolves.toEqual({
         statusCode: 400,
-        body: 'bad request'
+        body: 'bad request',
+        headers: {
+          'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key',
+          'Access-Control-Allow-Methods': '*',
+          'Access-Control-Allow-Origin': '*',
+        }
       });
     });
   });
@@ -209,7 +234,12 @@ describe('map handler', () => {
           policy: 'abcdef',
           keyPairId: 'key-pair',
           signature: '1234asdf'
-        })
+        }),
+        headers: {
+          'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key',
+          'Access-Control-Allow-Methods': '*',
+          'Access-Control-Allow-Origin': '*',
+        }
       });
   
       expect(fetchSpy).toHaveBeenCalledWith('http://localhost:2773/secretsmanager/get?secretId=secret-arn');
@@ -232,7 +262,12 @@ describe('map handler', () => {
       event.pathParameters!.userId = 'wrongUser';
       await expect(handler(event)).resolves.toEqual({
         statusCode: 400,
-        body: 'bad request'
+        body: 'bad request',
+        headers: {
+          'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key',
+          'Access-Control-Allow-Methods': '*',
+          'Access-Control-Allow-Origin': '*',
+        }
       });
     });
   });
@@ -244,7 +279,12 @@ describe('map handler', () => {
 
     await expect(handler(event)).resolves.toEqual({
       statusCode: 200,
-      body: JSON.stringify([ mapDTO ])
+      body: JSON.stringify([ mapDTO ]),
+      headers: {
+        'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key',
+        'Access-Control-Allow-Methods': '*',
+        'Access-Control-Allow-Origin': '*',
+      }
     });
     expect(listSpy).toHaveBeenCalledWith('user');
   })

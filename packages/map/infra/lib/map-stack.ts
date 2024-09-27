@@ -14,6 +14,7 @@ import {
   PublicKey,
   ViewerProtocolPolicy
 } from "aws-cdk-lib/aws-cloudfront";
+import { HttpMethods } from 'aws-cdk-lib/aws-s3'
 import { S3Origin } from "aws-cdk-lib/aws-cloudfront-origins";
 import { StringParameter } from "aws-cdk-lib/aws-ssm";
 import { Effect, PolicyStatement } from "aws-cdk-lib/aws-iam";
@@ -38,7 +39,12 @@ export class MapStack extends GridWolfStack {
       blockPublicAccess: BlockPublicAccess.BLOCK_ALL,
       bucketName: this.generateName(parameterNames.IMAGE_BUCKET_NAME),
       encryption: BucketEncryption.S3_MANAGED,
-      versioned: true
+      versioned: true,
+      cors: [{
+        allowedMethods: [ HttpMethods.PUT ],
+        allowedOrigins: ['*'],
+        allowedHeaders: [ 'Content-Type' ]
+      }]
     });
 
     const cdnPublicKey = new PublicKey(this, this.generateId(unique('public-key')), {
@@ -89,7 +95,7 @@ export class MapStack extends GridWolfStack {
         new PolicyStatement({
           effect: Effect.ALLOW,
           actions: [ 's3:PutObject' ],
-          resources: [ imageBucket.bucketArn ]
+          resources: [ `${imageBucket.bucketArn}/*` ]
         })
       ]
     });

@@ -34,10 +34,21 @@ const mismatchedUserRejection = (authUser: string, requestedUser: string) => {
   console.warn(
     `Username mismatch: auth user is ${authUser}, but request was for ${requestedUser}`
   )
-  return {
+  return addCORS({
     statusCode: 400,
     body: 'bad request'
-  };
+  });
+}
+
+const addCORS = (baseResponse: object) => {
+  return {
+    ...baseResponse,
+    headers: {
+      'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key',
+      'Access-Control-Allow-Methods': '*',
+      'Access-Control-Allow-Origin': '*',
+    }
+  }
 }
 
 const handlePutMapOperation = async (event: APIGatewayProxyEvent) => {
@@ -48,7 +59,7 @@ const handlePutMapOperation = async (event: APIGatewayProxyEvent) => {
   if (username !== gameDTO.userId) {
     return mismatchedUserRejection(username, gameDTO.userId);
   }
-  return dynamoClient.put(gameDTO).then(() => ({
+  return dynamoClient.put(gameDTO).then(() => addCORS({
     statusCode: 202,
     body: 'accepted'
   }));
@@ -63,15 +74,15 @@ const handleGetMapOperation = async (event: APIGatewayProxyEvent) => {
   try {
     map = await dynamoClient.get(username, mapId);
   } catch (e) {
-    return {
+    return addCORS({
       statusCode: 403,
       body: 'forbidden'
-    }
+    })
   }
-  return {
+  return addCORS({
     statusCode: 200,
     body: JSON.stringify(map)
-  };
+  });
 };
 
 const handleGetMapsOperation = async (event: APIGatewayProxyEvent) => {
@@ -83,15 +94,15 @@ const handleGetMapsOperation = async (event: APIGatewayProxyEvent) => {
     maps = await dynamoClient.list(username);
   } catch (e) {
     console.error(`Error getting game list for ${username}: ${e}`)
-    return {
+    return addCORS({
       statusCode: 500,
       body: 'Internal server error'
-    }
+    })
   }
-  return {
+  return addCORS({
     statusCode: 200,
     body: JSON.stringify(maps)
-  }
+  });
 };
 
 const handleGetMapSaveImageUrlOperation = async (event: APIGatewayProxyEvent) => {
@@ -103,16 +114,16 @@ const handleGetMapSaveImageUrlOperation = async (event: APIGatewayProxyEvent) =>
   if (username !== userId) {
     return mismatchedUserRejection(username, userId);
   }
-
+  
   const Bucket = process.env[EnvironmentVariableName.IMAGE_BUCKET_NAME]!;
   const Key = `${userId}/${filename}`;
   const command = new PutObjectCommand({ Bucket, Key });
-  const url = await getS3SignedUrl(s3Client, command);
+  const url = await getS3SignedUrl(s3Client, command, { expiresIn: 3600 });
 
-  return {
+  return addCORS({
     statusCode: 200,
     body: JSON.stringify({ userId, filename, url })
-  }
+  });
 }
 
 const handleGetMapImageUrlOperation = async (event: APIGatewayProxyEvent) => {
@@ -156,7 +167,7 @@ const handleGetMapImageUrlOperation = async (event: APIGatewayProxyEvent) => {
     url,
     policy
   }));
-  return {
+  return addCORS({
     statusCode: 200,
     body: JSON.stringify({
       userId,
@@ -164,7 +175,7 @@ const handleGetMapImageUrlOperation = async (event: APIGatewayProxyEvent) => {
       keyPairId: signedUrl.searchParams.get('Key-Pair-Id'),
       signature: signedUrl.searchParams.get('Signature')
     })
-  };
+  });
 }
 
 export async function handler(event: APIGatewayProxyEvent) {
