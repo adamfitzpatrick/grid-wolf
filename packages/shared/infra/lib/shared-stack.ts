@@ -7,7 +7,7 @@ import { resolve } from "path";
 import { ParameterTier, StringParameter } from "aws-cdk-lib/aws-ssm";
 
 const DEPENDENCY_LAYER_PATH = resolve(__dirname, '../../dependencies/');
-const SHARED_LAYER_PATH = resolve(__dirname, '../../layer/');
+const SHARED_LAYER_PATH = resolve(__dirname, '../../shared-layer/');
 
 export class SharedStack extends GridWolfStack {
   constructor(scope: Construct, id: string, props: GridWolfProps) {

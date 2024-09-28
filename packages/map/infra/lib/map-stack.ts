@@ -5,6 +5,7 @@ import { SingleHandlerApi } from '@grid-wolf/shared/constructs';
 import { GridWolfProps } from "@grid-wolf/shared/domain";
 import { BlockPublicAccess, Bucket, BucketEncryption } from "aws-cdk-lib/aws-s3";
 import {
+  AccessLevel,
   AllowedMethods,
   CachedMethods,
   CachePolicy,
@@ -14,6 +15,7 @@ import {
   PublicKey,
   ViewerProtocolPolicy
 } from "aws-cdk-lib/aws-cloudfront";
+import { S3BucketOrigin } from "aws-cdk-lib/aws-cloudfront-origins";
 import { HttpMethods } from 'aws-cdk-lib/aws-s3'
 import { S3Origin } from "aws-cdk-lib/aws-cloudfront-origins";
 import { StringParameter } from "aws-cdk-lib/aws-ssm";
@@ -57,7 +59,9 @@ export class MapStack extends GridWolfStack {
     });
     const distro = new Distribution(this, this.generateId(unique('distro')), {
       defaultBehavior: {
-        origin: new S3Origin(imageBucket),
+        origin: S3BucketOrigin.withOriginAccessControl(imageBucket, {
+          originAccessLevels: [ AccessLevel.READ ]
+        }),
         allowedMethods: AllowedMethods.ALLOW_GET_HEAD,
         cachePolicy: CachePolicy.CACHING_OPTIMIZED,
         cachedMethods: CachedMethods.CACHE_GET_HEAD,

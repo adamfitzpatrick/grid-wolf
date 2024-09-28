@@ -21,11 +21,12 @@
   "dependencies": {
     "@types/jest": "^29.5.12",
     "@types/node": "^22.5.1",
-    "aws-cdk-lib": "^2.155.0",
-    "constructs": "^10.3.0",
+    "@yarnpkg/types": "^4.0.0",
+    "aws-cdk-lib": "2.160.0",
+    "constructs": "10.3.0",
     "jest": "^29.7.0",
     "ts-jest": "^29.2.5",
     "ts-node": "^10.9.2",
-    "typescript": "^5.5.4"
+    "typescript": "5.5.4"
   }
 }

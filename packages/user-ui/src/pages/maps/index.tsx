@@ -8,7 +8,6 @@ import axios from "axios";
 export function Maps() {
   const account = useContext(AccountContext);
   const [ file, setFile ] = useState<File | null>(null);
-  const [ signedUrl, setSignedUrl ] = useState<string>('');
 
   const onChange = (event: ChangeEvent<HTMLInputElement>) => {
     if (event.target.files) {
@@ -30,11 +29,8 @@ export function Maps() {
     const formData = new FormData();
     formData.append('image-file', file!);
 
-    const options = {
-      'Content-Type': 'multipart/form-data'
-    }
     const signedUrlData = (await getSignedUrl(file!.name)).data;
-    const result = await axios.put(signedUrlData.url, formData, )
+    const result = await axios.put(signedUrlData.url, formData)
     console.log(result);
   }
 

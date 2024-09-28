@@ -13,18 +13,16 @@
     "@grid-wolf/shared": "workspace:^",
     "@types/aws-lambda": "^8.10.145",
     "@types/jest": "^29.5.12",
+    "@types/jsonwebtoken": "^9",
     "@types/node": "^22.5.4",
-    "aws-cdk-lib": "^2.155.0",
+    "aws-cdk-lib": "2.160.0",
     "aws-xray-sdk": "^3.9.0",
-    "cdk": "^2.155.0",
-    "constructs": "^10.3.0",
+    "cdk": "2.160.0",
+    "constructs": "10.3.0",
     "jest": "^29.7.0",
     "jsonwebtoken": "^9.0.2",
     "ts-jest": "^29.2.5",
     "ts-node": "^10.9.2",
-    "typescript": "^5.5.4"
-  },
-  "devDependencies": {
-    "@types/jsonwebtoken": "^9"
+    "typescript": "5.5.4"
   }
 }

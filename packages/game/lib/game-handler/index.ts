@@ -1,5 +1,5 @@
 import { GameDTO } from "@grid-wolf/shared/domain";
-import { DynamoClient, EnvironmentVariableName } from "@grid-wolf/shared/utils";
+import { DynamoClient } from "@grid-wolf/shared/utils";
 import { APIGatewayProxyEvent } from "aws-lambda";
 import { decode, JwtPayload } from 'jsonwebtoken';
 
