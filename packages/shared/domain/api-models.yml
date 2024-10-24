@@ -1,0 +1,35 @@
+openapi: 3.0.0
+info:
+  title: Models for use with GridWolf and VisualWolf APIs
+  version: 0.1.0
+components:
+  schemas:
+    Game:
+      type: object
+      required:
+        - id
+        - userId
+        - name
+        - timestamp
+      properties:
+        id:
+          type: string
+        userId:
+          type: string
+        name:
+          type: string
+        timestamp:
+          type: string
+    ApiResponse:
+      type: object
+      properties:
+        statusCode:
+          type: integer
+        message:
+          type: string
+  requestBodies:
+    PutGameRequest:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Game'

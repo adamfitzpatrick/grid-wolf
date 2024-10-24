@@ -14,7 +14,7 @@ paths:
       description: Upload a new or replacement game entry
       operationId: putGame
       requestBody: 
-        $ref: '#/components/requestBodies/PutGameRequest'
+        $ref: '../../shared/domain/api-models.yml#/components/requestBodies/PutGameRequest'
       responses:
         '200':
           description: Successful operation
