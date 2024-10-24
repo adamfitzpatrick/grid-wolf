@@ -20,6 +20,53 @@ components:
           type: string
         timestamp:
           type: string
+    Map:
+      type: object
+      required:
+        - id
+        - userId
+        - name
+        - timestamp
+      properties:
+        id:
+          type: string
+        userId:
+          type: string
+        name:
+          type: string
+        timestamp:
+          type: string
+        imageFilename:
+          type: string
+    ImageUrlSigningParameters:
+      type: object
+      required:
+        - userId
+        - keyPairId
+        - policy
+        - signature
+      properties:
+        userId:
+          type: string
+        keyPairId:
+          type: string
+        policy:
+          type: string
+        signature:
+          type: string
+    SaveImageUrl:
+      type: object
+      required:
+        - userId
+        - filename
+        - url
+      properties:
+        userId:
+          type: string
+        filename:
+          type: string
+        url:
+          type: string
     ApiResponse:
       type: object
       properties:
@@ -33,3 +80,8 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/Game'
+    PutMapRequest:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Map'
