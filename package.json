@@ -19,6 +19,9 @@
     "test": "jest"
   },
   "dependencies": {
+    "@testing-library/dom": "^10.4.0",
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/react": "^16.1.0",
     "@types/jest": "^29.5.12",
     "@types/node": "^22.5.1",
     "@yarnpkg/types": "^4.0.0",
