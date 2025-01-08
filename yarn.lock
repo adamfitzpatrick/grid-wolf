@@ -4296,6 +4296,7 @@ __metadata:
     jest: "npm:^29.7.0"
     jsonwebtoken: "npm:^9.0.2"
     node-fetch: "npm:2"
+    stepinto-aws-tools: "npm:^0.5.4"
     ts-jest: "npm:^29.2.5"
     ts-node: "npm:^10.9.2"
     typescript: "npm:5.5.4"
@@ -17721,7 +17722,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"stepinto-aws-tools@npm:0.5.4":
+"stepinto-aws-tools@npm:0.5.4, stepinto-aws-tools@npm:^0.5.4":
   version: 0.5.4
   resolution: "stepinto-aws-tools@npm:0.5.4"
   dependencies:

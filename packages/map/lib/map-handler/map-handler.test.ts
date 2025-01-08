@@ -1,33 +1,17 @@
 import { handler } from '.';
-import { MapDTO } from '@grid-wolf/shared/domain';
+import { MapDTO, MapItem } from '../map-dto';
 import { APIGatewayProxyEvent } from 'aws-lambda';
 import { EnvironmentVariableName } from '@grid-wolf/shared/utils';
-import { PutObjectCommand } from '@aws-sdk/client-s3';
+import { DynamoItemDao } from 'stepinto-aws-tools/clients';
 
 let fetchSpy: jest.Mock;
-let getSpy: jest.Mock;
-let listSpy: jest.Mock;
-let putSpy: jest.Mock;
 let getCdnSignedUrlSpy: jest.Mock;
 let putObjectSpy: jest.Mock;
 let getS3SignedUrlSpy: jest.Mock;
 
+jest.mock('stepinto-aws-tools/clients');
 jest.mock('node-fetch', () => {
   return (url: string) => fetchSpy(url);
-});
-jest.mock('@grid-wolf/shared/utils', () => {
-  const originalModule = jest.requireActual('@grid-wolf/shared/utils');
-
-  return {
-    ...originalModule,
-    DynamoClient: function () {
-      return {
-        get: (...params: any) => getSpy(...params),
-        list: (params: any) => listSpy(params),
-        put: (params: any) => putSpy(params)
-      }
-    }
-  }
 });
 jest.mock('jsonwebtoken', () => {
   return {
@@ -57,6 +41,11 @@ describe('map handler', () => {
   let mapDTO: MapDTO;
   let event: APIGatewayProxyEvent;
 
+  let dao: DynamoItemDao<MapItem, MapDTO>;
+  let getSpy: jest.Mock;
+  let getAllSpy: jest.Mock;
+  let putSpy: jest.Mock;
+
   beforeAll(() => {
     oldConsole = { ...console };
     console.warn = (message: string) => {};
@@ -71,18 +60,20 @@ describe('map handler', () => {
   });
 
   beforeEach(() => {
-    getSpy = jest.fn();
-    listSpy = jest.fn();
-    putSpy = jest.fn();
+    dao = (DynamoItemDao as unknown as jest.MockInstance<DynamoItemDao<MapItem, MapDTO>, any>).mock.instances[0];
+    getSpy = (dao.get as jest.Mock);
+    getAllSpy = (dao.getAll as jest.Mock);
+    putSpy = (dao.put as jest.Mock);
     getCdnSignedUrlSpy = jest.fn();
 
     Authorization = `Bearer TOKEN`;
     mapDTO = {
-      id: 'id',
-      userId: 'user',
+      mapId: 'id',
+      ownerId: 'user',
       name: 'map',
-      timestamp: 1234,
-      imageName: 'image'
+      imageUri: 'uri',
+      gridData: {},
+      created: 'date'
     };
     event = {
       body: JSON.stringify(mapDTO),
@@ -96,8 +87,14 @@ describe('map handler', () => {
     } as any as APIGatewayProxyEvent
   });
 
+  afterEach(() => {
+    getSpy.mockClear();
+    getAllSpy.mockClear();
+    putSpy.mockClear();
+  });
+
   test('PUT /map should save map data to DynamoDB', async () => {
-    putSpy.mockResolvedValue(mapDTO);
+    putSpy.mockResolvedValue(undefined);
 
     await expect(handler(event)).resolves.toEqual({
       statusCode: 202,
@@ -137,7 +134,7 @@ describe('map handler', () => {
     event.pathParameters = {
       mapId: 'id'
     };
-    getSpy.mockRejectedValue('not found');
+    getSpy.mockResolvedValue(null);
 
     await expect(handler(event)).resolves.toEqual({
       statusCode: 403,
@@ -152,7 +149,6 @@ describe('map handler', () => {
   });
 
   describe('GET /map/save-image-url/{userId}/{filename}', () => {
-
     beforeEach(() => {
       process.env[EnvironmentVariableName.IMAGE_BUCKET_NAME] = 'bucket';
       putObjectSpy = jest.fn().mockReturnValue({});
@@ -275,7 +271,7 @@ describe('map handler', () => {
   test('GET /maps should return all map data for the user', async () => {
     event.requestContext.resourcePath = '/maps'
     event.requestContext.httpMethod = 'GET'
-    listSpy.mockResolvedValue([ mapDTO ]);
+    getAllSpy.mockResolvedValue([ mapDTO ]);
 
     await expect(handler(event)).resolves.toEqual({
       statusCode: 200,
@@ -286,6 +282,6 @@ describe('map handler', () => {
         'Access-Control-Allow-Origin': '*',
       }
     });
-    expect(listSpy).toHaveBeenCalledWith('user');
+    expect(getAllSpy).toHaveBeenCalledWith('user');
   })
 });

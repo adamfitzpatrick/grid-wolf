@@ -7,10 +7,11 @@ components:
     Game:
       type: object
       required:
-        - id
-        - userId
+        - gameId
+        - ownerId
         - name
-        - timestamp
+        - players
+        - created
       properties:
         id:
           type: string
@@ -18,7 +19,11 @@ components:
           type: string
         name:
           type: string
-        timestamp:
+        players: 
+          type: array
+          items:
+            type: string
+        created:
           type: string
     Map:
       type: object

@@ -24,9 +24,6 @@
         }, {
             "name": "user",
             "path": "./packages/user"
-        }, {
-            "name": "user-ui",
-            "path": "./packages/user-ui"
         }
     ],
     "settings": {

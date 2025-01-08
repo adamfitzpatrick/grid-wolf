@@ -1,11 +1,12 @@
-import { MapDTO } from '@grid-wolf/shared/domain';
-import { DynamoClient, EnvironmentVariableName } from '@grid-wolf/shared/utils';
+import { MapItem, MapDTO, mapMapper } from '../map-dto';
+import { EnvironmentVariableName } from '@grid-wolf/shared/utils';
 import { getSignedUrl as getCdnSignedUrl } from '@aws-sdk/cloudfront-signer';
 import { APIGatewayProxyEvent } from 'aws-lambda';
 import { decode, JwtPayload } from 'jsonwebtoken';
 import fetch from 'node-fetch';
 import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
 import { getSignedUrl as getS3SignedUrl } from '@aws-sdk/s3-request-presigner'
+import { DynamoItemDao } from 'stepinto-aws-tools/clients';
 
 interface Secret {
   SecretString: string;
@@ -13,8 +14,8 @@ interface Secret {
 interface PrivateKeySecretString {
   'cdn-private-key': string;
 }
-
-const dynamoClient = new DynamoClient<MapDTO>('MapDTO');
+const tableName = process.env[EnvironmentVariableName.DATA_TABLE_NAME];
+const dao = new DynamoItemDao<MapItem, MapDTO>(tableName!, mapMapper);
 const s3Client = new S3Client();
 
 const SESSION_TOKEN = process.env['AWS_SESSION_TOKEN']!
@@ -53,13 +54,13 @@ const addCORS = (baseResponse: object) => {
 
 const handlePutMapOperation = async (event: APIGatewayProxyEvent) => {
   console.debug({ operationHandled: 'putMap' });
-  const gameDTO = JSON.parse(event.body!) as MapDTO;
+  const mapDTO = JSON.parse(event.body!) as MapDTO;
   const { username } = parseAuthToken(event);
 
-  if (username !== gameDTO.userId) {
-    return mismatchedUserRejection(username, gameDTO.userId);
+  if (username !== mapDTO.ownerId) {
+    return mismatchedUserRejection(username, mapDTO.ownerId);
   }
-  return dynamoClient.put(gameDTO).then(() => addCORS({
+  return dao.put(mapDTO).then(() => addCORS({
     statusCode: 202,
     body: 'accepted'
   }));
@@ -70,10 +71,8 @@ const handleGetMapOperation = async (event: APIGatewayProxyEvent) => {
   const mapId = event.pathParameters!['mapId']!;
   const { username } = parseAuthToken(event);
 
-  let map: MapDTO;
-  try {
-    map = await dynamoClient.get(username, mapId);
-  } catch (e) {
+  let map = await dao.get(username, mapId);
+  if (!map) {
     return addCORS({
       statusCode: 403,
       body: 'forbidden'
@@ -89,16 +88,7 @@ const handleGetMapsOperation = async (event: APIGatewayProxyEvent) => {
   console.debug({ operationHandled: 'getMaps' });
   const { username } = parseAuthToken(event);
 
-  let maps;
-  try {
-    maps = await dynamoClient.list(username);
-  } catch (e) {
-    console.error(`Error getting game list for ${username}: ${e}`)
-    return addCORS({
-      statusCode: 500,
-      body: 'Internal server error'
-    })
-  }
+  let maps = await dao.getAll(username);
   return addCORS({
     statusCode: 200,
     body: JSON.stringify(maps)

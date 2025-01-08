@@ -2,8 +2,21 @@ import { APIGatewayProxyEvent } from "aws-lambda";
 import { decode, JwtPayload } from 'jsonwebtoken';
 import { DynamoItemDao } from 'stepinto-aws-tools/clients';
 import { gameMapper, GameItem, GameDTO } from "../game-dto";
+import { EnvironmentVariableName } from "@grid-wolf/shared/utils";
 
-let dao = new DynamoItemDao<GameItem, GameDTO>('Table', gameMapper);
+let tableName = process.env[EnvironmentVariableName.DATA_TABLE_NAME];
+let dao = new DynamoItemDao<GameItem, GameDTO>(tableName!, gameMapper);
+
+const addCORS = (baseResponse: object) => {
+  return {
+    ...baseResponse,
+    headers: {
+      'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key',
+      'Access-Control-Allow-Methods': '*',
+      'Access-Control-Allow-Origin': '*',
+    }
+  }
+}
 
 const parseAuthToken = (event: APIGatewayProxyEvent) => {
   // Auth header is always present because requests are not accepted without it.
@@ -21,16 +34,16 @@ const handlePutGameOperation = async (event: APIGatewayProxyEvent) => {
     console.warn(
       `Username mismatch: auth user is ${username}, but request was for ${gameDTO.ownerId}`
     )
-    return {
+    return addCORS({
       statusCode: 400,
       body: 'bad request'
-    };
+    });
   }
   return dao.put(gameDTO).then(() => {
-    return {
+    return addCORS({
       statusCode: 202,
       body: 'accepted'
-    }
+    })
   });
 }
 
@@ -41,15 +54,15 @@ const handleGetGameOperation = async (event: APIGatewayProxyEvent) => {
 
   let game = await dao.get(username, gameId);
   if (!game) {
-    return {
+    return addCORS({
       statusCode: 403,
       body: 'access denied'
-    }
+    })
   }
-  return {
+  return addCORS({
     statusCode: 200,
     body: JSON.stringify(game)
-  };
+  });
 }
 
 const handleGetGamesOperation = async (event: APIGatewayProxyEvent) => {
@@ -57,10 +70,10 @@ const handleGetGamesOperation = async (event: APIGatewayProxyEvent) => {
   const { username } = parseAuthToken(event);
 
   let games = await dao.getAll(username);
-  return {
+  return addCORS({
     statusCode: 200,
     body: JSON.stringify(games)
-  }
+  })
 }
 
 export async function handler(event: APIGatewayProxyEvent) {

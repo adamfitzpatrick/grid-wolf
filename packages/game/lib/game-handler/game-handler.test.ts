@@ -68,7 +68,12 @@ describe('game handler', () => {
   test('/game PUT should save game data to dynamodb', async () => {
     await expect(handler(event)).resolves.toEqual({
       statusCode: 202,
-      body: 'accepted'
+      body: 'accepted',
+      headers: {
+        'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key',
+        'Access-Control-Allow-Methods': '*',
+        'Access-Control-Allow-Origin': '*',
+      }
     });
     expect(daoPut).toHaveBeenCalledWith(gameDTO);
   });
@@ -79,7 +84,12 @@ describe('game handler', () => {
 
     expect(await handler(event)).toEqual({
       statusCode: 400,
-      body: 'bad request'
+      body: 'bad request',
+      headers: {
+        'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key',
+        'Access-Control-Allow-Methods': '*',
+        'Access-Control-Allow-Origin': '*',
+      }
     });
 
     expect(daoPut).not.toHaveBeenCalled();
@@ -95,7 +105,12 @@ describe('game handler', () => {
 
     await expect(handler(event)).resolves.toEqual({
       statusCode: 200,
-      body: JSON.stringify(gameDTO)
+      body: JSON.stringify(gameDTO),
+      headers: {
+        'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key',
+        'Access-Control-Allow-Methods': '*',
+        'Access-Control-Allow-Origin': '*',
+      }
     });
     expect(daoGet).toHaveBeenCalledWith('user', 'id');
   });
@@ -110,7 +125,12 @@ describe('game handler', () => {
 
     await expect(handler(event)).resolves.toEqual({
       statusCode: 403,
-      body: 'access denied'
+      body: 'forbidden',
+      headers: {
+        'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key',
+        'Access-Control-Allow-Methods': '*',
+        'Access-Control-Allow-Origin': '*',
+      }
     });
     expect(daoGet).toHaveBeenCalledWith('user', 'id');
   });
@@ -122,7 +142,12 @@ describe('game handler', () => {
 
     await expect(handler(event)).resolves.toEqual({
       statusCode: 200,
-      body: JSON.stringify([ gameDTO ])
+      body: JSON.stringify([ gameDTO ]),
+      headers: {
+        'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key',
+        'Access-Control-Allow-Methods': '*',
+        'Access-Control-Allow-Origin': '*',
+      }
     });
 
     expect(daoGetAll).toHaveBeenCalledWith('user');

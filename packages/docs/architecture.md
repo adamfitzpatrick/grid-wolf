@@ -41,3 +41,7 @@ in-depth details on how each step is accomplished.
         src='./assets/high-level-system.drawio.svg'
         width='960px'>
 </center>
+
+Each application component consists of a distinct micro-app included in this repository.  For details on the function of each micro-app, refer to the documentation available in each package:
+
+- [game](../game/README.md)

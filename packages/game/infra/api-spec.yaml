@@ -14,14 +14,14 @@ paths:
       description: Upload a new or replacement game entry
       operationId: putGame
       requestBody: 
-        $ref: 'https://raw.githubusercontent.com/adamfitzpatrick/grid-wolf/refs/heads/main/packages/shared/domain/api-models.yml#/components/requestBodies/PutGameRequest'
+        $ref: '#/components/requestBodies/PutGameRequest'
       responses:
         '200':
           description: Successful operation
           content:
             application/json:
               schema:
-                $ref: 'https://raw.githubusercontent.com/adamfitzpatrick/grid-wolf/refs/heads/main/packages/shared/domain/api-models.yml#/components/schemas/ApiResponse'
+                $ref: '#/components/schemas/ApiResponse'
         '400':
           description: Bad request
       x-amazon-apigateway-integration:
@@ -39,18 +39,18 @@ paths:
           schema:
             type: string
       responses:
-        '200':
-          description: Successful operation
+        '202':
+          description: accepted
           content:
             application/json:
               schema:
-                $ref: 'https://raw.githubusercontent.com/adamfitzpatrick/grid-wolf/refs/heads/main/packages/shared/domain/api-models.yml#/components/schemas/ApiResponse'
+                $ref: '#/components/schemas/ApiResponse'
         '403':
           description: Forbidden
           content:
             application/json:
               schema:
-                $ref: 'https://raw.githubusercontent.com/adamfitzpatrick/grid-wolf/refs/heads/main/packages/shared/domain/api-models.yml#/components/schemas/ApiResponse'
+                $ref: '#/components/schemas/ApiResponse'
       x-amazon-apigateway-integration:
         type: aws_proxy
         uri: arn:aws:apigateway:{{region}}:lambda:path/2015-03-31/functions/{{handler}}/invocations
@@ -65,12 +65,47 @@ paths:
           content:
             application/json:
               schema:
-                $ref: 'https://raw.githubusercontent.com/adamfitzpatrick/grid-wolf/refs/heads/main/packages/shared/domain/api-models.yml#/components/schemas/ApiResponse'
+                $ref: '#/components/schemas/ApiResponse'
       x-amazon-apigateway-integration:
         type: aws_proxy
         uri: arn:aws:apigateway:{{region}}:lambda:path/2015-03-31/functions/{{handler}}/invocations
         httpMethod: POST
 components:
+  schemas:
+    Game:
+      type: object
+      required:
+        - gameId
+        - ownerId
+        - name
+        - players
+        - created
+      properties:
+        id:
+          type: string
+        userId:
+          type: string
+        name:
+          type: string
+        players: 
+          type: array
+          items:
+            type: string
+        created:
+          type: string
+    ApiResponse:
+      type: object
+      properties:
+        statusCode:
+          type: integer
+        message:
+          type: string
+  requestBodies:
+    PutGameRequest:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Game'
   securitySchemes:
     apiKey:
       type: apiKey
