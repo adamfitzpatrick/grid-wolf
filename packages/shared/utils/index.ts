@@ -1,10 +1,8 @@
 import { loadEnv, EnvironmentVariableName } from './env-loader';
-import { DynamoClient } from './dynamo-client';
 
 export {
   loadEnv,
-  EnvironmentVariableName,
-  DynamoClient
+  EnvironmentVariableName
 }
 
 export const UNPROCESSED_RECORD = 'unprocessed record';

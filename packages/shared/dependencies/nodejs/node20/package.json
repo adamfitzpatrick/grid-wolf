@@ -6,6 +6,7 @@
     "dotenv": "^16.4.5",
     "jsonwebtoken": "^9.0.2",
     "node-fetch": "2",
-    "parse-multipart": "^1.0.4"
+    "parse-multipart": "^1.0.4",
+    "stepinto-aws-tools": "^0.5.4"
   }
 }

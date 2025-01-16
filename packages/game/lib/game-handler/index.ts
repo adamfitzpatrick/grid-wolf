@@ -56,7 +56,7 @@ const handleGetGameOperation = async (event: APIGatewayProxyEvent) => {
   if (!game) {
     return addCORS({
       statusCode: 403,
-      body: 'access denied'
+      body: 'forbidden'
     })
   }
   return addCORS({
@@ -88,8 +88,8 @@ export async function handler(event: APIGatewayProxyEvent) {
   } else if (resourcePath === '/games' && httpMethod === 'GET') {
     returnValue = await handleGetGamesOperation(event);
   } else {
-    console.error(`No handler to invoke for path ${resourcePath} and method ${httpMethod}`)
+    throw new Error(`No handler to invoke for path ${resourcePath} and method ${httpMethod}`);
   }
-  console.debug({ returnValue })
+  console.debug({ returnValue });
   return returnValue;
 }

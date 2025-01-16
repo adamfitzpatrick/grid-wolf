@@ -1,17 +1,19 @@
 import { Construct } from "constructs";
 import { Effect, PolicyDocument, PolicyStatement, Role, ServicePrincipal } from "aws-cdk-lib/aws-iam";
-import { Code, Function as LambdaFunction, LayerVersion, LoggingFormat, Runtime, Tracing } from 'aws-cdk-lib/aws-lambda'
+import { ApplicationLogLevel, Code, Function as LambdaFunction, LayerVersion, LoggingFormat, Runtime, SystemLogLevel, Tracing } from 'aws-cdk-lib/aws-lambda'
 import { Duration, Fn } from "aws-cdk-lib";
 import { parameterNames } from "..";
 import { EnvironmentVariableName } from "../../utils";
 import { GridWolfConstruct, GridWolfConstructProps } from "../grid-wolf-construct";
 import { StringParameter } from "aws-cdk-lib/aws-ssm";
+import { LogLevel } from "aws-cdk-lib/aws-lambda-nodejs";
 
 const SECRETS_LAMBDA_EXTENSION_ARN =
   'arn:aws:lambda:us-west-2:345057560386:layer:AWS-Parameters-and-Secrets-Lambda-Extension:12';
 
 export interface ApiHandlerProps extends GridWolfConstructProps {
   handlerPath: string;
+  handler: string;
   dataTableName: string;
   additionalEnvironmentVariables?: { [key: string]: string };
   additionalHandlerPolicies?: PolicyStatement[]
@@ -84,7 +86,7 @@ export class ApiHandler extends GridWolfConstruct {
       functionName: this.generateName('handler'),
       runtime: Runtime.NODEJS_20_X,
       code: Code.fromAsset(props.handlerPath),
-      handler: 'index.handler',
+      handler: props.handler,
       tracing: Tracing.ACTIVE,
       environment,
       layers: [
@@ -94,6 +96,8 @@ export class ApiHandler extends GridWolfConstruct {
       ],
       role,
       timeout: Duration.minutes(1),
+      applicationLogLevelV2: ApplicationLogLevel.INFO,
+      systemLogLevelV2: SystemLogLevel.WARN,
       loggingFormat: LoggingFormat.JSON
     });
   }

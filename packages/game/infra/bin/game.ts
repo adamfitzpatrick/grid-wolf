@@ -3,6 +3,9 @@ import 'source-map-support/register';
 import * as cdk from 'aws-cdk-lib';
 import { GameStack, GameStackProps } from '../lib/game-stack';
 import { loadEnv, EnvironmentVariableName } from '@grid-wolf/shared/utils';
+import { config } from 'dotenv';
+
+config({ path: [ '../../.env.local', '../../.env.dev', '../../.env']});
 
 const envMap = loadEnv([
   EnvironmentVariableName.DATA_TABLE_NAME
