@@ -14,10 +14,13 @@
 #!.yarn/cache
 .pnp.*
 
+# IDE and OS
 .vscode
+**/.DS_Store
 
 # dotenv values
 .env.local
+.env
 
 # CDK
 cdk.out

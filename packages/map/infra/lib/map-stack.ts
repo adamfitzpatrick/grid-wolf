@@ -79,6 +79,7 @@ export class MapStack extends GridWolfStack {
       constructName: 'map',
       apiSpecPath: SPEC_PATH,
       handlerPath: HANDLER_PATH,
+      handler: 'map-handler/index.handler',
       authArnTemplateKey: 'authArn',
       handlerTemplateKey: 'handler',
       additionalEnvironmentVariables: {

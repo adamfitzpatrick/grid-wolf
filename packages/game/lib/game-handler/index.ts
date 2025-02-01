@@ -2,7 +2,7 @@ import { APIGatewayProxyEvent } from "aws-lambda";
 import { decode, JwtPayload } from 'jsonwebtoken';
 import { DynamoItemDao } from 'stepinto-aws-tools/clients';
 import { gameMapper, GameItem, GameDTO } from "../game-dto";
-import { EnvironmentVariableName } from "@grid-wolf/shared/utils";
+import { EnvironmentVariableName } from "stepinto-aws-tools/utils";
 
 let tableName = process.env[EnvironmentVariableName.DATA_TABLE_NAME];
 let dao = new DynamoItemDao<GameItem, GameDTO>(tableName!, gameMapper);
@@ -25,19 +25,23 @@ const parseAuthToken = (event: APIGatewayProxyEvent) => {
   return decode(token) as JwtPayload;
 }
 
+const handleUsernameMismatch = (username: string, owner: string) => {
+  console.warn(
+    `Username mismatch: auth user is ${username}, but request was for ${owner}`
+  )
+  return addCORS({
+    statusCode: 400,
+    body: 'bad request'
+  });
+}
+
 const handlePutGameOperation = async (event: APIGatewayProxyEvent) => {
   console.debug({ operationHandled: 'putGame' });
   const gameDTO = JSON.parse(event.body!) as GameDTO;
   const { username } = parseAuthToken(event);
 
   if (username !== gameDTO.ownerId) {
-    console.warn(
-      `Username mismatch: auth user is ${username}, but request was for ${gameDTO.ownerId}`
-    )
-    return addCORS({
-      statusCode: 400,
-      body: 'bad request'
-    });
+    return handleUsernameMismatch(username, gameDTO.ownerId);
   }
   return dao.put(gameDTO).then(() => {
     return addCORS({
@@ -76,6 +80,22 @@ const handleGetGamesOperation = async (event: APIGatewayProxyEvent) => {
   })
 }
 
+const handleDeleteGameOperation = async (event: APIGatewayProxyEvent) => {
+  console.debug({ operationHandled: 'deleteGame'});
+  const { username } = parseAuthToken(event);
+
+  const gameDTO = JSON.parse(event.body!) as GameDTO;
+  if (username !== gameDTO.ownerId) {
+    return handleUsernameMismatch(username, gameDTO.ownerId);
+  }
+  return dao.delete(gameDTO.ownerId, gameDTO.gameId).then(() => {
+    return addCORS({
+      statusCode: 202,
+      body: 'accepted'
+    })
+  })
+}
+
 export async function handler(event: APIGatewayProxyEvent) {
   console.info(JSON.stringify(event));
   const { resourcePath, httpMethod } = event.requestContext;
@@ -87,6 +107,8 @@ export async function handler(event: APIGatewayProxyEvent) {
     returnValue = await handleGetGameOperation(event);
   } else if (resourcePath === '/games' && httpMethod === 'GET') {
     returnValue = await handleGetGamesOperation(event);
+  } else if (resourcePath === '/game' && httpMethod === 'DELETE') {
+    returnValue = await handleDeleteGameOperation(event);
   } else {
     throw new Error(`No handler to invoke for path ${resourcePath} and method ${httpMethod}`);
   }

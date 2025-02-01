@@ -18,6 +18,7 @@ describe('game handler', () => {
   let daoPut: jest.Mock;
   let daoGet: jest.Mock;
   let daoGetAll: jest.Mock;
+  let daoDelete: jest.Mock;
 
   beforeAll(() => {
     oldConsole = { ...console };
@@ -39,7 +40,8 @@ describe('game handler', () => {
       ownerId: 'user',
       name: 'name',
       players: [],
-      timestamp: 1234
+      timestamp: 1234,
+      active: true
     };
     event = {
       body: JSON.stringify(gameDTO),
@@ -57,12 +59,14 @@ describe('game handler', () => {
     daoPut.mockResolvedValue(undefined);
     daoGet = daoMock.get as jest.Mock;
     daoGetAll = daoMock.getAll as jest.Mock;
+    daoDelete = daoMock.delete as jest.Mock;
   });
 
   afterEach(() => {
     daoPut.mockClear();
     daoGet.mockClear();
     daoGetAll.mockClear();
+    daoDelete.mockClear();
   })
 
   test('/game PUT should save game data to dynamodb', async () => {
@@ -78,7 +82,7 @@ describe('game handler', () => {
     expect(daoPut).toHaveBeenCalledWith(gameDTO);
   });
 
-  test('/game PUT should return 401 if Authorized user does not match request body user', async () => {
+  test('/game PUT should return 400 if Authorized user does not match request body user', async () => {
     gameDTO.ownerId = 'otherperson';
     event.body = JSON.stringify(gameDTO);
 
@@ -136,9 +140,9 @@ describe('game handler', () => {
   });
 
   test('/games GET should return a list of game data for the user', async () => {
-    event.requestContext.resourcePath = '/games'
-    event.requestContext.httpMethod = 'GET'
-    daoGetAll.mockReturnValue([ gameDTO ]);
+    event.requestContext.resourcePath = '/games';
+    event.requestContext.httpMethod = 'GET';
+    daoGetAll.mockResolvedValue([ gameDTO ]);
 
     await expect(handler(event)).resolves.toEqual({
       statusCode: 200,
@@ -151,5 +155,41 @@ describe('game handler', () => {
     });
 
     expect(daoGetAll).toHaveBeenCalledWith('user');
+  });
+
+  test('/game DELETE should remove an item from DynamoDB', async () => {
+    event.requestContext.resourcePath = '/game'
+    event.requestContext.httpMethod = 'DELETE';
+    daoDelete.mockResolvedValue({});
+
+    await expect(handler(event)).resolves.toEqual({
+      statusCode: 202,
+      body: 'accepted',
+      headers: {
+        'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key',
+        'Access-Control-Allow-Methods': '*',
+        'Access-Control-Allow-Origin': '*',
+      }
+    });
+
+    expect(daoDelete).toHaveBeenCalledWith('user', 'id');
+  });
+
+  test('/game DELETE should return a 400 if authorized user does not match delete request', async () => {
+    gameDTO.ownerId = 'otherperson';
+    event.body = JSON.stringify(gameDTO);
+    event.requestContext.resourcePath = '/game'
+    event.requestContext.httpMethod = 'DELETE';
+    daoDelete.mockResolvedValue({});
+
+    await expect(handler(event)).resolves.toEqual({
+      statusCode: 400,
+      body: 'bad request',
+      headers: {
+        'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key',
+        'Access-Control-Allow-Methods': '*',
+        'Access-Control-Allow-Origin': '*',
+      }
+    });
   });
 });

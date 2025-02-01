@@ -6,6 +6,7 @@ export interface GameItem extends DynamoItem {
   name: string;
   players: string[];
   timestamp: number;
+  active: boolean;
 }
 
 export interface GameDTO {
@@ -14,6 +15,7 @@ export interface GameDTO {
   name: string;
   players: string[]; // TODO Incorporate UserDTO
   timestamp: number;
+  active: boolean
 }
 
 export const gameMapper = new ObjectMapper<GameItem, GameDTO>({

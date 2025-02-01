@@ -28,6 +28,24 @@ paths:
         type: aws_proxy
         uri: arn:aws:apigateway:{{region}}:lambda:path/2015-03-31/functions/{{handler}}/invocations
         httpMethod: POST
+    delete:
+      description: Remove an existing game entry
+      operationId: deleteGame
+      requestBody: 
+        $ref: '#/components/requestBodies/DeleteGameRequest'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        '400':
+          description: Bad request
+      x-amazon-apigateway-integration:
+        type: aws_proxy
+        uri: arn:aws:apigateway:{{region}}:lambda:path/2015-03-31/functions/{{handler}}/invocations
+        httpMethod: POST
   '/game/{gameId}':
     get:
       description: Retrieve an existing game entry
@@ -102,6 +120,11 @@ components:
           type: string
   requestBodies:
     PutGameRequest:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Game'
+    DeleteGameRequest:
       content:
         application/json:
           schema:

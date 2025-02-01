@@ -24,6 +24,9 @@
         }, {
             "name": "user",
             "path": "./packages/user"
+        }, {
+            "name": "integration-tests",
+            "path": "./packages/integration-tests"
         }
     ],
     "settings": {
@@ -47,11 +50,13 @@
         "markdown-preview-github-styles.colorTheme": "light",
         "jest.disabledWorkspaceFolders": [
             "grid-wolf",
-            "docs"
+            "docs",
+            "integration-tests"
         ],
         "emmet.showExpandedAbbreviation": "never",
-        "liveServer.settings.multiRootWorkspaceName": "grid-wolf",
-        "svg.preview.background": "white"
+        "[cucumber]": {
+            "editor.semanticHighlighting.enabled": true
+        },
     },
     "extensions": {
         "recommendations": [

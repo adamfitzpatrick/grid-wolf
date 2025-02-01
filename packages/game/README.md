@@ -161,3 +161,9 @@ None
 > ```
 
 </details>
+
+## Integration Testing
+
+- **PUT /game happy path**
+- **PUT /game incorrect payload**
+- **PUT /game username/authorization mismatch**

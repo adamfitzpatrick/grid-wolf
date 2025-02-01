@@ -2,6 +2,7 @@ import { Match, Template } from "aws-cdk-lib/assertions";
 import { GameStack, GameStackProps } from "./game-stack";
 import { App } from "aws-cdk-lib";
 import { EnvironmentVariableName } from "@grid-wolf/shared/utils";
+import { DATA_TABLE_NAME } from "@grid-wolf/shared/constructs/parameter-names";
 
 describe('game-stack', () => {
   let props: GameStackProps;
@@ -26,7 +27,7 @@ describe('game-stack', () => {
       FunctionName: 'tst-grid-wolf-game-handler',
       Environment: {
         Variables: {
-          [EnvironmentVariableName.DATA_TABLE_NAME]: 'tst-table'
+          STEPINTO_APP_DATA_TABLE_NAME: 'tst-table'
         }
       }
     });

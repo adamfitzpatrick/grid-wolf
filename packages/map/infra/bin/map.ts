@@ -1,8 +1,11 @@
 #!/usr/bin/env node
 import 'source-map-support/register';
 import * as cdk from 'aws-cdk-lib';
+import { config } from 'dotenv';
 import { MapStack, MapStackProps } from '../lib/map-stack';
 import { loadEnv, EnvironmentVariableName } from '@grid-wolf/shared/utils';
+
+config({ path: [ '../../.env.local', '../../.env.dev', '../../.env']});
 
 const envMap = loadEnv([
   EnvironmentVariableName.DATA_TABLE_NAME,

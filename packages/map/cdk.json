@@ -1,5 +1,5 @@
 {
-  "app": "npx ts-node --prefer-ts-exts infra/bin/map.ts",
+  "app": "yarn dlx ts-node --prefer-ts-exts infra/bin/map.ts",
   "watch": {
     "include": [
       "**"

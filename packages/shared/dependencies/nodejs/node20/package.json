@@ -7,6 +7,6 @@
     "jsonwebtoken": "^9.0.2",
     "node-fetch": "2",
     "parse-multipart": "^1.0.4",
-    "stepinto-aws-tools": "^0.5.4"
+    "stepinto-aws-tools": "0.7.3"
   }
 }

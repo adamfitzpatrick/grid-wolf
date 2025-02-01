@@ -15,6 +15,7 @@ export interface ApiHandlerProps extends GridWolfConstructProps {
   handlerPath: string;
   handler: string;
   dataTableName: string;
+  usesSecrets?: boolean;
   additionalEnvironmentVariables?: { [key: string]: string };
   additionalHandlerPolicies?: PolicyStatement[]
 }
@@ -71,14 +72,22 @@ export class ApiHandler extends GridWolfConstruct {
       sharedLayerArn);
     const dependencyLayer = LayerVersion.fromLayerVersionArn(this, this.generateId('dep-layer'),
       dependencyLayerArn);
-    const secretsExtensionsLayer = LayerVersion.fromLayerVersionArn(
-      this,
-      this.generateId('secrets-layer'),
-      SECRETS_LAMBDA_EXTENSION_ARN
-    );
+    const layers = [
+      sharedLayer,
+      dependencyLayer
+    ];
+    if (props.usesSecrets) {
+      const secretsExtensionsLayer = LayerVersion.fromLayerVersionArn(
+        this,
+        this.generateId('secrets-layer'),
+        SECRETS_LAMBDA_EXTENSION_ARN
+      );
+      layers.push(secretsExtensionsLayer);
+    }
     
     const additionalEnvironmentVariables = props.additionalEnvironmentVariables || {};
     const environment = {
+      PARAMETERS_SECRETS_EXTENSION_LOG_LEVEL: 'warn',
       [EnvironmentVariableName.DATA_TABLE_NAME]: this.generateEnvGeneralName(props.dataTableName),
       ...additionalEnvironmentVariables
     }
@@ -89,15 +98,10 @@ export class ApiHandler extends GridWolfConstruct {
       handler: props.handler,
       tracing: Tracing.ACTIVE,
       environment,
-      layers: [
-        sharedLayer,
-        dependencyLayer,
-        secretsExtensionsLayer
-      ],
+      layers,
       role,
       timeout: Duration.minutes(1),
       applicationLogLevelV2: ApplicationLogLevel.INFO,
-      systemLogLevelV2: SystemLogLevel.WARN,
       loggingFormat: LoggingFormat.JSON
     });
   }

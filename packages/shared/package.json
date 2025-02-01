@@ -5,7 +5,7 @@
     "test": "jest",
     "tdd": "jest --watch",
     "build": "tsc",
-    "buildDepLayer": "cd dependencies/nodejs/node20 && yarn install",
+    "buildDepLayer": "cd dependencies/nodejs/node20 && yarn install && yarn cache clean",
     "cdk": "cdk",
     "clean": "rimraf cdk.out",
     "deploy": "yarn clean && yarn build && yarn buildDepLayer && cdk deploy --require-approval never"
