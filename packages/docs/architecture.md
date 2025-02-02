@@ -1,5 +1,27 @@
 # Architecture
 
+## Overview
+
+The goal of `grid-wolf` is to provide participants in table-top role playing games (TTRPG) with
+a way to visualize and track game scenarios in real-time over the internet. The application
+emphasizes the following aspects:
+
+- **Accessibility**: Software is *perceivable* through various senses, *operable* with assistive
+technologies, *understandable* via clear instructions, information sets and navigation, and
+*robustly* compatible with different devices and browsers.
+- **Performance**: Systems respond quickly to user inputs even under high application loads, and
+leverage strategies to ensure usability in circumstances with poor network connectivity.
+- **Ease-of-Use**: Interfaces are intuitive and flexible, requiring minimum user inputs to achieve
+desired goals.
+- **Availability**: Architecture relies on modern cloud-based technologies to maximize reliability,
+provide redundancy, and eliminate maintenance down-times.
+- **Maintainability**: Application components feature built-in metrics and alarms, are discrete and
+of minimal complexity, and manual interventions are nearly eliminated.
+
+### Scenarios
+
+1. 
+
 ## User Actions
 
 <center>

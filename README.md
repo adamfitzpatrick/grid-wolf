@@ -1,7 +1,7 @@
 # grid-wolf
 
 `grid-wolf` is a project meant primarily to demonstrate design and development patterns associated
-with the [AWS Well-Architected Framework](./packages/docs/aws-well-architected.md).
+with skillfully architected software solutions.
 
 The `grid-wolf` application provides UIs, APIs, code and infrastructure for managing encounters and
 combat in table-top roleplaying games. A gamemaster can upload map images, grid configuration and

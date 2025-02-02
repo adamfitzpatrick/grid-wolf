@@ -6,8 +6,8 @@ which to have discussion about architectural decisions, measure architectures ag
 and identify areas for improvement. The six pillars are:
 
 - [AWS Well-Architected Framework Overview](https://docs.aws.amazon.com/wellarchitected/latest/framework/welcome.html)
-- [Operational Excellence Pillar](https://docs.aws.amazon.com/wellarchitected/latest/operational-excellence-pillar/welcome.html)
-    - Design for telemetry:
+- [Operational Excellence Pillar](./operational-excellence.md)
+    - [Implement Observability](https://docs.aws.amazon.com/wellarchitected/latest/operational-excellence-pillar/implement-observability.html):
         - Identify key performance indicators
         - Implement application telemetry
         - Implement user experience telemetry
