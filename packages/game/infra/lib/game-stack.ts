@@ -7,7 +7,7 @@ import { Fn } from "aws-cdk-lib";
 import { StringParameter } from "aws-cdk-lib/aws-ssm";
 
 const SPEC_PATH = resolve(__dirname, '../api-spec.yaml');
-const HANDLER_PATH = resolve(__dirname, '../../lib');
+const HANDLER_PATH = resolve(__dirname, '../../lib/game-handler');
 
 export interface GameStackProps extends GridWolfProps {
   dataTableName: string;
@@ -29,12 +29,10 @@ export class GameStack extends GridWolfStack {
       apiSpecPath: SPEC_PATH,
       handlerPath: HANDLER_PATH,
       usesSecrets: false,
-      handler: 'game-handler/index.handler',
+      handler: 'index.handler',
       authArnTemplateKey: 'authArn',
       handlerTemplateKey: 'handler',
-      layers: {
-        dependencyLayer: dependencyLayerVersionArn
-      },
+      layers: {},
       userPoolArn
     })
   }

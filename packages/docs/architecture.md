@@ -9,8 +9,9 @@ emphasizes the following aspects:
 - **Accessibility**: Software is *perceivable* through various senses, *operable* with assistive
 technologies, *understandable* via clear instructions, information sets and navigation, and
 *robustly* compatible with different devices and browsers.
-- **Performance**: Systems respond quickly to user inputs even under high application loads, and
-leverage strategies to ensure usability in circumstances with poor network connectivity.
+- **Performance**: Systems respond quickly to user inputs even under high application loads,
+leverage strategies to ensure usability in circumstances with poor network connectivity, and are
+highly-tested to ensure reliability.
 - **Ease-of-Use**: Interfaces are intuitive and flexible, requiring minimum user inputs to achieve
 desired goals.
 - **Availability**: Architecture relies on modern cloud-based technologies to maximize reliability,
