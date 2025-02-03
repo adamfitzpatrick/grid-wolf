@@ -25,6 +25,7 @@
 # CDK
 cdk.out
 .cdk.staging
+**/cdk.context.json
 
 # Testing
 **/coverage

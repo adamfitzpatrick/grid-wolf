@@ -3,7 +3,7 @@ import { readFileSync, writeFileSync } from 'fs';
 import { resolve } from 'path';
 
 const AUTH_FILE_PATH = resolve(__dirname, './.auth.json');
-const GAME_API_BASE_URL = 'https://rist2yz0lh.execute-api.us-west-2.amazonaws.com/dev/';
+const API_BASE_URL = 'https://dev.grid-wolf.stepinto.io';
 
 export interface AuthData {
   username: string;
@@ -38,7 +38,7 @@ const test = base.extend<AuthenticatedFixture>({
   },
   request: async ({ playwright }, use) => {
     const authenticatedRequest = await playwright.request.newContext({
-      baseURL: GAME_API_BASE_URL,
+      baseURL: API_BASE_URL,
       extraHTTPHeaders: {
         Authorization: `Bearer ${getAuthData().accessToken}`,
         'content-type': 'application/json',

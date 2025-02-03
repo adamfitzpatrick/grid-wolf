@@ -13,7 +13,9 @@ describe('CentralInfraStack', () => {
         region: 'us-west-2',
         prefix: 'tst'
       },
-      dataTableName: 'table'
+      dataTableName: 'table',
+      hostedZone: 'zone',
+      apiCertificateArn: 'arn'
     }
     const app = new App();
     const stack = new CentralInfraStack(app, 'testStack', props);
@@ -48,59 +50,16 @@ describe('CentralInfraStack', () => {
     })
   });
 
-  /*
-  // TODO move to session package
-  test('should create a record handler lambda', () => {
-    template.hasResourceProperties('AWS::IAM::Role', {
-      RoleName: 'tst-grid-wolf-record-handler-exec-role',
-      AssumeRolePolicyDocument: {
-        Statement: [{
-          Action: 'sts:AssumeRole',
-          Effect: 'Allow',
-          Principal: {
-            Service: 'lambda.amazonaws.com'
-          }
-        }]
-      },
-      Policies: [{
-        PolicyName: 'loggingPolicy'
-      }, {
-        PolicyName: 'workingPolicy'
-      }]
+  test('should create a custom API Gateway domain and related records', () => {
+    template.hasResourceProperties('AWS::ApiGateway::DomainName', {
+      RegionalCertificateArn: 'arn',
+      DomainName: 'tst.grid-wolf.zone',
     });
-
-    template.hasResourceProperties('AWS::Lambda::Function', {
-      FunctionName: 'tst-grid-wolf-record-handler',
-      Environment: {
-        Variables: {
-          DATA_TABLE_NAME: Match.anyValue()
-        }
-      },
-      Handler: 'index.handler',
-      Role: Match.objectLike({ 'Fn::GetAtt': Match.anyValue() }),
-      Runtime: 'nodejs20.x',
-      TracingConfig: {
-        Mode: 'Active'
-      },
-      Layers: [{
-        'Fn::ImportValue': 'tst-grid-wolf-dependency-layer'
-      }, {
-        'Fn::ImportValue': 'tst-grid-wolf-shared-layer'
-      }]
+    template.hasResourceProperties('AWS::Route53::RecordSet', {
+      Type: 'A'
     });
-  });
-
-  test('should create kinesis stream and attach lambda event source', () => {
-    template.hasResourceProperties('AWS::Kinesis::Stream', {
-      Name: 'tst-grid-wolf-setup-stream',
-      StreamModeDetails: {
-        StreamMode: 'ON_DEMAND'
-      },
-      StreamEncryption: {
-        EncryptionType: 'KMS',
-        KeyId: 'alias/aws/kinesis'
-      }
+    template.hasResourceProperties('AWS::Route53::RecordSet', {
+      Type: 'AAAA'
     });
-  });
-  */
+  })
 });

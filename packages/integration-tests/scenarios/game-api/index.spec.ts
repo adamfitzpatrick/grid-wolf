@@ -2,8 +2,6 @@ import { test, expect } from '../authenticated-test';
 import { GameDTO } from '@grid-wolf/game/lib/game-dto';
 import { randomUUID } from 'crypto'
 
-expect('foo').toEqual('foo');
-
 test.describe('when creating games', () => {
   let gameId1: string;
   let gameId2: string;
@@ -39,7 +37,6 @@ test.describe('when creating games', () => {
   });
 
   test('authenticated users can retrieve samed game data', async ({ request }) => {
-    const url = `./game/${gameId1}`;
     const response = await request.get(`./game/${gameId1}`);
     expect(await response.json()).toEqual(game1);
   });
@@ -48,7 +45,7 @@ test.describe('when creating games', () => {
     await request.put('./game', {
       data: game2
     });
-    const response = await request.get('./games');
+    const response = await request.get('./game/list');
     expect((await response.json()).length).toBe(2);
   });
 
@@ -59,7 +56,7 @@ test.describe('when creating games', () => {
     await request.delete('./game', {
       data: game2
     });
-    const response = await request.get('./games');
+    const response = await request.get('./game/list');
     expect(await response.json()).toEqual([]);
   });
 });

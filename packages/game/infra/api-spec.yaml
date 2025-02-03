@@ -9,7 +9,7 @@ security:
   - cognitoPool:
     - openid
 paths:
-  '/game':
+  '/':
     put:
       description: Upload a new or replacement game entry
       operationId: putGame
@@ -46,7 +46,7 @@ paths:
         type: aws_proxy
         uri: arn:aws:apigateway:{{region}}:lambda:path/2015-03-31/functions/{{handler}}/invocations
         httpMethod: POST
-  '/game/{gameId}':
+  '/{gameId}':
     get:
       description: Retrieve an existing game entry
       operationId: getGame
@@ -73,7 +73,7 @@ paths:
         type: aws_proxy
         uri: arn:aws:apigateway:{{region}}:lambda:path/2015-03-31/functions/{{handler}}/invocations
         httpMethod: POST
-  '/games':
+  '/list':
     get:
       description: Retrieve a list of all games belonging to the authorized user
       operationId: getGames

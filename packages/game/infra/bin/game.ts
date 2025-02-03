@@ -8,7 +8,9 @@ import { config } from 'dotenv';
 config({ path: [ '../../.env.local', '../../.env.dev', '../../.env']});
 
 const envMap = loadEnv([
-  EnvironmentVariableName.DATA_TABLE_NAME
+  EnvironmentVariableName.DATA_TABLE_NAME,
+  EnvironmentVariableName.HOSTED_ZONE,
+  EnvironmentVariableName.API_CERTIFICATE_ARN
 ]);
 const app = new cdk.App();
 
@@ -18,6 +20,7 @@ const props: GameStackProps = {
     region: envMap[EnvironmentVariableName.REGION],
     prefix: envMap[EnvironmentVariableName.PREFIX]
   },
-  dataTableName: process.env[EnvironmentVariableName.DATA_TABLE_NAME]!
+  dataTableName: process.env[EnvironmentVariableName.DATA_TABLE_NAME]!,
+  hostedZone: envMap[EnvironmentVariableName.HOSTED_ZONE]
 };
 new GameStack(app, `${props.env.prefix}GameStack`, props);

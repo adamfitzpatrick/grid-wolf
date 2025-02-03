@@ -47,7 +47,7 @@ describe('game handler', () => {
       body: JSON.stringify(gameDTO),
       requestContext: {
         httpMethod: 'PUT',
-        resourcePath: '/game'
+        resourcePath: '/'
       },
       headers: {
         Authorization
@@ -69,7 +69,7 @@ describe('game handler', () => {
     daoDelete.mockClear();
   })
 
-  test('/game PUT should save game data to dynamodb', async () => {
+  test('/ PUT should save game data to dynamodb', async () => {
     await expect(handler(event)).resolves.toEqual({
       statusCode: 202,
       body: 'accepted',
@@ -82,7 +82,7 @@ describe('game handler', () => {
     expect(daoPut).toHaveBeenCalledWith(gameDTO);
   });
 
-  test('/game PUT should return 400 if Authorized user does not match request body user', async () => {
+  test('/ PUT should return 400 if Authorized user does not match request body user', async () => {
     gameDTO.ownerId = 'otherperson';
     event.body = JSON.stringify(gameDTO);
 
@@ -99,9 +99,9 @@ describe('game handler', () => {
     expect(daoPut).not.toHaveBeenCalled();
   });
 
-  test('/game/{gameId} GET should return data obtained from dynamodb', async () => {
+  test('/{gameId} GET should return data obtained from dynamodb', async () => {
     event.requestContext.httpMethod = 'GET';
-    event.requestContext.resourcePath = '/game/{gameId}';
+    event.requestContext.resourcePath = '/{gameId}';
     event.pathParameters = {
       gameId: 'id'
     };
@@ -119,9 +119,9 @@ describe('game handler', () => {
     expect(daoGet).toHaveBeenCalledWith('user', 'id');
   });
 
-  test('/game/{gameId} GET should return 403 error when game not found', async () => {
+  test('/{gameId} GET should return 403 error when game not found', async () => {
     event.requestContext.httpMethod = 'GET';
-    event.requestContext.resourcePath = '/game/{gameId}';
+    event.requestContext.resourcePath = '/{gameId}';
     event.pathParameters = {
       gameId: 'id'
     };
@@ -139,8 +139,8 @@ describe('game handler', () => {
     expect(daoGet).toHaveBeenCalledWith('user', 'id');
   });
 
-  test('/games GET should return a list of game data for the user', async () => {
-    event.requestContext.resourcePath = '/games';
+  test('/list GET should return a list of game data for the user', async () => {
+    event.requestContext.resourcePath = '/list';
     event.requestContext.httpMethod = 'GET';
     daoGetAll.mockResolvedValue([ gameDTO ]);
 
@@ -157,8 +157,8 @@ describe('game handler', () => {
     expect(daoGetAll).toHaveBeenCalledWith('user');
   });
 
-  test('/game DELETE should remove an item from DynamoDB', async () => {
-    event.requestContext.resourcePath = '/game'
+  test('/ DELETE should remove an item from DynamoDB', async () => {
+    event.requestContext.resourcePath = '/'
     event.requestContext.httpMethod = 'DELETE';
     daoDelete.mockResolvedValue({});
 
@@ -175,10 +175,10 @@ describe('game handler', () => {
     expect(daoDelete).toHaveBeenCalledWith('user', 'id');
   });
 
-  test('/game DELETE should return a 400 if authorized user does not match delete request', async () => {
+  test('/ DELETE should return a 400 if authorized user does not match delete request', async () => {
     gameDTO.ownerId = 'otherperson';
     event.body = JSON.stringify(gameDTO);
-    event.requestContext.resourcePath = '/game'
+    event.requestContext.resourcePath = '/'
     event.requestContext.httpMethod = 'DELETE';
     daoDelete.mockResolvedValue({});
 

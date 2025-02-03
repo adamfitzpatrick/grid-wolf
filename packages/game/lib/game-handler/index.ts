@@ -101,13 +101,13 @@ export async function handler(event: APIGatewayProxyEvent) {
   const { resourcePath, httpMethod } = event.requestContext;
 
   let returnValue: object | null = null;
-  if (resourcePath === '/game' && httpMethod === 'PUT') {
+  if (resourcePath === '/' && httpMethod === 'PUT') {
     returnValue = await handlePutGameOperation(event);
-  } else if (resourcePath === '/game/{gameId}' && httpMethod === 'GET') {
+  } else if (resourcePath === '/{gameId}' && httpMethod === 'GET') {
     returnValue = await handleGetGameOperation(event);
-  } else if (resourcePath === '/games' && httpMethod === 'GET') {
+  } else if (resourcePath === '/list' && httpMethod === 'GET') {
     returnValue = await handleGetGamesOperation(event);
-  } else if (resourcePath === '/game' && httpMethod === 'DELETE') {
+  } else if (resourcePath === '/' && httpMethod === 'DELETE') {
     returnValue = await handleDeleteGameOperation(event);
   } else {
     throw new Error(`No handler to invoke for path ${resourcePath} and method ${httpMethod}`);

@@ -1,12 +1,10 @@
 import { Match, Template } from "aws-cdk-lib/assertions";
 import { GameStack, GameStackProps } from "./game-stack";
 import { App } from "aws-cdk-lib";
-import { EnvironmentVariableName } from "@grid-wolf/shared/utils";
-import { DATA_TABLE_NAME } from "@grid-wolf/shared/constructs/parameter-names";
 
 describe('game-stack', () => {
   let props: GameStackProps;
-  let template: Template
+  let template: Template;
 
   beforeEach(() => {
     props = {
@@ -15,8 +13,9 @@ describe('game-stack', () => {
         region: 'us-west-2',
         prefix: 'tst'
       },
-      dataTableName: 'table'
-    }
+      dataTableName: 'table',
+      hostedZone: 'zone.com',
+    };
     const app = new App();
     const stack = new GameStack(app, 'TestStack', props);
     template = Template.fromStack(stack);
@@ -37,11 +36,15 @@ describe('game-stack', () => {
     template.hasResourceProperties('AWS::ApiGateway::RestApi', {
       Body: {
         paths: {
-          '/game': Match.anyValue(),
-          '/game/{gameId}': Match.anyValue(),
-          '/games': Match.anyValue()
+          '/': Match.anyValue(),
+          '/{gameId}': Match.anyValue(),
+          '/list': Match.anyValue()
         }
       }
     })
+  });
+
+  test('should add a base path mapping', () => {
+    template.hasResourceProperties('AWS::ApiGateway::BasePathMapping', {});
   });
 });

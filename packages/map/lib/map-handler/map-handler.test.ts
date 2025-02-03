@@ -200,9 +200,9 @@ describe('map handler', () => {
 
   describe('GET /map/image-url/{userId}', () => {
     beforeEach(() => {
-      process.env[EnvironmentVariableName.CDN_HOST] = 'https://cdn-host.com';
-      process.env[EnvironmentVariableName.CDN_PRIVATE_KEY_SECRET_ID] = 'secret-arn';
-      process.env[EnvironmentVariableName.CDN_PUBLIC_KEY_ID] = 'key-pair';
+      // process.env[EnvironmentVariableName.CDN_HOST] = 'https://cdn-host.com';
+      // process.env[EnvironmentVariableName.CDN_PRIVATE_KEY_SECRET_ID] = 'secret-arn';
+      // process.env[EnvironmentVariableName.CDN_PUBLIC_KEY_ID] = 'key-pair';
   
       fetchSpy = jest.fn().mockResolvedValue({
         json: () => {
