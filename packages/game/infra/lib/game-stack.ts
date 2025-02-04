@@ -1,33 +1,32 @@
-import { GridWolfStack, parameterNames } from "@grid-wolf/shared/constructs";
+import { parameterNames } from "@grid-wolf/shared/constructs";
 import { Construct } from "constructs";
 import { resolve } from "path";
 import { SingleHandlerApi } from 'stepinto-aws-tools/constructs';
-import { GridWolfProps } from "@grid-wolf/shared/domain";
 import { Fn } from "aws-cdk-lib";
-import { HostedZone } from "aws-cdk-lib/aws-route53";
-import { CfnBasePathMapping, DomainName } from "aws-cdk-lib/aws-apigateway";
+import { CfnBasePathMapping } from "aws-cdk-lib/aws-apigateway";
+import { StepintoBaseProps, StepintoBaseStack } from 'stepinto-aws-tools/constructs';
 
+const APP_NAME = 'grid-wolf-game';
+const BASE_PATH = 'game';
 const SPEC_PATH = resolve(__dirname, '../api-spec.yaml');
 const HANDLER_PATH = resolve(__dirname, '../../lib/game-handler');
 
-export interface GameStackProps extends GridWolfProps {
+export interface GameStackProps extends Omit<StepintoBaseProps, 'appName'> {
   dataTableName: string;
   hostedZone: string;
+  subdomain: string;
 }
 
-export class GameStack extends GridWolfStack {
+export class GameStack extends StepintoBaseStack {
   constructor(scope: Construct, id: string, props: GameStackProps) {
-    super(scope, id, props);
+    super(scope, id, { appName: APP_NAME, ...props });
 
-    const userPoolArn = Fn.importValue(this.generateName(parameterNames.USER_POOL_ARN));
-    let domainName = `${this.appName}.${props.hostedZone}`;
-    if (props.env.prefix !== 'prd') {
-      domainName = `${props.env.prefix}.${domainName}`;
-    }
+    const userPoolArn = Fn.importValue(`${props.env.prefix}-${parameterNames.USER_POOL_ARN}`);
+    
     const api = new SingleHandlerApi(this, this.generateId('api'), {
       ...props,
-      appName: 'grid-wolf',
-      constructName: 'game',
+      appName: this.appName,
+      constructName: 'api',
       apiSpecPath: SPEC_PATH,
       handlerPath: HANDLER_PATH,
       usesSecrets: false,
@@ -37,9 +36,14 @@ export class GameStack extends GridWolfStack {
       layers: {},
       userPoolArn
     });
-    new CfnBasePathMapping(this, this.generateId('path-mapping'), {
+
+    let domainName = `${props.subdomain}.${props.hostedZone}`;
+    if (props.env.prefix !== 'prd') {
+      domainName = `${props.env.prefix}.${domainName}`;
+    }
+    new CfnBasePathMapping(this, this.generateId('api-path-mapping'), {
       domainName,
-      basePath: 'game',
+      basePath: BASE_PATH,
       restApiId: api.getApi().restApiId,
       stage: api.getStage().stageName
     });

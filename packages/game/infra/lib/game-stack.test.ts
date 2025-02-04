@@ -15,6 +15,7 @@ describe('game-stack', () => {
       },
       dataTableName: 'table',
       hostedZone: 'zone.com',
+      subdomain: 'subdomain'
     };
     const app = new App();
     const stack = new GameStack(app, 'TestStack', props);
@@ -23,7 +24,7 @@ describe('game-stack', () => {
 
   test('should create a handler lambda', () => {
     template.hasResourceProperties('AWS::Lambda::Function', {
-      FunctionName: 'tst-grid-wolf-game-handler',
+      FunctionName: 'tst-grid-wolf-game-api-handler',
       Environment: {
         Variables: {
           STEPINTO_APP_DATA_TABLE_NAME: 'tst-table'

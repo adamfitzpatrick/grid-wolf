@@ -10,7 +10,8 @@ config({ path: [ '../../.env.local', '../../.env.dev', '../../.env']});
 const envMap = loadEnv([
   EnvironmentVariableName.DATA_TABLE_NAME,
   EnvironmentVariableName.HOSTED_ZONE,
-  EnvironmentVariableName.API_CERTIFICATE_ARN
+  EnvironmentVariableName.API_CERTIFICATE_ARN,
+  EnvironmentVariableName.APP_SUBDOMAIN
 ]);
 const app = new cdk.App();
 
@@ -21,6 +22,7 @@ const props: GameStackProps = {
     prefix: envMap[EnvironmentVariableName.PREFIX]
   },
   dataTableName: process.env[EnvironmentVariableName.DATA_TABLE_NAME]!,
-  hostedZone: envMap[EnvironmentVariableName.HOSTED_ZONE]
+  hostedZone: envMap[EnvironmentVariableName.HOSTED_ZONE],
+  subdomain: envMap[EnvironmentVariableName.APP_SUBDOMAIN]
 };
 new GameStack(app, `${props.env.prefix}GameStack`, props);
