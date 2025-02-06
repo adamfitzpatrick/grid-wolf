@@ -5,7 +5,7 @@ info:
     This API provides endpoints for updating and retrieving map data for users of grid-wolf.
   version: 0.1.0
 paths:
-  /map:
+  /:
     options:
       security: []
       responses:
@@ -70,7 +70,25 @@ paths:
           method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key'"
           method.response.header.Access-Control-Allow-Methods: "'*'"
           method.response.header.Access-Control-Allow-Origin: "'*'"
-  /map/{mapId}:
+    delete:
+      description: Remove an existing map entry
+      operationId: deleteMap
+      requestBody: 
+        $ref: '#/components/requestBodies/DeleteMapRequest'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        '400':
+          description: Bad request
+      x-amazon-apigateway-integration:
+        type: aws_proxy
+        uri: arn:aws:apigateway:{{region}}:lambda:path/2015-03-31/functions/{{handler}}/invocations
+        httpMethod: POST
+  /{mapId}:
     options:
       security: []
       responses:
@@ -143,7 +161,7 @@ paths:
           method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key'"
           method.response.header.Access-Control-Allow-Methods: "'*'"
           method.response.header.Access-Control-Allow-Origin: "'*'"
-  /map/save-image-url/{userId}/{filename}:
+  /save-image-url/{userId}/{filename}:
     options:
       security: []
       responses:
@@ -221,7 +239,7 @@ paths:
           method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key'"
           method.response.header.Access-Control-Allow-Methods: "'*'"
           method.response.header.Access-Control-Allow-Origin: "'*'"
-  /map/image-url/{userId}:
+  /image-url/{userId}:
     options:
       security: []
       responses:
@@ -294,7 +312,7 @@ paths:
           method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key'"
           method.response.header.Access-Control-Allow-Methods: "'*'"
           method.response.header.Access-Control-Allow-Origin: "'*'"
-  /maps:
+  /list:
     options:
       security: []
       responses:
@@ -362,10 +380,13 @@ components:
     Map:
       type: object
       required:
-        - id
-        - userId
+        - mapId
+        - ownerId
         - name
+        - imageUri
+        - gridData
         - timestamp
+        - active
       properties:
         id:
           type: string
@@ -373,10 +394,14 @@ components:
           type: string
         name:
           type: string
+        imageUri:
+          type: string
+        gridData:
+          type: object
         timestamp:
-          type: string
-        imageFilename:
-          type: string
+          type: number
+        active:
+          type: boolean
     ImageUrlSigningParameters:
       type: object
       required:
@@ -415,6 +440,11 @@ components:
           type: string
   requestBodies:
     PutMapRequest:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Map'
+    DeleteMapRequest:
       content:
         application/json:
           schema:

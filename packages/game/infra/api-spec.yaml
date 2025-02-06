@@ -181,7 +181,7 @@ components:
         - ownerId
         - name
         - players
-        - created
+        - timestamp
       properties:
         id:
           type: string
@@ -194,7 +194,7 @@ components:
           items:
             type: string
         created:
-          type: string
+          type: number
     ApiResponse:
       type: object
       properties:

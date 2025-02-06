@@ -9,7 +9,9 @@ config({ path: [ '../../.env.local', '../../.env.dev', '../../.env']});
 
 const envMap = loadEnv([
   EnvironmentVariableName.DATA_TABLE_NAME,
-  EnvironmentVariableName.DEPLOY_SECRETS_ARN
+  EnvironmentVariableName.SECRETS_ARN,
+  EnvironmentVariableName.HOSTED_ZONE,
+  EnvironmentVariableName.APP_SUBDOMAIN
 ]);
 const app = new cdk.App();
 
@@ -20,6 +22,8 @@ const props: MapStackProps = {
     prefix: envMap[EnvironmentVariableName.PREFIX]
   },
   dataTableName: envMap[EnvironmentVariableName.DATA_TABLE_NAME],
-  deploySecretsArn: envMap[EnvironmentVariableName.DEPLOY_SECRETS_ARN]
+  deploySecretsArn: envMap[EnvironmentVariableName.SECRETS_ARN],
+  hostedZone: envMap[EnvironmentVariableName.HOSTED_ZONE],
+  subdomain: envMap[EnvironmentVariableName.APP_SUBDOMAIN]
 };
 new MapStack(app, `${props.env.prefix}MapStack`, props);

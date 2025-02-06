@@ -3,9 +3,11 @@ import { DynamoItem, ObjectMapper } from "stepinto-aws-tools/clients";
 export interface MapItem extends DynamoItem {
   mapId: string;
   ownerId: string;
+  name: string;
   imageUri: string;
   gridData: object;
-  created: string;
+  timestamp: number;
+  active: boolean;
 }
 
 export interface MapDTO {
@@ -14,7 +16,8 @@ export interface MapDTO {
   name: string;
   imageUri: string;
   gridData: object;
-  created: string;
+  timestamp: number;
+  active: boolean;
 }
 
 export const mapMapper = new ObjectMapper<MapItem, MapDTO>({

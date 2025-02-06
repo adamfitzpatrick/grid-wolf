@@ -9,6 +9,7 @@ describe('map-stack', () => {
   let template: Template
 
   beforeEach(() => {
+    process.env[EnvironmentVariableName.DATA_TABLE_NAME] = 'table';
     props = {
       env: {
         account: 'account',
@@ -16,7 +17,9 @@ describe('map-stack', () => {
         prefix: 'tst'
       },
       dataTableName: 'table',
-      deploySecretsArn: 'secrets-arn'
+      deploySecretsArn: 'secrets-arn',
+      hostedZone: 'zone',
+      subdomain: 'domain'
     }
     const app = new App();
     const stack = new MapStack(app, 'TestStack', props);
@@ -63,9 +66,9 @@ describe('map-stack', () => {
     template.hasResourceProperties('AWS::ApiGateway::RestApi', {
       Body: {
         paths: {
-          '/map': Match.anyValue(),
-          '/map/{mapId}': Match.anyValue(),
-          '/maps': Match.anyValue()
+          '/': Match.anyValue(),
+          '/{mapId}': Match.anyValue(),
+          '/list': Match.anyValue()
         }
       }
     })
@@ -81,7 +84,7 @@ describe('map-stack', () => {
           }
         }]
       },
-      BucketName: `tst-${parameterNames.IMAGE_BUCKET_NAME}`,
+      BucketName: `tst-grid-wolf-${parameterNames.IMAGE_BUCKET_NAME}`,
       PublicAccessBlockConfiguration: {
         BlockPublicAcls: true,
         BlockPublicPolicy: true,
@@ -105,5 +108,9 @@ describe('map-stack', () => {
         PriceClass: 'PriceClass_100'
       }
     });
+  });
+
+  test('should add a base path mapping for the api', () => {
+    template.hasResourceProperties('AWS::ApiGateway::BasePathMapping', {});
   });
 });

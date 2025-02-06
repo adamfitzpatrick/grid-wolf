@@ -66,6 +66,20 @@ const handlePutMapOperation = async (event: APIGatewayProxyEvent) => {
   }));
 };
 
+const handleDeleteMapOperation = async (event: APIGatewayProxyEvent) => {
+  console.debug({ operationHandled: 'deleteMap'});
+  const mapDTO = JSON.parse(event.body!) as MapDTO;
+  const { username } = parseAuthToken(event);
+
+  if (username !== mapDTO.ownerId) {
+    return mismatchedUserRejection(username, mapDTO.ownerId);
+  }
+  return dao.delete(mapDTO.ownerId, mapDTO.mapId).then(() => addCORS({
+    statusCode: 202,
+    body: 'accepted'
+  }));
+}
+
 const handleGetMapOperation = async (event: APIGatewayProxyEvent) => {
   console.debug({ operationHandled: 'getMap' });
   const mapId = event.pathParameters!['mapId']!;
@@ -173,19 +187,21 @@ export async function handler(event: APIGatewayProxyEvent) {
   const { resourcePath, httpMethod } = event.requestContext;
 
   let returnValue: object | null = null;
-  if (resourcePath === '/map' && httpMethod === 'PUT') {
+  if (resourcePath === '/' && httpMethod === 'PUT') {
     returnValue = await handlePutMapOperation(event);
-  } else if (resourcePath === '/map/{mapId}' && httpMethod === 'GET') {
+  } else if ((resourcePath === '/' && httpMethod === 'DELETE')) {
+    returnValue = await handleDeleteMapOperation(event);
+  } else if (resourcePath === '/{mapId}' && httpMethod === 'GET') {
     returnValue = await handleGetMapOperation(event);
-  } else if (resourcePath === '/maps' && httpMethod === 'GET') {
+  } else if (resourcePath === '/list' && httpMethod === 'GET') {
     returnValue = await handleGetMapsOperation(event);
-  } else if (resourcePath === '/map/save-image-url/{userId}/{filename}' && httpMethod === 'GET') {
+  } else if (resourcePath === '/save-image-url/{userId}/{filename}' && httpMethod === 'GET') {
     returnValue = await handleGetMapSaveImageUrlOperation(event);
-  } else if (resourcePath === '/map/image-url/{userId}' && httpMethod === 'GET') {
+  } else if (resourcePath === '/image-url/{userId}' && httpMethod === 'GET') {
     returnValue = await handleGetMapImageUrlOperation(event);
   } else {
-    console.error(`No handler to invoke for path ${resourcePath} and method ${httpMethod}`)
+    throw new Error(`No handler to invoke for path ${resourcePath} and method ${httpMethod}`)
   }
-  console.debug({ returnValue })
+  console.debug({ returnValue });
   return returnValue;
 }

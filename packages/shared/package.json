@@ -26,7 +26,7 @@
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "rimraf": "^6.0.1",
-    "stepinto-aws-tools": "^0.7.8",
+    "stepinto-aws-tools": "^0.7.10",
     "ts-jest": "^29.2.5",
     "ts-node": "^10.9.2",
     "typescript": "5.5.4",

@@ -16,11 +16,12 @@
 dependency ordering and deploy successfully
 - I want to be able to create a game and all required data within a UI
 - I want to be able to setup and save a map & grid for a game within the UI
-- I want to be able to get a list of saved data when there are too many items to retrieve with a
-single call
+- ~~I want to be able to get a list of saved data when there are too many items to retrieve with a
+single call~~
+- Set up private key rotation and/or generate public private pair at deploy time and store to secrets manager
 
 ## Bugfix
-- I want to remove the kinesis stream from `central-infra` and only implement as part of `session`
+- ~~I want to remove the kinesis stream from `central-infra` and only implement as part of `session`~~
 
 ## Maint
 - To DRY up my api specifications, I want to reference models shared from a CDN

@@ -45,6 +45,7 @@ describe('map handler', () => {
   let getSpy: jest.Mock;
   let getAllSpy: jest.Mock;
   let putSpy: jest.Mock;
+  let deleteSpy: jest.Mock;
 
   beforeAll(() => {
     oldConsole = { ...console };
@@ -60,10 +61,14 @@ describe('map handler', () => {
   });
 
   beforeEach(() => {
+    process.env[EnvironmentVariableName.CDN_PUBLIC_KEY_ID] = 'key-pair';
+    process.env[EnvironmentVariableName.CDN_PRIVATE_KEY_SECRET_ID] = 'secret-arn';
+    process.env[EnvironmentVariableName.CDN_HOST] = 'https://cdn-host.com';
     dao = (DynamoItemDao as unknown as jest.MockInstance<DynamoItemDao<MapItem, MapDTO>, any>).mock.instances[0];
     getSpy = (dao.get as jest.Mock);
     getAllSpy = (dao.getAll as jest.Mock);
     putSpy = (dao.put as jest.Mock);
+    deleteSpy = (dao.delete as jest.Mock);
     getCdnSignedUrlSpy = jest.fn();
 
     Authorization = `Bearer TOKEN`;
@@ -73,13 +78,14 @@ describe('map handler', () => {
       name: 'map',
       imageUri: 'uri',
       gridData: {},
-      created: 'date'
+      timestamp: 1,
+      active: true
     };
     event = {
       body: JSON.stringify(mapDTO),
       requestContext: {
         httpMethod: 'PUT',
-        resourcePath: '/map'
+        resourcePath: '/'
       },
       headers: {
         Authorization
@@ -93,7 +99,7 @@ describe('map handler', () => {
     putSpy.mockClear();
   });
 
-  test('PUT /map should save map data to DynamoDB', async () => {
+  test('PUT / should save map data to DynamoDB', async () => {
     putSpy.mockResolvedValue(undefined);
 
     await expect(handler(event)).resolves.toEqual({
@@ -108,9 +114,44 @@ describe('map handler', () => {
     expect(putSpy).toHaveBeenCalledWith(mapDTO);
   });
 
-  test('GET /map/{mapId} should get specific map data', async () => {
+  describe('DELETE /', () => {
+    beforeEach(() => {
+      event.requestContext.httpMethod = 'DELETE';
+    });
+
+    test('should remove a map item from DynamoDB', async () => {
+      deleteSpy.mockResolvedValue(undefined);
+  
+      await expect(handler(event)).resolves.toEqual({
+        statusCode: 202,
+        body: 'accepted',
+        headers: {
+          'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key',
+          'Access-Control-Allow-Methods': '*',
+          'Access-Control-Allow-Origin': '*',
+        }
+      });
+      expect(deleteSpy).toHaveBeenCalledWith('user', 'id');
+    });
+    
+    test('should return 400 error if authenticated user does not match requested userId', async () => {
+      mapDTO.ownerId = 'otherUser';
+      event.body = JSON.stringify(mapDTO);
+      await expect(handler(event)).resolves.toEqual({
+        statusCode: 400,
+        body: 'bad request',
+        headers: {
+          'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key',
+          'Access-Control-Allow-Methods': '*',
+          'Access-Control-Allow-Origin': '*',
+        }
+      });
+    });
+  })
+
+  test('GET /{mapId} should get specific map data', async () => {
     event.requestContext.httpMethod = 'GET';
-    event.requestContext.resourcePath = '/map/{mapId}';
+    event.requestContext.resourcePath = '/{mapId}';
     event.pathParameters = {
       mapId: 'id'
     };
@@ -128,9 +169,9 @@ describe('map handler', () => {
     expect(getSpy).toHaveBeenCalledWith('user', 'id');
   });
 
-  test('GET /map/{mapId} should return 403 error when map not found', async () => {
+  test('GET /{mapId} should return 403 error when map not found', async () => {
     event.requestContext.httpMethod = 'GET';
-    event.requestContext.resourcePath = '/map/{mapId}';
+    event.requestContext.resourcePath = '/{mapId}';
     event.pathParameters = {
       mapId: 'id'
     };
@@ -148,13 +189,13 @@ describe('map handler', () => {
     expect(getSpy).toHaveBeenCalledWith('user', 'id');
   });
 
-  describe('GET /map/save-image-url/{userId}/{filename}', () => {
+  describe('GET /save-image-url/{userId}/{filename}', () => {
     beforeEach(() => {
       process.env[EnvironmentVariableName.IMAGE_BUCKET_NAME] = 'bucket';
       putObjectSpy = jest.fn().mockReturnValue({});
       getS3SignedUrlSpy = jest.fn().mockResolvedValue('https://signed-url');
 
-      event.requestContext.resourcePath = '/map/save-image-url/{userId}/{filename}';
+      event.requestContext.resourcePath = '/save-image-url/{userId}/{filename}';
       event.requestContext.httpMethod = 'GET';
       event.pathParameters = {
         userId: 'user',
@@ -198,7 +239,7 @@ describe('map handler', () => {
     });
   });
 
-  describe('GET /map/image-url/{userId}', () => {
+  describe('GET /image-url/{userId}', () => {
     beforeEach(() => {
       // process.env[EnvironmentVariableName.CDN_HOST] = 'https://cdn-host.com';
       // process.env[EnvironmentVariableName.CDN_PRIVATE_KEY_SECRET_ID] = 'secret-arn';
@@ -216,7 +257,7 @@ describe('map handler', () => {
       );
   
       event.requestContext.httpMethod = 'GET';
-      event.requestContext.resourcePath = '/map/image-url/{userId}';
+      event.requestContext.resourcePath = '/image-url/{userId}';
       event.pathParameters = {
         userId: 'user'
       };
@@ -268,8 +309,8 @@ describe('map handler', () => {
     });
   });
 
-  test('GET /maps should return all map data for the user', async () => {
-    event.requestContext.resourcePath = '/maps'
+  test('GET /list should return all map data for the user', async () => {
+    event.requestContext.resourcePath = '/list'
     event.requestContext.httpMethod = 'GET'
     getAllSpy.mockResolvedValue([ mapDTO ]);
 
@@ -283,5 +324,14 @@ describe('map handler', () => {
       }
     });
     expect(getAllSpy).toHaveBeenCalledWith('user');
+  });
+
+  test('should throw if there is no matching resourcePath and method', async () => {
+    event.requestContext.resourcePath = '/wrong';
+    await expect(handler(event)).rejects.toThrow('No handler');
+
+    event.requestContext.resourcePath = '/';
+    event.requestContext.httpMethod = 'POST';
+    await expect(handler(event)).rejects.toThrow('No handler');
   })
 });
