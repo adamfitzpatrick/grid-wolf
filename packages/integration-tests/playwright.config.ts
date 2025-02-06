@@ -37,7 +37,7 @@ export default defineConfig({
       testMatch: /global-setup\.ts/
     },
     {
-      name: 'chromium',
+      name: 'api',
       use: { ...devices['Desktop Chrome'] },
       dependencies: ['authenticate']
     },

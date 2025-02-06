@@ -2735,7 +2735,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@grid-wolf/map@workspace:packages/map":
+"@grid-wolf/map@workspace:^, @grid-wolf/map@workspace:packages/map":
   version: 0.0.0-use.local
   resolution: "@grid-wolf/map@workspace:packages/map"
   dependencies:
@@ -6761,6 +6761,7 @@ __metadata:
   dependencies:
     "@aws-sdk/client-dynamodb": "npm:^3.738.0"
     "@grid-wolf/game": "workspace:^"
+    "@grid-wolf/map": "workspace:^"
     "@grid-wolf/shared": "workspace:^"
     "@playwright/test": "npm:^1.50.0"
     "@types/jsonwebtoken": "npm:^9"

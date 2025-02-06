@@ -8,7 +8,8 @@ export const AUTH_FILE_PATH = resolve(__dirname, '../auth');
 const USERNAME      = process.env[EnvironmentVariableName.INT_TEST_USERNAME]!;
 const PASSWORD      = process.env[EnvironmentVariableName.INT_TEST_PASSWORD]!;
 const USER_ID       = process.env[EnvironmentVariableName.INT_TEST_USER_ID]!;
-const API_KEY       = process.env[EnvironmentVariableName.INT_TEST_API_KEY]!;
+const GAME_API_KEY  = process.env[EnvironmentVariableName.INT_TEST_GAME_API_KEY]!;
+const MAP_API_KEY   = process.env[EnvironmentVariableName.INT_TEST_MAP_API_KEY]!;
 const AUTH_HOST     = process.env[EnvironmentVariableName.USER_AUTH_DOMAIN]!;
 const LOGIN_PATH    = '/login';
 const CLIENT_ID     = process.env[EnvironmentVariableName.USER_AUTH_CLIENT_ID]!;
@@ -35,6 +36,9 @@ setup('authenticate', async ({ page }) => {
     username: USERNAME,
     password: PASSWORD,
     accessToken,
-    apiKey: API_KEY
+    apiKey: {
+      game: GAME_API_KEY,
+      map: MAP_API_KEY
+    }
   });
 });

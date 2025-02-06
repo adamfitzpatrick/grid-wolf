@@ -5,12 +5,17 @@ import { resolve } from 'path';
 const AUTH_FILE_PATH = resolve(__dirname, './.auth.json');
 const API_BASE_URL = 'https://dev.grid-wolf.stepinto.io';
 
+export interface ApiKeys {
+  game: string;
+  map: string;
+}
+
 export interface AuthData {
   username: string;
   password: string;
   userId: string;
   accessToken: string;
-  apiKey: string;
+  apiKey: ApiKeys
 }
 
 let _authData: AuthData | null;
@@ -29,7 +34,8 @@ export const getAuthData = (): AuthData => {
 
 interface AuthenticatedFixture {
   getAuthData: typeof getAuthData;
-  request: APIRequestContext
+  request: APIRequestContext;
+  keyedRequest: (keyName: keyof ApiKeys) => Promise<APIRequestContext>
 }
 
 const test = base.extend<AuthenticatedFixture>({
@@ -41,8 +47,7 @@ const test = base.extend<AuthenticatedFixture>({
       baseURL: API_BASE_URL,
       extraHTTPHeaders: {
         Authorization: `Bearer ${getAuthData().accessToken}`,
-        'content-type': 'application/json',
-        'x-api-key': getAuthData().apiKey
+        'content-type': 'application/json'
       }
     });
     await use(authenticatedRequest)
