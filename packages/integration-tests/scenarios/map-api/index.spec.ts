@@ -1,6 +1,13 @@
+import { EnvironmentVariableName } from '@grid-wolf/shared/utils';
 import { test, expect } from '../authenticated-test';
 import { MapDTO } from '@grid-wolf/map/lib/map-dto';
 import { randomUUID } from 'crypto'
+import { readFileSync } from 'fs';
+import { resolve } from 'path';
+
+const TEST_IMAGE_FILENAME = 'test-image.webp';
+const TEST_IMAGE_PATH = resolve(__dirname, TEST_IMAGE_FILENAME);
+const CDN_HOST = process.env[EnvironmentVariableName.CDN_HOST];
 
 test.describe('when managing maps', () => {
   let mapId1: string;
@@ -77,7 +84,41 @@ test.describe('when managing maps', () => {
     expect(await response.json()).toEqual([]);
   });
 
-  test.fixme('authenticated users can obtain a URI for saving a map image', () => {});
+  test('authenticated users can obtain a URI for saving a map image', async ({ playwright, request, getAuthData }) => {
+    const saveUriResponse = await request.get(`./map/save-image-url/${getAuthData().userId}/${TEST_IMAGE_FILENAME}`, {
+      headers: { 'x-api-key': getAuthData().apiKey.map }
+    });
+    const saveInfo = await saveUriResponse.json();
+    expect(saveInfo).toEqual({
+      userId: getAuthData().userId,
+      filename: TEST_IMAGE_FILENAME,
+      url: expect.stringContaining('PutObject')
+    });
 
-  test.fixme('authenticated users can obtain a URI which works for map image retrieval', () => {});
+    const testFile = readFileSync(TEST_IMAGE_PATH);
+    const saveRequestContext = await playwright.request.newContext();
+    const saveResponse = await saveRequestContext.put(saveInfo.url, {
+      data: testFile
+    });
+    expect(saveResponse.ok()).toBeTruthy();
+  });
+
+  test('authenticated users can obtain a URI which works for map image retrieval', async ({ playwright, request, getAuthData }) => {
+    const getUriResponse = await request.get(`./map/image-url/${getAuthData().userId}`, {
+      headers: { 'x-api-key': getAuthData().apiKey.map }
+    });
+    const getInfo = await getUriResponse.json()
+    expect(getInfo).toEqual({
+      userId: getAuthData().userId,
+      policy: expect.anything(),
+      keyPairId: expect.anything(),
+      signature: expect.anything()
+    });
+    
+    const url = `https://${CDN_HOST}/${getInfo.userId}/${TEST_IMAGE_FILENAME}?Policy=${getInfo.policy}&` +
+        `Signature=${getInfo.signature}&Key-Pair-Id=${getInfo.keyPairId}`;
+    const getRequestContext = await playwright.request.newContext();
+    const response = await getRequestContext.get(url);
+    expect(response.ok()).toBeTruthy();
+  });
 });
