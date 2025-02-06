@@ -22,25 +22,27 @@ import { Effect, PolicyStatement } from "aws-cdk-lib/aws-iam";
 import { EnvironmentVariableName } from "@grid-wolf/shared/utils";
 import { CfnBasePathMapping } from "aws-cdk-lib/aws-apigateway";
 import { Fn } from "aws-cdk-lib";
+import { StepintoBaseStack, StepintoBaseProps } from 'stepinto-aws-tools/constructs';
 
+const APP_NAME = 'grid-wolf-map';
 const SPEC_PATH = resolve(__dirname, '../api-spec.yaml');
 const HANDLER_PATH = resolve(__dirname, '../../lib/map-handler');
 const BASE_PATH = 'map';
 
-export interface MapStackProps extends GridWolfProps {
+export interface MapStackProps extends Omit<StepintoBaseProps, 'appName'> {
   dataTableName: string;
   deploySecretsArn: string;
   hostedZone: string;
   subdomain: string;
 }
 
-export class MapStack extends GridWolfStack {
+export class MapStack extends StepintoBaseStack {
   constructor(scope: Construct, id: string, props: MapStackProps) {
-    super(scope, id, props);
-    const unique = (component: string) => `${this.appName}-map-${component}`;
+    super(scope, id, { appName: APP_NAME, ...props });
+    
     const publicKey = StringParameter.valueForStringParameter(this, `/${props.env.prefix}${parameterNames.CDN_PUBLIC_KEY_PARAM}`);
 
-    const imageBucket = new Bucket(this, this.generateId(unique('images')), {
+    const imageBucket = new Bucket(this, this.generateId('images'), {
       bucketKeyEnabled: true,
       blockPublicAccess: BlockPublicAccess.BLOCK_ALL,
       bucketName: this.generateName(parameterNames.IMAGE_BUCKET_NAME),
@@ -53,15 +55,15 @@ export class MapStack extends GridWolfStack {
       }]
     });
 
-    const cdnPublicKey = new PublicKey(this, this.generateId(unique('public-key')), {
+    const cdnPublicKey = new PublicKey(this, this.generateId('public-key'), {
       encodedKey: publicKey
     });
-    const keyGroup = new KeyGroup(this, this.generateId(unique('key-group')), {
+    const keyGroup = new KeyGroup(this, this.generateId('key-group'), {
       items: [
         cdnPublicKey
       ]
     });
-    const distro = new Distribution(this, this.generateId(unique('distro')), {
+    const distro = new Distribution(this, this.generateId('distro'), {
       defaultBehavior: {
         origin: S3BucketOrigin.withOriginAccessControl(imageBucket, {
           originAccessLevels: [ AccessLevel.READ ]
@@ -79,10 +81,10 @@ export class MapStack extends GridWolfStack {
     });
 
     const userPoolArn = Fn.importValue(`${props.env.prefix}-${parameterNames.USER_POOL_ARN}`);
-    const api = new SingleHandlerApi(this, this.generateId(unique('api')), {
+    const api = new SingleHandlerApi(this, this.generateId('api'), {
       ...props,
       appName: this.appName,
-      constructName: 'map',
+      constructName: 'api',
       apiSpecPath: SPEC_PATH,
       handlerPath: HANDLER_PATH,
       handler: 'map-handler/index.handler',
@@ -90,6 +92,7 @@ export class MapStack extends GridWolfStack {
       handlerTemplateKey: 'handler',
       layers: {},
       additionalEnvironmentVariables: {
+        PARAMETERS_SECRETS_EXTENSION_LOG_LEVEL: 'ERROR',
         [EnvironmentVariableName.DATA_TABLE_NAME]: `${props.env.prefix}-${process.env[EnvironmentVariableName.DATA_TABLE_NAME]!}`,
         [EnvironmentVariableName.IMAGE_BUCKET_NAME]: imageBucket.bucketName,
         [EnvironmentVariableName.CDN_HOST]: distro.domainName,

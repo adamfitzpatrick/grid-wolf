@@ -73,6 +73,10 @@ paths:
     delete:
       description: Remove an existing map entry
       operationId: deleteMap
+      security: 
+        - apiKey: []
+        - cognitoPool:
+          - openid
       requestBody: 
         $ref: '#/components/requestBodies/DeleteMapRequest'
       responses:

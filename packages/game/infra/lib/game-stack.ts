@@ -33,6 +33,9 @@ export class GameStack extends StepintoBaseStack {
       handler: 'index.handler',
       authArnTemplateKey: 'authArn',
       handlerTemplateKey: 'handler',
+      additionalEnvironmentVariables: {
+        PARAMETERS_SECRETS_EXTENSION_LOG_LEVEL: 'error'
+    },
       layers: {},
       userPoolArn
     });

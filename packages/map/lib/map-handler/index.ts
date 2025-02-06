@@ -154,7 +154,7 @@ const handleGetMapImageUrlOperation = async (event: APIGatewayProxyEvent) => {
     (JSON.parse(secretString) as PrivateKeySecretString)['cdn-private-key'], 'base64'
   ).toString();
 
-  const url = `${cdnHost}/${userId}`;
+  const url = `https://${cdnHost}/${userId}`;
   const epochTime = new Date().getTime() + 60 * 60 * 1000;
   const policy = JSON.stringify({
     Statement: [{

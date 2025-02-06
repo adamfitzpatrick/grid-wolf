@@ -50,7 +50,7 @@ describe('map-stack', () => {
       ]
     });
     template.hasResourceProperties('AWS::Lambda::Function', {
-      FunctionName: 'tst-grid-wolf-map-handler',
+      FunctionName: 'tst-grid-wolf-map-api-handler',
       Environment: {
         Variables: {
           [EnvironmentVariableName.DATA_TABLE_NAME]: 'tst-table',
@@ -84,7 +84,7 @@ describe('map-stack', () => {
           }
         }]
       },
-      BucketName: `tst-grid-wolf-${parameterNames.IMAGE_BUCKET_NAME}`,
+      BucketName: `tst-grid-wolf-map-${parameterNames.IMAGE_BUCKET_NAME}`,
       PublicAccessBlockConfiguration: {
         BlockPublicAcls: true,
         BlockPublicPolicy: true,

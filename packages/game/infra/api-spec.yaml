@@ -41,6 +41,10 @@ paths:
     put:
       description: Upload a new or replacement game entry
       operationId: putGame
+      security: 
+        - apiKey: []
+        - cognitoPool:
+          - openid
       requestBody: 
         $ref: '#/components/requestBodies/PutGameRequest'
       responses:
@@ -59,6 +63,10 @@ paths:
     delete:
       description: Remove an existing game entry
       operationId: deleteGame
+      security: 
+        - apiKey: []
+        - cognitoPool:
+          - openid
       requestBody: 
         $ref: '#/components/requestBodies/DeleteGameRequest'
       responses:
