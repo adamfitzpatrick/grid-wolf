@@ -63,7 +63,7 @@ describe('map handler', () => {
   beforeEach(() => {
     process.env[EnvironmentVariableName.CDN_PUBLIC_KEY_ID] = 'key-pair';
     process.env[EnvironmentVariableName.CDN_PRIVATE_KEY_SECRET_ID] = 'secret-arn';
-    process.env[EnvironmentVariableName.CDN_HOST] = 'https://cdn-host.com';
+    process.env[EnvironmentVariableName.CDN_HOST] = 'cdn-host';
     dao = (DynamoItemDao as unknown as jest.MockInstance<DynamoItemDao<MapItem, MapDTO>, any>).mock.instances[0];
     getSpy = (dao.get as jest.Mock);
     getAllSpy = (dao.getAll as jest.Mock);
@@ -281,7 +281,7 @@ describe('map handler', () => {
   
       expect(fetchSpy).toHaveBeenCalledWith('http://localhost:2773/secretsmanager/get?secretId=secret-arn');
       expect(getCdnSignedUrlSpy).toHaveBeenCalledWith(expect.objectContaining({
-        url: 'https://cdn-host.com/user',
+        url: 'https://cdn-host/user',
         keyPairId: 'key-pair',
         privateKey: expect.anything(),
         policy: expect.any(String)
@@ -289,7 +289,7 @@ describe('map handler', () => {
       const policyCall = JSON.parse(getCdnSignedUrlSpy.mock.calls[0][0].policy);
       expect(policyCall).toEqual(expect.objectContaining({
         Statement: [{
-          Resource: 'https://cdn-host.com/user/*',
+          Resource: 'https://cdn-host/user/*',
           Condition: { DateLessThan: { 'AWS:EpochTime': expect.any(Number) }}
         }]
       }))

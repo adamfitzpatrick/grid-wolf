@@ -1,8 +1,7 @@
-import { GridWolfStack, parameterNames } from "@grid-wolf/shared/constructs";
+import { parameterNames } from "@grid-wolf/shared/constructs";
 import { Construct } from "constructs";
 import { resolve } from "path";
 import { SingleHandlerApi } from 'stepinto-aws-tools/constructs';
-import { GridWolfProps } from "@grid-wolf/shared/domain";
 import { BlockPublicAccess, Bucket, BucketEncryption } from "aws-cdk-lib/aws-s3";
 import {
   AccessLevel,
@@ -23,6 +22,9 @@ import { EnvironmentVariableName } from "@grid-wolf/shared/utils";
 import { CfnBasePathMapping } from "aws-cdk-lib/aws-apigateway";
 import { Fn } from "aws-cdk-lib";
 import { StepintoBaseStack, StepintoBaseProps } from 'stepinto-aws-tools/constructs';
+import { HostedZone, RecordSet, RecordTarget, RecordType } from "aws-cdk-lib/aws-route53";
+import { CloudFrontTarget } from "aws-cdk-lib/aws-route53-targets";
+import { Certificate } from "aws-cdk-lib/aws-certificatemanager";
 
 const APP_NAME = 'grid-wolf-map';
 const SPEC_PATH = resolve(__dirname, '../api-spec.yaml');
@@ -34,6 +36,7 @@ export interface MapStackProps extends Omit<StepintoBaseProps, 'appName'> {
   deploySecretsArn: string;
   hostedZone: string;
   subdomain: string;
+  cdnCertificate: string;
 }
 
 export class MapStack extends StepintoBaseStack {
@@ -41,7 +44,6 @@ export class MapStack extends StepintoBaseStack {
     super(scope, id, { appName: APP_NAME, ...props });
     
     const publicKey = StringParameter.valueForStringParameter(this, `/${props.env.prefix}${parameterNames.CDN_PUBLIC_KEY_PARAM}`);
-
     const imageBucket = new Bucket(this, this.generateId('images'), {
       bucketKeyEnabled: true,
       blockPublicAccess: BlockPublicAccess.BLOCK_ALL,
@@ -63,7 +65,18 @@ export class MapStack extends StepintoBaseStack {
         cdnPublicKey
       ]
     });
+    let cdnDomain = `images.${props.subdomain}.${props.hostedZone}`;
+    if (props.env.prefix !== 'prd') {
+      cdnDomain = `${props.env.prefix}.${cdnDomain}`
+    }
+    const certificate = Certificate.fromCertificateArn(
+      this,
+      this.generateId('cdn-cert'),
+      props.cdnCertificate
+    );
     const distro = new Distribution(this, this.generateId('distro'), {
+      certificate,
+      domainNames: [cdnDomain],
       defaultBehavior: {
         origin: S3BucketOrigin.withOriginAccessControl(imageBucket, {
           originAccessLevels: [ AccessLevel.READ ]
@@ -75,9 +88,26 @@ export class MapStack extends StepintoBaseStack {
         trustedKeyGroups: [
           keyGroup
         ],
-        viewerProtocolPolicy: ViewerProtocolPolicy.HTTPS_ONLY
+        viewerProtocolPolicy: ViewerProtocolPolicy.HTTPS_ONLY,
+        
       },
       priceClass: PriceClass.PRICE_CLASS_100
+    });
+
+    const zone = HostedZone.fromLookup(this, this.generateId('zone'), {
+      domainName: props.hostedZone
+    });
+    new RecordSet(this, this.generateId('arecord'), {
+      recordType: RecordType.A,
+      recordName: `${props.env.prefix}.images.${props.subdomain}`,
+      zone,
+      target: RecordTarget.fromAlias(new CloudFrontTarget(distro))
+    });
+    new RecordSet(this, this.generateId('aaaarecord'), {
+      recordType: RecordType.AAAA,
+      recordName: `${props.env.prefix}.images.${props.subdomain}`,
+      zone,
+      target: RecordTarget.fromAlias(new CloudFrontTarget(distro))
     });
 
     const userPoolArn = Fn.importValue(`${props.env.prefix}-${parameterNames.USER_POOL_ARN}`);
@@ -95,9 +125,9 @@ export class MapStack extends StepintoBaseStack {
         PARAMETERS_SECRETS_EXTENSION_LOG_LEVEL: 'ERROR',
         [EnvironmentVariableName.DATA_TABLE_NAME]: `${props.env.prefix}-${process.env[EnvironmentVariableName.DATA_TABLE_NAME]!}`,
         [EnvironmentVariableName.IMAGE_BUCKET_NAME]: imageBucket.bucketName,
-        [EnvironmentVariableName.CDN_HOST]: distro.domainName,
         [EnvironmentVariableName.CDN_PUBLIC_KEY_ID]: cdnPublicKey.publicKeyId,
-        [EnvironmentVariableName.CDN_PRIVATE_KEY_SECRET_ID]: props.deploySecretsArn
+        [EnvironmentVariableName.CDN_PRIVATE_KEY_SECRET_ID]: props.deploySecretsArn,
+        CDN_HOST: cdnDomain
       },
       additionalHandlerPolicies: [
         new PolicyStatement({

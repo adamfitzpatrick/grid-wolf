@@ -7,7 +7,8 @@ import { resolve } from 'path';
 
 const TEST_IMAGE_FILENAME = 'test-image.webp';
 const TEST_IMAGE_PATH = resolve(__dirname, TEST_IMAGE_FILENAME);
-const CDN_HOST = process.env[EnvironmentVariableName.CDN_HOST];
+const SUBDOMAIN = process.env[EnvironmentVariableName.APP_SUBDOMAIN];
+const ENV = process.env[EnvironmentVariableName.PREFIX];
 
 test.describe('when managing maps', () => {
   let mapId1: string;
@@ -114,8 +115,7 @@ test.describe('when managing maps', () => {
       keyPairId: expect.anything(),
       signature: expect.anything()
     });
-    
-    const url = `https://${CDN_HOST}/${getInfo.userId}/${TEST_IMAGE_FILENAME}?Policy=${getInfo.policy}&` +
+    const url = `https://${ENV}.images.${SUBDOMAIN}.stepinto.io/${getInfo.userId}/${TEST_IMAGE_FILENAME}?Policy=${getInfo.policy}&` +
         `Signature=${getInfo.signature}&Key-Pair-Id=${getInfo.keyPairId}`;
     const getRequestContext = await playwright.request.newContext();
     const response = await getRequestContext.get(url);

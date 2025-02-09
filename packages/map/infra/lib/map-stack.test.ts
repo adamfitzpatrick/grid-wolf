@@ -113,4 +113,8 @@ describe('map-stack', () => {
   test('should add a base path mapping for the api', () => {
     template.hasResourceProperties('AWS::ApiGateway::BasePathMapping', {});
   });
+
+  test('should have an a record for the cloudfront distro', () => {
+
+  });
 });

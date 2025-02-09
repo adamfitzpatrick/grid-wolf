@@ -141,7 +141,7 @@ const handleGetMapImageUrlOperation = async (event: APIGatewayProxyEvent) => {
 
   const keyPairId = process.env[EnvironmentVariableName.CDN_PUBLIC_KEY_ID]!;
   const secretId = process.env[EnvironmentVariableName.CDN_PRIVATE_KEY_SECRET_ID]!;
-  const cdnHost = process.env[EnvironmentVariableName.CDN_HOST]!;
+  const cdnHost = process.env['CDN_HOST']!;
 
   const response = await fetch(getSecretUrl(secretId), {
     headers: {

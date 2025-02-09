@@ -12,7 +12,8 @@ const envMap = loadEnv([
   EnvironmentVariableName.SECRETS_ARN,
   EnvironmentVariableName.HOSTED_ZONE,
   EnvironmentVariableName.APP_SUBDOMAIN,
-  EnvironmentVariableName.CDN_HOST
+  EnvironmentVariableName.CDN_HOST,
+  EnvironmentVariableName.CDN_CERTIFICATE_ARN
 ]);
 const app = new cdk.App();
 
@@ -25,6 +26,7 @@ const props: MapStackProps = {
   dataTableName: envMap[EnvironmentVariableName.DATA_TABLE_NAME],
   deploySecretsArn: envMap[EnvironmentVariableName.SECRETS_ARN],
   hostedZone: envMap[EnvironmentVariableName.HOSTED_ZONE],
-  subdomain: envMap[EnvironmentVariableName.APP_SUBDOMAIN]
+  subdomain: envMap[EnvironmentVariableName.APP_SUBDOMAIN],
+  cdnCertificate: envMap[EnvironmentVariableName.CDN_CERTIFICATE_ARN]
 };
 new MapStack(app, `${props.env.prefix}MapStack`, props);
