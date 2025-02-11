@@ -1,11 +1,19 @@
 import { GridWolfStack, parameterNames } from "@grid-wolf/shared/constructs";
 import { GridWolfProps } from "@grid-wolf/shared/domain";
 import { CfnOutput, Duration } from "aws-cdk-lib";
+import { Certificate } from "aws-cdk-lib/aws-certificatemanager";
 import { AccountRecovery, CfnUserPoolUser, OAuthScope, UserPool, UserPoolClient, UserPoolDomain } from "aws-cdk-lib/aws-cognito";
+import { HostedZone, RecordSet, RecordTarget, RecordType } from "aws-cdk-lib/aws-route53";
+import { UserPoolDomainTarget } from "aws-cdk-lib/aws-route53-targets";
+import { ParameterTier, StringParameter } from "aws-cdk-lib/aws-ssm";
 import { Construct } from "constructs";
 
+const SUBDOMAIN_PART = 'auth';
+
 export interface UserStackProps extends GridWolfProps {
-  domain: string;
+  certificateArn: string;
+  hostedZone: string;
+  subdomain: string;
 }
 
 export class UserStack extends GridWolfStack {
@@ -23,7 +31,7 @@ export class UserStack extends GridWolfStack {
       signInAliases: {
         email: true
       },
-      userPoolName: this.generateName(unique('pool')),
+      userPoolName: this.generateName('user-pool'),
       passwordPolicy: {
         requireDigits: true,
         requireLowercase: true,
@@ -34,7 +42,7 @@ export class UserStack extends GridWolfStack {
 
     new UserPoolClient(this, this.generateId(unique('client')), {
       userPool,
-      userPoolClientName: this.generateName(unique('client')),
+      userPoolClientName: this.generateName('user-client'),
       accessTokenValidity: Duration.hours(24),
       enableTokenRevocation: true,
       generateSecret: false,
@@ -48,16 +56,32 @@ export class UserStack extends GridWolfStack {
       }
     });
 
-    new UserPoolDomain(this, this.generateId(unique('domain')), {
+    const zone = HostedZone.fromLookup(this, this.generateId('zone'), {
+      domainName: props.hostedZone
+    });
+    let domainName = `${SUBDOMAIN_PART}.${props.subdomain}.${props.hostedZone}`;
+    if (props.env.prefix !== 'prd') {
+      domainName = `${props.env.prefix}.${domainName}`;
+    }
+    const certificate = Certificate.fromCertificateArn(this, this.generateId('cert'), props.certificateArn);
+    const userPoolDomain = new UserPoolDomain(this, this.generateId(unique('domain')), {
       userPool,
-      cognitoDomain: {
-        domainPrefix: this.generateName('grid-wolf-stepinto')
+      customDomain: {
+        domainName,
+        certificate
       }
     });
-
-    new CfnOutput(this, this.generateId(unique('arn-output')), {
-      exportName: this.generateName(parameterNames.USER_POOL_ARN),
-      value: userPool.userPoolArn
+    new RecordSet(this, this.generateId('arecord'), {
+      zone,
+      recordType: RecordType.A,
+      recordName: domainName,
+      target: RecordTarget.fromAlias(new UserPoolDomainTarget(userPoolDomain))
+    });
+    new RecordSet(this, this.generateId('aaaarecord'), {
+      zone,
+      recordType: RecordType.AAAA,
+      recordName: domainName,
+      target: RecordTarget.fromAlias(new UserPoolDomainTarget(userPoolDomain))
     });
   }
 }

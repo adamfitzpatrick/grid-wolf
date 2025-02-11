@@ -18,7 +18,7 @@ const RESPONSE_TYPE = 'token'
 const SCOPE         = 'openid'
 
 setup('authenticate', async ({ page }) => {
-  const loginUrl = `${AUTH_HOST}${LOGIN_PATH}?client_id=${CLIENT_ID}&response_type=${RESPONSE_TYPE}` +
+  const loginUrl = `https://dev.${AUTH_HOST}${LOGIN_PATH}?client_id=${CLIENT_ID}&response_type=${RESPONSE_TYPE}` +
     `&scope=${SCOPE}&redirect_uri=${REDIRECT_URI}`;
   await page.goto(loginUrl);
   await page.locator('.modal-content.visible-md').getByRole('textbox', { name: 'name@host.com' }).fill(USERNAME);

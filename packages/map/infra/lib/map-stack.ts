@@ -30,6 +30,7 @@ const APP_NAME = 'grid-wolf-map';
 const SPEC_PATH = resolve(__dirname, '../api-spec.yaml');
 const HANDLER_PATH = resolve(__dirname, '../../lib/map-handler');
 const BASE_PATH = 'map';
+const SUBDOMAIN_PART = 'images';
 
 export interface MapStackProps extends Omit<StepintoBaseProps, 'appName'> {
   dataTableName: string;
@@ -65,7 +66,7 @@ export class MapStack extends StepintoBaseStack {
         cdnPublicKey
       ]
     });
-    let cdnDomain = `images.${props.subdomain}.${props.hostedZone}`;
+    let cdnDomain = `${SUBDOMAIN_PART}.${props.subdomain}.${props.hostedZone}`;
     if (props.env.prefix !== 'prd') {
       cdnDomain = `${props.env.prefix}.${cdnDomain}`
     }
@@ -99,13 +100,13 @@ export class MapStack extends StepintoBaseStack {
     });
     new RecordSet(this, this.generateId('arecord'), {
       recordType: RecordType.A,
-      recordName: `${props.env.prefix}.images.${props.subdomain}`,
+      recordName: `${props.env.prefix}.${SUBDOMAIN_PART}.${props.subdomain}`,
       zone,
       target: RecordTarget.fromAlias(new CloudFrontTarget(distro))
     });
     new RecordSet(this, this.generateId('aaaarecord'), {
       recordType: RecordType.AAAA,
-      recordName: `${props.env.prefix}.images.${props.subdomain}`,
+      recordName: `${props.env.prefix}.${SUBDOMAIN_PART}.${props.subdomain}`,
       zone,
       target: RecordTarget.fromAlias(new CloudFrontTarget(distro))
     });

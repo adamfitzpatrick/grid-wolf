@@ -13,7 +13,9 @@ describe('UserStack', () => {
         region: 'region',
         prefix: 'tst'
       },
-      domain: 'domain'
+      certificateArn: 'arn',
+      hostedZone: 'zone',
+      subdomain: 'subdomain'
     };
     const app = new App();
     const stack = new UserStack(app, 'TestStack', props);
@@ -56,8 +58,9 @@ describe('UserStack', () => {
   });
 
   test('should create user pool domain', () => {
+    template.resourceCountIs('AWS::Route53::RecordSet', 2);
     template.hasResourceProperties('AWS::Cognito::UserPoolDomain', {
-      Domain: Match.stringLikeRegexp('tst-grid-wolf-stepinto')
+      Domain: Match.stringLikeRegexp('auth.subdomain.zone')
     });
   });
 });

@@ -3,7 +3,10 @@ import { loadEnv, EnvironmentVariableName } from '@grid-wolf/shared/utils';
 import { UserStack, UserStackProps } from '../lib/user-stack';
 
 const environmentVars = loadEnv([
-  EnvironmentVariableName.USER_AUTH_DOMAIN
+  EnvironmentVariableName.USER_AUTH_DOMAIN,
+  EnvironmentVariableName.USER_POOL_CERTIFICATE_ARN,
+  EnvironmentVariableName.APP_SUBDOMAIN,
+  EnvironmentVariableName.HOSTED_ZONE
 ]);
 
 const props: UserStackProps = {
@@ -12,7 +15,9 @@ const props: UserStackProps = {
     region: environmentVars[EnvironmentVariableName.REGION],
     prefix: environmentVars[EnvironmentVariableName.PREFIX]
   },
-  domain: environmentVars[EnvironmentVariableName.USER_AUTH_DOMAIN]
+  certificateArn: environmentVars[EnvironmentVariableName.USER_POOL_CERTIFICATE_ARN],
+  hostedZone: environmentVars[EnvironmentVariableName.HOSTED_ZONE],
+  subdomain: environmentVars[EnvironmentVariableName.APP_SUBDOMAIN]
 };
 
 const app = new App();
