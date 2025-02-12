@@ -19,7 +19,8 @@ describe('map-stack', () => {
       dataTableName: 'table',
       deploySecretsArn: 'secrets-arn',
       hostedZone: 'zone',
-      subdomain: 'domain'
+      subdomain: 'domain',
+      cdnCertificate: 'arn:a:b:us-east-1:d:e'
     }
     const app = new App();
     const stack = new MapStack(app, 'TestStack', props);
@@ -55,7 +56,6 @@ describe('map-stack', () => {
         Variables: {
           [EnvironmentVariableName.DATA_TABLE_NAME]: 'tst-table',
           [EnvironmentVariableName.CDN_PRIVATE_KEY_SECRET_ID]: 'secrets-arn',
-          [EnvironmentVariableName.CDN_HOST]: Match.anyValue(),
           [EnvironmentVariableName.CDN_PUBLIC_KEY_ID]: Match.anyValue()
         }
       }
@@ -115,6 +115,6 @@ describe('map-stack', () => {
   });
 
   test('should have an a record for the cloudfront distro', () => {
-
+    template.resourceCountIs('AWS::Route53::RecordSet', 2);
   });
 });

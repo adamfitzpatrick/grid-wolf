@@ -66,20 +66,6 @@ const handlePutMapOperation = async (event: APIGatewayProxyEvent) => {
   }));
 };
 
-const handleDeleteMapOperation = async (event: APIGatewayProxyEvent) => {
-  console.debug({ operationHandled: 'deleteMap'});
-  const mapDTO = JSON.parse(event.body!) as MapDTO;
-  const { username } = parseAuthToken(event);
-
-  if (username !== mapDTO.ownerId) {
-    return mismatchedUserRejection(username, mapDTO.ownerId);
-  }
-  return dao.delete(mapDTO.ownerId, mapDTO.mapId).then(() => addCORS({
-    statusCode: 202,
-    body: 'accepted'
-  }));
-}
-
 const handleGetMapOperation = async (event: APIGatewayProxyEvent) => {
   console.debug({ operationHandled: 'getMap' });
   const mapId = event.pathParameters!['mapId']!;
@@ -97,6 +83,17 @@ const handleGetMapOperation = async (event: APIGatewayProxyEvent) => {
     body: JSON.stringify(map)
   });
 };
+
+const handleDeleteMapOperation = async (event: APIGatewayProxyEvent) => {
+  console.debug({ operationHandled: 'deleteMap'});
+  const { username } = parseAuthToken(event);
+  const mapId = event.pathParameters!['mapId']!;
+
+  return dao.delete(username, mapId).then(() => addCORS({
+    statusCode: 202,
+    body: 'accepted'
+  }));
+}
 
 const handleGetMapsOperation = async (event: APIGatewayProxyEvent) => {
   console.debug({ operationHandled: 'getMaps' });
@@ -189,10 +186,10 @@ export async function handler(event: APIGatewayProxyEvent) {
   let returnValue: object | null = null;
   if (resourcePath === '/' && httpMethod === 'PUT') {
     returnValue = await handlePutMapOperation(event);
-  } else if ((resourcePath === '/' && httpMethod === 'DELETE')) {
-    returnValue = await handleDeleteMapOperation(event);
   } else if (resourcePath === '/{mapId}' && httpMethod === 'GET') {
     returnValue = await handleGetMapOperation(event);
+  } else if ((resourcePath === '/{mapId}' && httpMethod === 'DELETE')) {
+    returnValue = await handleDeleteMapOperation(event);
   } else if (resourcePath === '/list' && httpMethod === 'GET') {
     returnValue = await handleGetMapsOperation(event);
   } else if (resourcePath === '/save-image-url/{userId}/{filename}' && httpMethod === 'GET') {

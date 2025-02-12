@@ -12,7 +12,6 @@ const envMap = loadEnv([
   EnvironmentVariableName.SECRETS_ARN,
   EnvironmentVariableName.HOSTED_ZONE,
   EnvironmentVariableName.APP_SUBDOMAIN,
-  EnvironmentVariableName.CDN_HOST,
   EnvironmentVariableName.CDN_CERTIFICATE_ARN
 ]);
 const app = new cdk.App();

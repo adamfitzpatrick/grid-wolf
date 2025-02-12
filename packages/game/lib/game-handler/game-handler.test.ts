@@ -157,9 +157,13 @@ describe('game handler', () => {
     expect(daoGetAll).toHaveBeenCalledWith('user');
   });
 
-  test('/ DELETE should remove an item from DynamoDB', async () => {
-    event.requestContext.resourcePath = '/'
+  test('/{gameId} DELETE should remove an item from DynamoDB', async () => {
+    event.body = '';
+    event.requestContext.resourcePath = '/{gameId}'
     event.requestContext.httpMethod = 'DELETE';
+    event.pathParameters = {
+      gameId: 'id'
+    };
     daoDelete.mockResolvedValue({});
 
     await expect(handler(event)).resolves.toEqual({
@@ -173,23 +177,5 @@ describe('game handler', () => {
     });
 
     expect(daoDelete).toHaveBeenCalledWith('user', 'id');
-  });
-
-  test('/ DELETE should return a 400 if authorized user does not match delete request', async () => {
-    gameDTO.ownerId = 'otherperson';
-    event.body = JSON.stringify(gameDTO);
-    event.requestContext.resourcePath = '/'
-    event.requestContext.httpMethod = 'DELETE';
-    daoDelete.mockResolvedValue({});
-
-    await expect(handler(event)).resolves.toEqual({
-      statusCode: 400,
-      body: 'bad request',
-      headers: {
-        'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key',
-        'Access-Control-Allow-Methods': '*',
-        'Access-Control-Allow-Origin': '*',
-      }
-    });
   });
 });

@@ -36,6 +36,10 @@ The following resources are managed within this micro-app, and leverage a Single
         border: 1px solid rgb(122, 163, 251);
         background: rgba(122, 163, 251, 0.1);
     }
+    .api-operation.delete {
+        border: 1px solid rgb(240, 0, 0);
+        background: rgba(240, 0, 0, 0.1)
+    }
     .api-summary {
         list-style: none;
         position: relative;
@@ -68,6 +72,9 @@ The following resources are managed within this micro-app, and leverage a Single
     .api-verb.get {
         background: rgb(122, 163, 251);
     }
+    .api-verb.delete {
+        background: rgb(240, 0, 0);
+    }
     .api-operation-content {
         font-size: 90%;
     }
@@ -85,11 +92,12 @@ The following resources are managed within this micro-app, and leverage a Single
 
 ```typescript
 {
-    gameId: string,
-    ownerId: string,
-    name: string,
-    players: string,
-    created: string
+    gameId: string;
+    ownerId: string;
+    name: string;
+    players: string[];
+    timestamp: number;
+    active: boolean
 }
 ```
 
@@ -103,7 +111,37 @@ The following resources are managed within this micro-app, and leverage a Single
 <h4>Example cURL</h4>
 
 ```bash
-curl -X PUT -H "Content-Type: application/json" -H "Authorization: Bearer TOKEN" -H "x-api-key: API_KEY" --data '{"gameId":"example","ownerId":"owner","name":"Example Game","players":["player1","player2"],"created":"2025-01-07T00:39:11.099Z"}' http://server-host/game/
+curl -X PUT -H "Content-Type: application/json" -H "Authorization: Bearer TOKEN" -H "x-api-key: API_KEY" --data '{"gameId":"example","ownerId":"owner","name":"Example Game","players":["player1","player2"],"timestamp":12345,"active":true}' http://server-host/game/
+```
+
+</details>
+
+<details class='api-operation delete'>
+ <summary class='api-summary'><span class='api-verb delete'>DELETE</span> <code><b>/game</b></code><span>Remove an existing game entry</span></summary>
+
+<h4>Parameters</h4>
+
+| name | required? | data type | description |
+|---|---|---|---|
+| `gameId` | true | string | Unique ID specifying the game data to be removed |
+
+*Note: `gameId` is combined with a user ID parsed from the provided authentication token to determine the specific item to be deleted.*
+
+<h4>Request Body</h4>
+
+None
+
+<h4>Responses</h4>
+
+| http code | content-type | response |
+|---|---|---|
+| `202` | `application/json`| `accepted` |
+| `400` | `application/json`| `bad request` |
+
+<h4>Example cURL</h4>
+
+```bash
+curl -X DELETE -H "Content-Type: application/json" -H "Authorization: Bearer TOKEN" -H "x-api-key: API_KEY" http://server-host/game/gameId
 ```
 
 </details>

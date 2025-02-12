@@ -111,7 +111,7 @@ export class MapStack extends StepintoBaseStack {
       target: RecordTarget.fromAlias(new CloudFrontTarget(distro))
     });
 
-    const userPoolArn = Fn.importValue(`${props.env.prefix}-${parameterNames.USER_POOL_ARN}`);
+    const userPoolArn = StringParameter.valueForStringParameter(this, `/${props.env.prefix}${parameterNames.USER_POOL_ARN}`);
     const api = new SingleHandlerApi(this, this.generateId('api'), {
       ...props,
       appName: this.appName,

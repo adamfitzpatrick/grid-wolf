@@ -70,28 +70,6 @@ paths:
           method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key'"
           method.response.header.Access-Control-Allow-Methods: "'*'"
           method.response.header.Access-Control-Allow-Origin: "'*'"
-    delete:
-      description: Remove an existing map entry
-      operationId: deleteMap
-      security: 
-        - apiKey: []
-        - cognitoPool:
-          - openid
-      requestBody: 
-        $ref: '#/components/requestBodies/DeleteMapRequest'
-      responses:
-        '200':
-          description: Successful operation
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiResponse'
-        '400':
-          description: Bad request
-      x-amazon-apigateway-integration:
-        type: aws_proxy
-        uri: arn:aws:apigateway:{{region}}:lambda:path/2015-03-31/functions/{{handler}}/invocations
-        httpMethod: POST
   /{mapId}:
     options:
       security: []
@@ -165,6 +143,32 @@ paths:
           method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key'"
           method.response.header.Access-Control-Allow-Methods: "'*'"
           method.response.header.Access-Control-Allow-Origin: "'*'"
+    delete:
+      description: Remove an existing map entry
+      operationId: deleteMap
+      security: 
+        - apiKey: []
+        - cognitoPool:
+          - openid
+      parameters: 
+        - in: path
+          name: mapId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        '400':
+          description: Bad request
+      x-amazon-apigateway-integration:
+        type: aws_proxy
+        uri: arn:aws:apigateway:{{region}}:lambda:path/2015-03-31/functions/{{handler}}/invocations
+        httpMethod: POST
   /save-image-url/{userId}/{filename}:
     options:
       security: []

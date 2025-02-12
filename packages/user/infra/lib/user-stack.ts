@@ -1,8 +1,8 @@
 import { GridWolfStack, parameterNames } from "@grid-wolf/shared/constructs";
 import { GridWolfProps } from "@grid-wolf/shared/domain";
-import { CfnOutput, Duration } from "aws-cdk-lib";
+import { Duration } from "aws-cdk-lib";
 import { Certificate } from "aws-cdk-lib/aws-certificatemanager";
-import { AccountRecovery, CfnUserPoolUser, OAuthScope, UserPool, UserPoolClient, UserPoolDomain } from "aws-cdk-lib/aws-cognito";
+import { AccountRecovery, OAuthScope, UserPool, UserPoolClient, UserPoolDomain } from "aws-cdk-lib/aws-cognito";
 import { HostedZone, RecordSet, RecordTarget, RecordType } from "aws-cdk-lib/aws-route53";
 import { UserPoolDomainTarget } from "aws-cdk-lib/aws-route53-targets";
 import { ParameterTier, StringParameter } from "aws-cdk-lib/aws-ssm";
@@ -82,6 +82,12 @@ export class UserStack extends GridWolfStack {
       recordType: RecordType.AAAA,
       recordName: domainName,
       target: RecordTarget.fromAlias(new UserPoolDomainTarget(userPoolDomain))
+    });
+
+    new StringParameter(this, this.generateId('pool-arn'), {
+      parameterName: `/${props.env.prefix}${parameterNames.USER_POOL_ARN}`,
+      stringValue: userPool.userPoolArn,
+      tier: ParameterTier.STANDARD
     });
   }
 }

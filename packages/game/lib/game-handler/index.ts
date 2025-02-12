@@ -83,12 +83,8 @@ const handleGetGamesOperation = async (event: APIGatewayProxyEvent) => {
 const handleDeleteGameOperation = async (event: APIGatewayProxyEvent) => {
   console.debug({ operationHandled: 'deleteGame'});
   const { username } = parseAuthToken(event);
-
-  const gameDTO = JSON.parse(event.body!) as GameDTO;
-  if (username !== gameDTO.ownerId) {
-    return handleUsernameMismatch(username, gameDTO.ownerId);
-  }
-  return dao.delete(gameDTO.ownerId, gameDTO.gameId).then(() => {
+  const gameId = event.pathParameters!['gameId']!;
+  return dao.delete(username, gameId).then(() => {
     return addCORS({
       statusCode: 202,
       body: 'accepted'
@@ -107,7 +103,7 @@ export async function handler(event: APIGatewayProxyEvent) {
     returnValue = await handleGetGameOperation(event);
   } else if (resourcePath === '/list' && httpMethod === 'GET') {
     returnValue = await handleGetGamesOperation(event);
-  } else if (resourcePath === '/' && httpMethod === 'DELETE') {
+  } else if (resourcePath === '/{gameId}' && httpMethod === 'DELETE') {
     returnValue = await handleDeleteGameOperation(event);
   } else {
     throw new Error(`No handler to invoke for path ${resourcePath} and method ${httpMethod}`);

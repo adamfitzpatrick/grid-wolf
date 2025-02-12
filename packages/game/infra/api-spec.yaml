@@ -60,28 +60,6 @@ paths:
         type: aws_proxy
         uri: arn:aws:apigateway:{{region}}:lambda:path/2015-03-31/functions/{{handler}}/invocations
         httpMethod: POST
-    delete:
-      description: Remove an existing game entry
-      operationId: deleteGame
-      security: 
-        - apiKey: []
-        - cognitoPool:
-          - openid
-      requestBody: 
-        $ref: '#/components/requestBodies/DeleteGameRequest'
-      responses:
-        '200':
-          description: Successful operation
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiResponse'
-        '400':
-          description: Bad request
-      x-amazon-apigateway-integration:
-        type: aws_proxy
-        uri: arn:aws:apigateway:{{region}}:lambda:path/2015-03-31/functions/{{handler}}/invocations
-        httpMethod: POST
   '/{gameId}':
     options:
       security: []
@@ -133,6 +111,32 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiResponse'
+      x-amazon-apigateway-integration:
+        type: aws_proxy
+        uri: arn:aws:apigateway:{{region}}:lambda:path/2015-03-31/functions/{{handler}}/invocations
+        httpMethod: POST
+    delete:
+      description: Remove an existing game entry
+      operationId: deleteGame
+      security: 
+        - apiKey: []
+        - cognitoPool:
+          - openid
+      parameters: 
+        - in: path
+          name: gameId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        '400':
+          description: Bad request
       x-amazon-apigateway-integration:
         type: aws_proxy
         uri: arn:aws:apigateway:{{region}}:lambda:path/2015-03-31/functions/{{handler}}/invocations

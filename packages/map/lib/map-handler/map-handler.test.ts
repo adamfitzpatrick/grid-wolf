@@ -114,41 +114,6 @@ describe('map handler', () => {
     expect(putSpy).toHaveBeenCalledWith(mapDTO);
   });
 
-  describe('DELETE /', () => {
-    beforeEach(() => {
-      event.requestContext.httpMethod = 'DELETE';
-    });
-
-    test('should remove a map item from DynamoDB', async () => {
-      deleteSpy.mockResolvedValue(undefined);
-  
-      await expect(handler(event)).resolves.toEqual({
-        statusCode: 202,
-        body: 'accepted',
-        headers: {
-          'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key',
-          'Access-Control-Allow-Methods': '*',
-          'Access-Control-Allow-Origin': '*',
-        }
-      });
-      expect(deleteSpy).toHaveBeenCalledWith('user', 'id');
-    });
-    
-    test('should return 400 error if authenticated user does not match requested userId', async () => {
-      mapDTO.ownerId = 'otherUser';
-      event.body = JSON.stringify(mapDTO);
-      await expect(handler(event)).resolves.toEqual({
-        statusCode: 400,
-        body: 'bad request',
-        headers: {
-          'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key',
-          'Access-Control-Allow-Methods': '*',
-          'Access-Control-Allow-Origin': '*',
-        }
-      });
-    });
-  })
-
   test('GET /{mapId} should get specific map data', async () => {
     event.requestContext.httpMethod = 'GET';
     event.requestContext.resourcePath = '/{mapId}';
@@ -188,6 +153,33 @@ describe('map handler', () => {
     });
     expect(getSpy).toHaveBeenCalledWith('user', 'id');
   });
+
+  describe('DELETE /{mapId}', () => {
+    beforeEach(() => {
+      event.requestContext.httpMethod = 'DELETE';
+      event.requestContext.resourcePath = '/{mapId}'
+      event.body = '';
+      event.pathParameters = {
+        mapId: 'id'
+      }
+    });
+
+    test('should remove a map item from DynamoDB', async () => {
+      deleteSpy.mockResolvedValue(undefined);
+  
+      await expect(handler(event)).resolves.toEqual({
+        statusCode: 202,
+        body: 'accepted',
+        headers: {
+          'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key',
+          'Access-Control-Allow-Methods': '*',
+          'Access-Control-Allow-Origin': '*',
+        }
+      });
+      expect(deleteSpy).toHaveBeenCalledWith('user', 'id');
+    });
+  })
+
 
   describe('GET /save-image-url/{userId}/{filename}', () => {
     beforeEach(() => {
