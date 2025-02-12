@@ -20,7 +20,6 @@ import { StringParameter } from "aws-cdk-lib/aws-ssm";
 import { Effect, PolicyStatement } from "aws-cdk-lib/aws-iam";
 import { EnvironmentVariableName } from "@grid-wolf/shared/utils";
 import { CfnBasePathMapping } from "aws-cdk-lib/aws-apigateway";
-import { Fn } from "aws-cdk-lib";
 import { StepintoBaseStack, StepintoBaseProps } from 'stepinto-aws-tools/constructs';
 import { HostedZone, RecordSet, RecordTarget, RecordType } from "aws-cdk-lib/aws-route53";
 import { CloudFrontTarget } from "aws-cdk-lib/aws-route53-targets";
@@ -30,7 +29,8 @@ const APP_NAME = 'grid-wolf-map';
 const SPEC_PATH = resolve(__dirname, '../api-spec.yaml');
 const HANDLER_PATH = resolve(__dirname, '../../lib/map-handler');
 const BASE_PATH = 'map';
-const SUBDOMAIN_PART = 'images';
+const API_SUBDOMAIN_PART = 'api';
+const CDN_SUBDOMAIN_PART = 'images';
 
 export interface MapStackProps extends Omit<StepintoBaseProps, 'appName'> {
   dataTableName: string;
@@ -66,7 +66,7 @@ export class MapStack extends StepintoBaseStack {
         cdnPublicKey
       ]
     });
-    let cdnDomain = `${SUBDOMAIN_PART}.${props.subdomain}.${props.hostedZone}`;
+    let cdnDomain = `${CDN_SUBDOMAIN_PART}.${props.subdomain}.${props.hostedZone}`;
     if (props.env.prefix !== 'prd') {
       cdnDomain = `${props.env.prefix}.${cdnDomain}`
     }
@@ -100,13 +100,13 @@ export class MapStack extends StepintoBaseStack {
     });
     new RecordSet(this, this.generateId('arecord'), {
       recordType: RecordType.A,
-      recordName: `${props.env.prefix}.${SUBDOMAIN_PART}.${props.subdomain}`,
+      recordName: `${props.env.prefix}.${CDN_SUBDOMAIN_PART}.${props.subdomain}`,
       zone,
       target: RecordTarget.fromAlias(new CloudFrontTarget(distro))
     });
     new RecordSet(this, this.generateId('aaaarecord'), {
       recordType: RecordType.AAAA,
-      recordName: `${props.env.prefix}.${SUBDOMAIN_PART}.${props.subdomain}`,
+      recordName: `${props.env.prefix}.${CDN_SUBDOMAIN_PART}.${props.subdomain}`,
       zone,
       target: RecordTarget.fromAlias(new CloudFrontTarget(distro))
     });
@@ -149,7 +149,7 @@ export class MapStack extends StepintoBaseStack {
       usesSecrets: true
     });
 
-    let domainName = `${props.subdomain}.${props.hostedZone}`;
+    let domainName = `${API_SUBDOMAIN_PART}.${props.subdomain}.${props.hostedZone}`;
     if (props.env.prefix !== 'prd') {
       domainName = `${props.env.prefix}.${domainName}`;
     }

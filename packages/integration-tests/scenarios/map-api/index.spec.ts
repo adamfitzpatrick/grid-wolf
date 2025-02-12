@@ -73,9 +73,8 @@ test.describe('when managing maps', () => {
     });
 
     const promises = (await existingGames.json()).map(async (map: MapDTO) => {
-      await request.delete('./map', {
-        headers: { 'x-api-key': getAuthData().apiKey.map },
-        data: map
+      await request.delete(`./map/${map.mapId}`, {
+        headers: { 'x-api-key': getAuthData().apiKey.map }
       });
     });
     await Promise.all(promises);

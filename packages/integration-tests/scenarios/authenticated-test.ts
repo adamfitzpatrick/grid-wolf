@@ -1,9 +1,11 @@
+import { EnvironmentVariableName } from '@grid-wolf/shared/utils';
 import { APIRequestContext, test as base, expect } from '@playwright/test';
 import { readFileSync, writeFileSync } from 'fs';
 import { resolve } from 'path';
 
 const AUTH_FILE_PATH = resolve(__dirname, './.auth.json');
-const API_BASE_URL = 'https://dev.grid-wolf.stepinto.io';
+const API_DOMAIN = process.env[EnvironmentVariableName.API_DOMAIN];
+const API_BASE_URL = `https://dev.${API_DOMAIN}`;
 
 export interface ApiKeys {
   game: string;
@@ -15,6 +17,7 @@ export interface AuthData {
   password: string;
   userId: string;
   accessToken: string;
+  idToken?: string;
   apiKey: ApiKeys
 }
 

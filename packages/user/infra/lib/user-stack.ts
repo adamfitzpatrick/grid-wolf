@@ -7,21 +7,22 @@ import { HostedZone, RecordSet, RecordTarget, RecordType } from "aws-cdk-lib/aws
 import { UserPoolDomainTarget } from "aws-cdk-lib/aws-route53-targets";
 import { ParameterTier, StringParameter } from "aws-cdk-lib/aws-ssm";
 import { Construct } from "constructs";
+import { StepintoBaseStack, StepintoBaseProps } from 'stepinto-aws-tools/constructs';
 
+const APP_NAME = 'grid-wolf-user';
 const SUBDOMAIN_PART = 'auth';
 
-export interface UserStackProps extends GridWolfProps {
+export interface UserStackProps extends Omit<StepintoBaseProps, 'appName'> {
   certificateArn: string;
   hostedZone: string;
   subdomain: string;
 }
 
-export class UserStack extends GridWolfStack {
+export class UserStack extends StepintoBaseStack {
   constructor(scope: Construct, id: string, props: UserStackProps) {
-    super(scope, id, props);
+    super(scope, id, { appName: APP_NAME, ...props });
 
-    const unique = (part: string) => `${this.appName}-user-${part}`
-    const userPool = new UserPool(this, this.generateId(unique('pool')), {
+    const userPool = new UserPool(this, this.generateId('pool'), {
       accountRecovery: AccountRecovery.EMAIL_AND_PHONE_WITHOUT_MFA,
       deletionProtection: true,
       deviceTracking: {
@@ -31,7 +32,7 @@ export class UserStack extends GridWolfStack {
       signInAliases: {
         email: true
       },
-      userPoolName: this.generateName('user-pool'),
+      userPoolName: this.generateName('pool'),
       passwordPolicy: {
         requireDigits: true,
         requireLowercase: true,
@@ -40,9 +41,9 @@ export class UserStack extends GridWolfStack {
       }
     });
 
-    new UserPoolClient(this, this.generateId(unique('client')), {
+    new UserPoolClient(this, this.generateId('client'), {
       userPool,
-      userPoolClientName: this.generateName('user-client'),
+      userPoolClientName: this.generateName('client'),
       accessTokenValidity: Duration.hours(24),
       enableTokenRevocation: true,
       generateSecret: false,
@@ -64,7 +65,7 @@ export class UserStack extends GridWolfStack {
       domainName = `${props.env.prefix}.${domainName}`;
     }
     const certificate = Certificate.fromCertificateArn(this, this.generateId('cert'), props.certificateArn);
-    const userPoolDomain = new UserPoolDomain(this, this.generateId(unique('domain')), {
+    const userPoolDomain = new UserPoolDomain(this, this.generateId('domain'), {
       userPool,
       customDomain: {
         domainName,

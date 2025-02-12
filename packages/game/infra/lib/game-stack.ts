@@ -2,7 +2,6 @@ import { parameterNames } from "@grid-wolf/shared/constructs";
 import { Construct } from "constructs";
 import { resolve } from "path";
 import { SingleHandlerApi } from 'stepinto-aws-tools/constructs';
-import { Fn } from "aws-cdk-lib";
 import { CfnBasePathMapping } from "aws-cdk-lib/aws-apigateway";
 import { StepintoBaseProps, StepintoBaseStack } from 'stepinto-aws-tools/constructs';
 import { StringParameter } from "aws-cdk-lib/aws-ssm";
@@ -11,6 +10,7 @@ const APP_NAME = 'grid-wolf-game';
 const BASE_PATH = 'game';
 const SPEC_PATH = resolve(__dirname, '../api-spec.yaml');
 const HANDLER_PATH = resolve(__dirname, '../../lib/game-handler');
+const API_SUBDOMAIN_PART = 'api';
 
 export interface GameStackProps extends Omit<StepintoBaseProps, 'appName'> {
   dataTableName: string;
@@ -36,12 +36,12 @@ export class GameStack extends StepintoBaseStack {
       handlerTemplateKey: 'handler',
       additionalEnvironmentVariables: {
         PARAMETERS_SECRETS_EXTENSION_LOG_LEVEL: 'error'
-    },
+      },
       layers: {},
       userPoolArn
     });
 
-    let domainName = `${props.subdomain}.${props.hostedZone}`;
+    let domainName = `${API_SUBDOMAIN_PART}.${props.subdomain}.${props.hostedZone}`;
     if (props.env.prefix !== 'prd') {
       domainName = `${props.env.prefix}.${domainName}`;
     }

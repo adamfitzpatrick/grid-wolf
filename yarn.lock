@@ -2702,6 +2702,7 @@ __metadata:
     jest: "npm:^29.7.0"
     rimraf: "npm:^6.0.1"
     source-map-support: "npm:^0.5.21"
+    stepinto-aws-tools: "npm:^0.7.13"
     ts-jest: "npm:^29.1.5"
     ts-node: "npm:^10.9.2"
     typescript: "npm:5.5.4"
@@ -2728,7 +2729,7 @@ __metadata:
     esbuild: "npm:^0.24.2"
     jest: "npm:^29.7.0"
     jsonwebtoken: "npm:^9.0.2"
-    stepinto-aws-tools: "npm:^0.7.10"
+    stepinto-aws-tools: "npm:^0.7.13"
     ts-jest: "npm:^29.2.5"
     ts-node: "npm:^10.9.2"
     typescript: "npm:5.5.4"
@@ -2759,7 +2760,7 @@ __metadata:
     jest: "npm:^29.7.0"
     jsonwebtoken: "npm:^9.0.2"
     node-fetch: "npm:2"
-    stepinto-aws-tools: "npm:^0.7.10"
+    stepinto-aws-tools: "npm:^0.7.13"
     ts-jest: "npm:^29.2.5"
     ts-node: "npm:^10.9.2"
     typescript: "npm:5.5.4"
@@ -2788,7 +2789,7 @@ __metadata:
     react: "npm:^18.3.1"
     react-dom: "npm:^18.3.1"
     rimraf: "npm:^6.0.1"
-    stepinto-aws-tools: "npm:^0.7.10"
+    stepinto-aws-tools: "npm:^0.7.13"
     ts-jest: "npm:^29.2.5"
     ts-node: "npm:^10.9.2"
     typescript: "npm:5.5.4"
@@ -2807,6 +2808,7 @@ __metadata:
     cdk: "npm:2.160.0"
     constructs: "npm:10.3.0"
     jest: "npm:^29.7.0"
+    stepinto-aws-tools: "npm:^0.7.13"
     ts-jest: "npm:^29.2.5"
     ts-node: "npm:^10.9.2"
     typescript: "npm:5.5.4"
@@ -8697,9 +8699,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"stepinto-aws-tools@npm:^0.7.10":
-  version: 0.7.10
-  resolution: "stepinto-aws-tools@npm:0.7.10"
+"stepinto-aws-tools@npm:^0.7.13":
+  version: 0.7.13
+  resolution: "stepinto-aws-tools@npm:0.7.13"
   dependencies:
     "@aws-sdk/util-dynamodb": "npm:^3.716.0"
     dotenv: "npm:^16.4.5"
@@ -8710,7 +8712,7 @@ __metadata:
     aws-cdk-lib: 2.160.0
     constructs: 10.3.0
     typescript: 5.5.4
-  checksum: 10c0/d8e6a0f77a98e62ad7aa1c05808904b5d847a0a4cfa8432bec84ce7211a21d18cbf20cee5dee52ca77a0cd079677ae3511e555361a06b67585cb8bc870500248
+  checksum: 10c0/f9a49c1c24bfa11457ad4de56625b45eb74e6eab566b006bf04d27d3a2c988e78716d819a4fc96770d15820943402fd3f30c771d0ebf2ad0feee1c45f9d8c469
   languageName: node
   linkType: hard
 

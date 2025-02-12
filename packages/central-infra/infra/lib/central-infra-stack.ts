@@ -1,30 +1,31 @@
-import { CfnOutput } from 'aws-cdk-lib';
 import { AttributeType, BillingMode, StreamViewType, Table } from 'aws-cdk-lib/aws-dynamodb';
 import { Construct } from 'constructs';
-import { GridWolfStack, parameterNames } from '@grid-wolf/shared/constructs';
-import { GridWolfProps } from '@grid-wolf/shared/domain';
 import { HostedZone, RecordSet, RecordTarget, RecordType } from 'aws-cdk-lib/aws-route53';
 import { DomainName, EndpointType } from 'aws-cdk-lib/aws-apigateway';
 import { Certificate } from 'aws-cdk-lib/aws-certificatemanager';
-import { ApiGateway, ApiGatewayDomain } from 'aws-cdk-lib/aws-route53-targets';
+import { ApiGatewayDomain } from 'aws-cdk-lib/aws-route53-targets';
+import { StepintoBaseStack, StepintoBaseProps } from 'stepinto-aws-tools/constructs';
 
-export interface CentralInfraStackProps extends GridWolfProps {
+export const APP_NAME = 'grid-wolf';
+export const API_SUBDOMAIN_PART = 'api';
+
+export interface CentralInfraStackProps extends Omit<StepintoBaseProps, 'appName'> {
   dataTableName: string;
   hostedZone: string;
   apiCertificateArn: string;
 }
 
-export class CentralInfraStack extends GridWolfStack {
+export class CentralInfraStack extends StepintoBaseStack {
   constructor(scope: Construct, id: string, props: CentralInfraStackProps) {
-    super(scope, id, props);
+    super(scope, id, { appName: APP_NAME, ...props });
 
-    const table = this.createDataTable(props.dataTableName);
+    this.createDataTable(props.env.prefix, props.dataTableName);
     this.createApiDomain(props.env.prefix, props.hostedZone, props.apiCertificateArn);
   }
 
-  createDataTable(dataTableName: string) {
-    const table = new Table(this, this.generateId(parameterNames.DATA_TABLE_NAME), {
-      tableName: this.generateName(dataTableName),
+  createDataTable(envPrefix: string, dataTableName: string) {
+    const table = new Table(this, this.generateId('data-table'), {
+      tableName: `${envPrefix}-${dataTableName}`,
       partitionKey: {
         name: 'pk',
         type: AttributeType.STRING
@@ -39,15 +40,11 @@ export class CentralInfraStack extends GridWolfStack {
       stream: StreamViewType.NEW_IMAGE
     });
 
-    new CfnOutput(this, 'DataTableName', {
-      exportName: this.generateName(parameterNames.DATA_TABLE_NAME),
-      value: table.tableName
-    });
     return table
   }
 
   createApiDomain(envPrefix: string, zoneName: string, certificateArn: string) {
-    let domainName = `${this.appName}.${zoneName}`;
+    let domainName = `${API_SUBDOMAIN_PART}.${this.appName}.${zoneName}`;
     if (envPrefix !== 'prd') {
       domainName = `${envPrefix}.${domainName}`;
     }

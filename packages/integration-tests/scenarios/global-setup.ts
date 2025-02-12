@@ -11,9 +11,9 @@ const USER_ID       = process.env[EnvironmentVariableName.INT_TEST_USER_ID]!;
 const GAME_API_KEY  = process.env[EnvironmentVariableName.INT_TEST_GAME_API_KEY]!;
 const MAP_API_KEY   = process.env[EnvironmentVariableName.INT_TEST_MAP_API_KEY]!;
 const AUTH_HOST     = process.env[EnvironmentVariableName.USER_AUTH_DOMAIN]!;
-const LOGIN_PATH    = '/login';
 const CLIENT_ID     = process.env[EnvironmentVariableName.USER_AUTH_CLIENT_ID]!;
 const REDIRECT_URI  = process.env[EnvironmentVariableName.USER_AUTH_REDIRECT_URI]!;
+const LOGIN_PATH    = '/login';
 const RESPONSE_TYPE = 'token'
 const SCOPE         = 'openid'
 

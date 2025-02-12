@@ -29,3 +29,4 @@ single call~~
 parameter store instead of importing stack outputs~~
 - To DRY up my APIs, I want to use a shared API handler component which accepts specific models and
 prepends primary and sort key values properly
+- Document challenge: Immutable deployments and addToLogicalID method
