@@ -54,7 +54,7 @@ test.describe('when managing games', () => {
     expect(response.ok()).toBeFalsy();
   });
 
-  test('users cannot save data owned by another user', async ({ request, getAuthData }) => {
+  test('users cannot save game data owned by another user', async ({ request, getAuthData }) => {
     game1.ownerId = 'somebody-else';
     const response = await request.put('./game', {
       headers: { 'x-api-key': getAuthData().apiKey.game },
@@ -70,7 +70,7 @@ test.describe('when managing games', () => {
     expect(await response.json()).toEqual(game1);
   });
   
-  test('authenticated users receive "access denied" when requesting non-existent data', async ({ request, getAuthData }) => {
+  test('authenticated users receive "access denied" when requesting non-existent game data', async ({ request, getAuthData }) => {
     const response = await request.get(`./game/not-a-game`, {
       headers: { 'x-api-key': getAuthData().apiKey.game }
     });

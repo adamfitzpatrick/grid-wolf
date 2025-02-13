@@ -61,7 +61,7 @@ curl -X PUT -H "Content-Type: application/json" -H "Authorization: Bearer TOKEN"
 </details>
 
 <details>
- <summary><span>DELETE</span> <code><b>/game</b></code><span>Remove an existing game entry</span></summary>
+ <summary><span>DELETE</span> <code><b>/game/{gameId}</b></code><span>Remove an existing game entry</span></summary>
 
 <h4>Parameters</h4>
 
@@ -80,12 +80,11 @@ None
 | http code | content-type | response |
 |---|---|---|
 | `202` | `application/json`| `accepted` |
-| `400` | `application/json`| `bad request` |
 
 <h4>Example cURL</h4>
 
 ```bash
-curl -X DELETE -H "Content-Type: application/json" -H "Authorization: Bearer TOKEN" -H "x-api-key: API_KEY" http://server-host/game/gameId
+curl -X DELETE -H "Content-Type: application/json" -H "Authorization: Bearer TOKEN" -H "x-api-key: API_KEY" http://server-host/game/example-game-id
 ```
 
 </details>
@@ -119,7 +118,7 @@ curl -X GET -H "Content-Type: application/json" -H "Authorization: Bearer TOKEN"
 </details>
 
 <details>
- <summary><span>GET</span> <code><b>/games</b></code> <span>Retrieve a list of all games owned by user</span></summary>
+ <summary><span>GET</span> <code><b>/game/list</b></code> <span>Retrieve a list of all games owned by user</span></summary>
 
 <h4>Parameters</h4>
 
@@ -139,7 +138,7 @@ None
 <h4>Example cURL</h4>
 
 > ```bash
->  curl -X GET -H "Content-Type: application/json" -H "Authorization: Bearer TOKEN" -H "x-api-key: API_KEY" http://server-host/games/
+>  curl -X GET -H "Content-Type: application/json" -H "Authorization: Bearer TOKEN" -H "x-api-key: API_KEY" http://server-host/game/list/
 > ```
 
 </details>
@@ -148,9 +147,9 @@ None
 
 - **PUT /game happy path** *authenticated users can save game data*
 - **PUT /game incorrect payload** *users cannot save invalid game data*
-- **PUT /game username/authorization mismatch** *users cannot save data owned by another user*
+- **PUT /game username/authorization mismatch** *users cannot save game data owned by another user*
 - **GET /game/{gameId} happy path** *authenticated users can retrieve saved game data*
-- **GET /game/{gameId} non-existent gameId** *authenticated users receive "access denied" when requesting non-existent data*
+- **GET /game/{gameId} non-existent gameId** *authenticated users receive "access denied" when requesting non-existent game data*
 - **GET /game/list happy path** *authenticated users can retrieve a list of games*
-- **DELETE /game/{gameId} happy path** *authenticated users can delete games they have create*
+- **DELETE /game/{gameId} happy path** *authenticated users can delete games they have created*
 - **DELETE /game/{gameId} non-existent gameId** *authenticated users can attempt to delete non-existent games without error*

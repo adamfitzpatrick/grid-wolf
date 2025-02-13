@@ -1,11 +1,23 @@
 import { DynamoItem, ObjectMapper } from "stepinto-aws-tools/clients";
 
+export interface Vector {
+  x: number;
+  y: number;
+}
+
+export interface GridData {
+  origin: Vector;
+  cellWidth: number;
+  difficult: Vector[];
+  impassable: Vector[];
+}
+
 export interface MapItem extends DynamoItem {
   mapId: string;
   ownerId: string;
   name: string;
-  imageUri: string;
-  gridData: object;
+  imageUrl: string;
+  gridData: GridData;
   timestamp: number;
   active: boolean;
 }
@@ -14,8 +26,8 @@ export interface MapDTO {
   mapId: string;
   ownerId: string;
   name: string;
-  imageUri: string;
-  gridData: object;
+  imageUrl: string;
+  gridData: GridData;
   timestamp: number;
   active: boolean;
 }

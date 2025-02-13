@@ -15,26 +15,47 @@ test.describe('when managing maps', () => {
   let mapId2: string;
   let map1: MapDTO;
   let map2: MapDTO;
+  let timestamp: number;
 
-  test.beforeAll(({ getAuthData }) => {
+  test.beforeAll(() => {
     mapId1 = randomUUID();
     mapId2 = randomUUID();
+    timestamp = new Date().getTime();
+  });
+
+  test.beforeEach(({ getAuthData }) => {
     map1 = {
       mapId: mapId1,
       ownerId: getAuthData().userId,
       name: 'test-game-1',
-      timestamp: new Date().getTime(),
-      imageUri: 'image',
-      gridData: {},
+      timestamp,
+      imageUrl: 'image',
+      gridData: {
+        origin: {
+          x: 0,
+          y: 0
+        },
+        cellWidth: 0,
+        difficult: [],
+        impassable: []
+      },
       active: true
     };
     map2 = {
       mapId: mapId2,
       ownerId: getAuthData().userId,
       name: 'test-game-2',
-      imageUri: 'image',
-      gridData: {},
-      timestamp: new Date().getTime(),
+      imageUrl: 'image',
+      gridData: {
+        origin: {
+          x: 0,
+          y: 0
+        },
+        cellWidth: 0,
+        difficult: [],
+        impassable: []
+      },
+      timestamp,
       active: true
     }
   });
@@ -47,11 +68,39 @@ test.describe('when managing maps', () => {
     expect(response.ok()).toBeTruthy();
   });
 
-  test('authenticated users can retrieve samed map data', async ({ request, getAuthData }) => {
+  test('users cannot save invalid game data', async ({ request, getAuthData }) => {
+    const invalid = {
+      ...map1,
+      badField: 'bad'
+    };
+    const response = await request.put('./map', {
+      headers: { 'x-api-key': getAuthData().apiKey.map },
+      data: invalid
+    });
+    expect(response.ok()).toBeFalsy();
+  });
+
+  test('users cannot save map data owned by another user', async ({ request, getAuthData }) => {
+    map1.ownerId = 'somebody-else';
+    const response = await request.put('./map', {
+      headers: { 'x-api-key': getAuthData().apiKey.map },
+      data: map1
+    });
+    expect(response.ok()).toBeFalsy();
+  });
+
+  test('authenticated users can retrieve saved map data', async ({ request, getAuthData }) => {
     const response = await request.get(`./map/${mapId1}`, {
       headers: { 'x-api-key': getAuthData().apiKey.map }
     });
     expect(await response.json()).toEqual(map1);
+  });
+  
+  test('authenticated users receive "access denied" when requesting non-existent map data', async ({ request, getAuthData }) => {
+    const response = await request.get(`./map/not-a-map`, {
+      headers: { 'x-api-key': getAuthData().apiKey.map }
+    });
+    expect(await response.status()).toBe(403);
   });
 
   test('authenticated users can retrieve a list of maps', async ({ request, getAuthData }) => {
@@ -118,6 +167,13 @@ test.describe('when managing maps', () => {
         `Signature=${getInfo.signature}&Key-Pair-Id=${getInfo.keyPairId}`;
     const getRequestContext = await playwright.request.newContext();
     const response = await getRequestContext.get(url);
+    expect(response.ok()).toBeTruthy();
+  });
+
+  test('authenticated users can attempt to delete non-existent maps without error', async ({ request, getAuthData }) => {
+    const response = await request.delete(`./map/non-existent`, {
+      headers: { 'x-api-key': getAuthData().apiKey.map }
+    });
     expect(response.ok()).toBeTruthy();
   });
 });

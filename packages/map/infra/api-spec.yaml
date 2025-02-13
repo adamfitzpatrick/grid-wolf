@@ -62,6 +62,7 @@ paths:
                 $ref: '#/components/schemas/ApiResponse'
         '400':
           description: Bad request
+      x-amazon-apigateway-request-validator: "Validate body"
       x-amazon-apigateway-integration:
         type: aws_proxy
         uri: arn:aws:apigateway:{{region}}:lambda:path/2015-03-31/functions/{{handler}}/invocations
@@ -385,27 +386,60 @@ paths:
           method.response.header.Access-Control-Allow-Origin: "'*'"
 components:
   schemas:
+    Vector:
+      type: object
+      required:
+        - x
+        - 'y'
+      additionalProperties: false
+      properties:
+        x:
+          type: number
+        y:
+          type: number
+    GridData:
+      type: object
+      required:
+        - origin
+        - cellWidth
+        - difficult
+        - impassable
+      additionalProperties: false
+      properties:
+        origin:
+          $ref: '#/components/schemas/Vector'
+        cellWidth:
+          type: number
+        difficult:
+          type: array
+          items:
+            $ref: '#/components/schemas/Vector'
+        impassable:
+          type: array
+          items:
+            $ref: '#/components/schemas/Vector'
     Map:
       type: object
       required:
         - mapId
         - ownerId
         - name
-        - imageUri
+        - imageUrl
         - gridData
         - timestamp
         - active
+      additionalProperties: false
       properties:
-        id:
+        mapId:
           type: string
-        userId:
+        ownerId:
           type: string
         name:
           type: string
-        imageUri:
+        imageUrl:
           type: string
         gridData:
-          type: object
+          $ref: '#/components/schemas/GridData'
         timestamp:
           type: number
         active:
@@ -473,3 +507,8 @@ components:
         authorizerResultTtlInSeconds: 300
         providerARNs:
           - {{authArn}}
+x-amazon-apigateway-request-validators:
+  Validate body:
+    validateRequestParameters: false
+    validateRequestBody: true
+
