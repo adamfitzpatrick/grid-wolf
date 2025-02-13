@@ -56,6 +56,7 @@ paths:
                 $ref: '#/components/schemas/ApiResponse'
         '400':
           description: Bad request
+      x-amazon-apigateway-request-validator: "Validate body"
       x-amazon-apigateway-integration:
         type: aws_proxy
         uri: arn:aws:apigateway:{{region}}:lambda:path/2015-03-31/functions/{{handler}}/invocations
@@ -194,10 +195,12 @@ components:
         - name
         - players
         - timestamp
+        - active
+      additionalProperties: false
       properties:
-        id:
+        gameId:
           type: string
-        userId:
+        ownerId:
           type: string
         name:
           type: string
@@ -205,8 +208,10 @@ components:
           type: array
           items:
             type: string
-        created:
+        timestamp:
           type: number
+        active:
+          type: boolean
     ApiResponse:
       type: object
       properties:
@@ -241,3 +246,7 @@ components:
         authorizerResultTtlInSeconds: 300
         providerARNs:
           - {{authArn}}
+x-amazon-apigateway-request-validators:
+  Validate body:
+    validateRequestParameters: false
+    validateRequestBody: true

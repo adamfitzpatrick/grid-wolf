@@ -1,12 +1,12 @@
 # game
 
-The **game** micro-application provides an API and related resources to manage, modify and store information about *Games* created by users.  In the context of **grid-wolf**, a *game* is the overarching data structure that unites the game master with the players. A *game* is owned by the game master who created it, and is associated with the following:
+The **game** micro-application provides an API and related resources to manage, modify and store information about *Games* created by users.  In the context of **grid-wolf**, a *game* is the overarching data structure that unites the game leader with the players. A *game* is owned by the game leader who created it, and is associated with the following:
 
-- Players (users who the game master invites to participate)
-- Maps (created by the game master and others)
-- Entities (created by the game master and others)
+- Players (users who the game leader invites to participate)
+- Maps (created by the game leader and others)
+- Entities (created by the game leader and others)
 
-Additionally, each game encloses one or more encounters, which represent the actual game play that **grid-wolf** is designed to track. The distinction between "associated" and "enclosed" data elements lies in the fact that, while *players*, *maps*, and *entities* all exist (and can be created) outside of the context of a *game*, *encounters* cannot, even though they are managed by **grid-wolf** as a separate micro-app.
+Additionally, each game encloses one or more encounters, which represent the actual game play that **grid-wolf** is designed to track. In this context, the distinction between "associated" and "enclosed" data elements lies in the fact that, while *players*, *maps*, and *entities* all exist (and can be created) outside of the context of a *game*, *encounters* cannot, even though they are managed by **grid-wolf** as a separate micro-app.
 
 ## Infrastructure
 
@@ -23,72 +23,16 @@ The following resources are managed within this micro-app, and leverage a Single
 
 ## API Definition
 
-<style>
-    .api-operation {
-        padding: 5px 5px;
-        border-radius: 5px;
-    }
-    .api-operation.put {
-        border: 1px solid rgb(255, 147, 16);
-        background: rgba(255, 147, 16, 0.1)
-    }
-    .api-operation.get {
-        border: 1px solid rgb(122, 163, 251);
-        background: rgba(122, 163, 251, 0.1);
-    }
-    .api-operation.delete {
-        border: 1px solid rgb(240, 0, 0);
-        background: rgba(240, 0, 0, 0.1)
-    }
-    .api-summary {
-        list-style: none;
-        position: relative;
-    }
-    .api-summary > span {
-        font-size: 90%;
-    }
-
-    .api-summary::after {
-        content: '\2335';
-        font-size: 30px;
-        line-height: 0.5;
-        display: inline-block;
-        position: absolute;
-        right: 5px;
-    }
-    .api-verb {
-        display: inline-block;
-        border-radius: 3px;
-        padding: 3px 8px;
-        color: rgb(255, 255, 255);
-        font-size: 13px;
-        font-weight: 700;
-        width: 60px;
-        text-align: center;
-    }
-    .api-verb.put {
-        background: rgb(255, 147, 16);
-    }
-    .api-verb.get {
-        background: rgb(122, 163, 251);
-    }
-    .api-verb.delete {
-        background: rgb(240, 0, 0);
-    }
-    .api-operation-content {
-        font-size: 90%;
-    }
-</style>
-<details class='api-operation put'>
- <summary class='api-summary'><span class='api-verb put'>PUT</span> <code><b>/game</b></code><span>Upload a new or replacement game entry</span></summary>
+<details >
+ <summary>PUT <code><b>/game</b></code><span>Upload a new or replacement game entry</span></summary>
 
 <h4>Parameters</h4>
 
-<span class='api-operation-content'>No parameters</span>
+<span>No parameters</span>
 
 <h4>Request Body</h4>
 
-<span class='api-operation-content'>Content-Type `application/json`</span>:
+<span>Content-Type `application/json`</span>:
 
 ```typescript
 {
@@ -116,8 +60,8 @@ curl -X PUT -H "Content-Type: application/json" -H "Authorization: Bearer TOKEN"
 
 </details>
 
-<details class='api-operation delete'>
- <summary class='api-summary'><span class='api-verb delete'>DELETE</span> <code><b>/game</b></code><span>Remove an existing game entry</span></summary>
+<details>
+ <summary><span>DELETE</span> <code><b>/game</b></code><span>Remove an existing game entry</span></summary>
 
 <h4>Parameters</h4>
 
@@ -146,8 +90,8 @@ curl -X DELETE -H "Content-Type: application/json" -H "Authorization: Bearer TOK
 
 </details>
 
-<details class='api-operation get'>
- <summary class='api-summary'><span class='api-verb get'>GET</span> <code><b>/game/{gameId}</b></code> <span>Retrieve a single game by gameId</span></summary>
+<details>
+ <summary><span>GET</span> <code><b>/game/{gameId}</b></code> <span>Retrieve a single game by gameId</span></summary>
 
 <h4>Parameters</h4>
 
@@ -174,8 +118,8 @@ curl -X GET -H "Content-Type: application/json" -H "Authorization: Bearer TOKEN"
 
 </details>
 
-<details class='api-operation get'>
- <summary class='api-summary'><span class='api-verb get'>GET</span> <code><b>/games</b></code> <span>Retrieve a list of all games owned by user</span></summary>
+<details>
+ <summary><span>GET</span> <code><b>/games</b></code> <span>Retrieve a list of all games owned by user</span></summary>
 
 <h4>Parameters</h4>
 
@@ -202,6 +146,11 @@ None
 
 ## Integration Testing
 
-- **PUT /game happy path**
-- **PUT /game incorrect payload**
-- **PUT /game username/authorization mismatch**
+- **PUT /game happy path** *authenticated users can save game data*
+- **PUT /game incorrect payload** *users cannot save invalid game data*
+- **PUT /game username/authorization mismatch** *users cannot save data owned by another user*
+- **GET /game/{gameId} happy path** *authenticated users can retrieve saved game data*
+- **GET /game/{gameId} non-existent gameId** *authenticated users receive "access denied" when requesting non-existent data*
+- **GET /game/list happy path** *authenticated users can retrieve a list of games*
+- **DELETE /game/{gameId} happy path** *authenticated users can delete games they have create*
+- **DELETE /game/{gameId} non-existent gameId** *authenticated users can attempt to delete non-existent games without error*
