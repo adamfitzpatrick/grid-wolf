@@ -486,11 +486,6 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/Map'
-    DeleteMapRequest:
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Map'
   securitySchemes:
     apiKey:
       type: apiKey

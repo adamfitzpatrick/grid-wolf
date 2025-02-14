@@ -63,4 +63,10 @@ describe('UserStack', () => {
       Domain: Match.stringLikeRegexp('auth.subdomain.zone')
     });
   });
+
+  test('should create a REST API and related handler', () => {});
+
+  test('should create a player notification topic and related handler', () => {
+    
+  });
 });

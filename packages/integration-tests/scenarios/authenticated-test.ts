@@ -10,6 +10,7 @@ const API_BASE_URL = `https://dev.${API_DOMAIN}`;
 export interface ApiKeys {
   game: string;
   map: string;
+  user: string;
 }
 
 export interface AuthData {

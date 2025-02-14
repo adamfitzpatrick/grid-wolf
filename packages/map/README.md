@@ -1,4 +1,4 @@
-# map
+# @grid-wolf/map
 
 The **map** micro-application provides an API and related resources to manage, modify and store information about *maps* created by users.  In the context of **grid-wolf**, a *map* is a data set paired with an image which allows the game leader and players to visualize an encounter and apply game mechanics to the space depicted in the image.  The relationship between image space and map data is primarily defined in terms of *GridData*:
 

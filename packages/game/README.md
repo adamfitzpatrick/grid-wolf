@@ -1,4 +1,4 @@
-# game
+# @grid-wolf/game
 
 The **game** micro-application provides an API and related resources to manage, modify and store information about *Games* created by users.  In the context of **grid-wolf**, a *game* is the overarching data structure that unites the game leader with the players. A *game* is owned by the game leader who created it, and is associated with the following:
 
