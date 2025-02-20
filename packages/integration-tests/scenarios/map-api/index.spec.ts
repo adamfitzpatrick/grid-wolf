@@ -26,7 +26,7 @@ test.describe('when managing maps', () => {
   test.beforeEach(({ getAuthData }) => {
     map1 = {
       mapId: mapId1,
-      ownerId: getAuthData().userId,
+      ownerId: getAuthData().users[0].userId,
       name: 'test-game-1',
       timestamp,
       imageUrl: 'image',
@@ -43,7 +43,7 @@ test.describe('when managing maps', () => {
     };
     map2 = {
       mapId: mapId2,
-      ownerId: getAuthData().userId,
+      ownerId: getAuthData().users[0].userId,
       name: 'test-game-2',
       imageUrl: 'image',
       gridData: {
@@ -134,12 +134,13 @@ test.describe('when managing maps', () => {
   });
 
   test('authenticated users can obtain a URI for saving a map image', async ({ playwright, request, getAuthData }) => {
-    const saveUriResponse = await request.get(`./map/save-image-url/${getAuthData().userId}/${TEST_IMAGE_FILENAME}`, {
+    const userId = getAuthData().users[0].userId
+    const saveUriResponse = await request.get(`./map/save-image-url/${userId}/${TEST_IMAGE_FILENAME}`, {
       headers: { 'x-api-key': getAuthData().apiKey.map }
     });
     const saveInfo = await saveUriResponse.json();
     expect(saveInfo).toEqual({
-      userId: getAuthData().userId,
+      userId,
       filename: TEST_IMAGE_FILENAME,
       url: expect.stringContaining('PutObject')
     });
@@ -153,12 +154,13 @@ test.describe('when managing maps', () => {
   });
 
   test('authenticated users can obtain a URI which works for map image retrieval', async ({ playwright, request, getAuthData }) => {
-    const getUriResponse = await request.get(`./map/image-url/${getAuthData().userId}`, {
+    const userId = getAuthData().users[0].userId
+    const getUriResponse = await request.get(`./map/image-url/${userId}`, {
       headers: { 'x-api-key': getAuthData().apiKey.map }
     });
     const getInfo = await getUriResponse.json()
     expect(getInfo).toEqual({
-      userId: getAuthData().userId,
+      userId,
       policy: expect.anything(),
       keyPairId: expect.anything(),
       signature: expect.anything()

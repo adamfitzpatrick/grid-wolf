@@ -2,13 +2,19 @@
   "name": "@grid-wolf/user",
   "packageManager": "yarn@4.4.1",
   "scripts": {
-    "build": "tsc",
+    "build:api-handler": "esbuild ./lib/user-api-handler/index.ts --bundle --platform=node \"--external:@aws-sdk/*\" --outfile=./lib/user-api-handler/index.js",
+    "build:event-handler": "esbuild ./lib/user-event-handler/index.ts --bundle --platform=node \"--external:@aws-sdk/*\" --outfile=./lib/user-event-handler/index.js",
+    "build": "yarn build:api-handler && yarn build:event-handler",
+    "clean": "rm **/*.js",
     "test": "jest",
     "cdk": "cdk",
-    "deploy": "yarn cdk deploy --require-approval never"
+    "deploy": "yarn build && yarn cdk deploy --require-approval never $0 $1 && yarn clean"
   },
   "dependencies": {
-    "@aws-sdk/client-dynamodb": "^3.744.0",
+    "@aws-sdk/client-cognito-identity-provider": "^3.750.0",
+    "@aws-sdk/client-dynamodb": "^3.749.0",
+    "@aws-sdk/client-eventbridge": "^3.749.0",
+    "@grid-wolf/game": "workspace:^",
     "@grid-wolf/shared": "workspace:^",
     "@types/aws-lambda": "^8.10.147",
     "@types/jest": "^29.5.12",
@@ -17,9 +23,10 @@
     "aws-cdk-lib": "2.160.0",
     "cdk": "2.160.0",
     "constructs": "10.3.0",
+    "esbuild": "^0.25.0",
     "jest": "^29.7.0",
     "jsonwebtoken": "^9.0.2",
-    "stepinto-aws-tools": "^0.7.13",
+    "stepinto-aws-tools": "^0.7.14",
     "ts-jest": "^29.2.5",
     "ts-node": "^10.9.2",
     "typescript": "5.5.4"

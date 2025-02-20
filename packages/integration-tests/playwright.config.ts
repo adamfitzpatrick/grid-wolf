@@ -34,13 +34,18 @@ export default defineConfig({
   projects: [
     {
       name: 'authenticate',
-      testMatch: /global-setup\.ts/
+      testMatch: /global-setup\.ts/,
+      teardown: 'cleanup'
     },
     {
       name: 'api',
       use: { ...devices['Desktop Chrome'] },
       dependencies: ['authenticate']
     },
+    {
+      name: 'cleanup',
+      testMatch: /global-teardown\.ts/
+    }
 /*
     {
       name: 'firefox',

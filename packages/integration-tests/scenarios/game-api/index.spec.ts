@@ -18,7 +18,7 @@ test.describe('when managing games', () => {
   test.beforeEach(({ getAuthData }) => {
     game1 = {
       gameId: gameId1,
-      ownerId: getAuthData().userId,
+      ownerId: getAuthData().users[0].userId,
       name: 'test-game-1',
       players: [],
       timestamp,
@@ -26,7 +26,7 @@ test.describe('when managing games', () => {
     };
     game2 = {
       gameId: gameId2,
-      ownerId: getAuthData().userId,
+      ownerId: getAuthData().users[0].userId,
       name: 'test-game-2',
       players: [],
       timestamp,
@@ -87,15 +87,15 @@ test.describe('when managing games', () => {
         'x-api-key': getAuthData().apiKey.game
       }
     });
-    expect((await response.json()).length).toBe(2);
+    expect((await response.json()).length).toBeGreaterThanOrEqual(2);
   });
 
   test('authenticated users can delete games they have created', async ({ request, getAuthData }) => {
-    const existingGames = await request.get('./game/list', {
+    const existingGamesResponse = await request.get('./game/list', {
       headers: { 'x-api-key': getAuthData().apiKey.game }
     });
-
-    const promises = (await existingGames.json()).map(async (game: GameDTO) => {
+    const existingGames = await existingGamesResponse.json() as GameDTO[];
+    const promises = existingGames.map(async (game: GameDTO) => {
       await request.delete(`./game/${game.gameId}`, {
         headers: { 'x-api-key': getAuthData().apiKey.game }
       });
@@ -104,6 +104,9 @@ test.describe('when managing games', () => {
     const response = await request.get('./game/list', {
       headers: { 'x-api-key': getAuthData().apiKey.game }
     });
+    // Other tests may add games in the meantime.  We're only concerned about ones that we deleted
+    const failedDelete = (await response.json() as GameDTO[])
+      .filter(game => existingGames.some(existing => existing.gameId === game.gameId));
     expect(await response.json()).toEqual([]);
   });
 

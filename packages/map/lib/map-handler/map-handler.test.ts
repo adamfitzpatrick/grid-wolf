@@ -33,7 +33,7 @@ jest.mock('@aws-sdk/s3-request-presigner', () => {
   return {
     getSignedUrl: (...params: any[]) => getS3SignedUrlSpy(...params)
   }
-})
+});
 
 describe('map handler', () => {
   let oldConsole: Console;
@@ -63,7 +63,7 @@ describe('map handler', () => {
   beforeEach(() => {
     process.env[EnvironmentVariableName.CDN_PUBLIC_KEY_ID] = 'key-pair';
     process.env[EnvironmentVariableName.CDN_PRIVATE_KEY_SECRET_ID] = 'secret-arn';
-    process.env[EnvironmentVariableName.CDN_HOST] = 'cdn-host';
+    process.env['CDN_HOST'] = 'cdn-host';
     dao = (DynamoItemDao as unknown as jest.MockInstance<DynamoItemDao<MapItem, MapDTO>, any>).mock.instances[0];
     getSpy = (dao.get as jest.Mock);
     getAllSpy = (dao.getAll as jest.Mock);
@@ -76,8 +76,13 @@ describe('map handler', () => {
       mapId: 'id',
       ownerId: 'user',
       name: 'map',
-      imageUri: 'uri',
-      gridData: {},
+      imageUrl: 'uri',
+      gridData: {
+        origin: { x: 0, y: 0 },
+        cellWidth: 0,
+        difficult: [],
+        impassable: []
+      },
       timestamp: 1,
       active: true
     };
@@ -96,6 +101,7 @@ describe('map handler', () => {
   afterEach(() => {
     getSpy.mockClear();
     getAllSpy.mockClear();
+    deleteSpy.mockClear();
     putSpy.mockClear();
   });
 

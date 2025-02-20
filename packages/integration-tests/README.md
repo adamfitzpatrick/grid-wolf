@@ -1,5 +1,11 @@
 # integration-tests
 
+**grid-wolf** relies on [playwright](https://playwright.dev/) integration testing, which provides a set of APIs for both headless and non-headless browser testing, as well as API request testing, authentication, detailed reporting and coverage. 
+
+## Prerequisites
+
+Two user accounts must be established in the 
+
 ## Accounts and Authentication
 
 Testing user authentication, as well as acquiring access tokens for testing API endpoints,

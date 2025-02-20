@@ -14,12 +14,14 @@ export interface ApiKeys {
 }
 
 export interface AuthData {
-  username: string;
-  password: string;
-  userId: string;
-  accessToken: string;
-  idToken?: string;
-  apiKey: ApiKeys
+  users: {
+    username: string;
+    password: string;
+    userId: string;
+    accessToken: string;
+    idToken?: string;
+  }[];
+  apiKey: ApiKeys;
 }
 
 let _authData: AuthData | null;
@@ -39,7 +41,7 @@ export const getAuthData = (): AuthData => {
 interface AuthenticatedFixture {
   getAuthData: typeof getAuthData;
   request: APIRequestContext;
-  keyedRequest: (keyName: keyof ApiKeys) => Promise<APIRequestContext>
+  user2Request: APIRequestContext
 }
 
 const test = base.extend<AuthenticatedFixture>({
@@ -50,12 +52,21 @@ const test = base.extend<AuthenticatedFixture>({
     const authenticatedRequest = await playwright.request.newContext({
       baseURL: API_BASE_URL,
       extraHTTPHeaders: {
-        Authorization: `Bearer ${getAuthData().accessToken}`,
+        Authorization: `Bearer ${getAuthData().users[0].accessToken}`,
         'content-type': 'application/json'
       }
     });
     await use(authenticatedRequest)
-  }
+  },
+  user2Request: async({ playwright }, use) => {
+    const authenticatedRequest = await playwright.request.newContext({
+      baseURL: API_BASE_URL,
+      extraHTTPHeaders: {
+        Authorization: `Bearer ${getAuthData().users[1].accessToken}`,
+        'content-type': 'application/json'
+      }
+    });
+    await use(authenticatedRequest)}
 });
 
 export { test, expect }

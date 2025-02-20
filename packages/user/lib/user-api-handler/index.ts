@@ -1,4 +1,4 @@
-import { EnvironmentVariableName } from "@grid-wolf/shared/utils";
+import { EnvironmentVariableName } from "stepinto-aws-tools/utils";
 import { APIGatewayProxyEvent } from "aws-lambda";
 import { decode, JwtPayload } from "jsonwebtoken";
 import { DynamoItemDao } from "stepinto-aws-tools/clients";

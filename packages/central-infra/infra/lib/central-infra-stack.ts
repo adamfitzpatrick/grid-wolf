@@ -5,6 +5,9 @@ import { DomainName, EndpointType } from 'aws-cdk-lib/aws-apigateway';
 import { Certificate } from 'aws-cdk-lib/aws-certificatemanager';
 import { ApiGatewayDomain } from 'aws-cdk-lib/aws-route53-targets';
 import { StepintoBaseStack, StepintoBaseProps } from 'stepinto-aws-tools/constructs';
+import { EventBus } from 'aws-cdk-lib/aws-events';
+import { StringParameter } from 'aws-cdk-lib/aws-ssm';
+import { parameterNames } from '@grid-wolf/shared/constructs';
 
 export const APP_NAME = 'grid-wolf';
 export const API_SUBDOMAIN_PART = 'api';
@@ -21,6 +24,7 @@ export class CentralInfraStack extends StepintoBaseStack {
 
     this.createDataTable(props.env.prefix, props.dataTableName);
     this.createApiDomain(props.env.prefix, props.hostedZone, props.apiCertificateArn);
+    this.createEventBus(props);
   }
 
   createDataTable(envPrefix: string, dataTableName: string) {
@@ -70,6 +74,16 @@ export class CentralInfraStack extends StepintoBaseStack {
       zone,
       recordName: domainName,
       target: RecordTarget.fromAlias(new ApiGatewayDomain(apiDomain))
+    });
+  }
+
+  createEventBus(props: CentralInfraStackProps) {
+    const eventBus = new EventBus(this, this.generateId('event-bus'), {
+      eventBusName: this.generateName('event-bus')
+    });
+    new StringParameter(this, this.generateId('event-bus-param'), {
+      parameterName: `/${props.env.prefix}${parameterNames.EVENT_BUS_ARN}`,
+      stringValue: eventBus.eventBusArn
     });
   }
 }

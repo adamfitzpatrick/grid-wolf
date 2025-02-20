@@ -7,7 +7,7 @@
     "test": "jest",
     "cdk": "cdk",
     "clean": "rm **/*.js",
-    "deploy": "yarn build && yarn cdk deploy --require-approval never"
+    "deploy": "yarn build && yarn cdk deploy --require-approval never $0 $1 && yarn clean"
   },
   "dependencies": {
     "@grid-wolf/shared": "workspace:^",

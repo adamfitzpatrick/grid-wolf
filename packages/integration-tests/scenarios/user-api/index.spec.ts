@@ -1,14 +1,13 @@
 import { EnvironmentVariableName } from '@grid-wolf/shared/utils';
-import { test, expect, getAuthData } from '../authenticated-test';
+import { test as baseTest } from '@playwright/test';
+import { test, expect } from '../authenticated-test';
 import { randomUUID } from 'crypto'
-import { resolve } from 'path';
 import { PlayerGameDTO } from '@grid-wolf/user/lib/player-game-dto'
 import { GameDTO } from '@grid-wolf/game/lib/game-dto';
+import { DynamoHelper } from '../../lib/dynamo-helper';
 
-const TEST_IMAGE_FILENAME = 'test-image.webp';
-const TEST_IMAGE_PATH = resolve(__dirname, TEST_IMAGE_FILENAME);
-const SUBDOMAIN = process.env[EnvironmentVariableName.APP_SUBDOMAIN];
-const ENV = process.env[EnvironmentVariableName.PREFIX];
+
+const assertDynamo = new DynamoHelper(`dev-${process.env[EnvironmentVariableName.DATA_TABLE_NAME]}`);
 
 test.describe('when getting user info', () => {
   let gameId: string;
@@ -20,21 +19,52 @@ test.describe('when getting user info', () => {
     gameId = randomUUID();
   });
 
-  test.beforeEach(({ getAuthData }) => {
+  test.beforeEach(() => {
     playerGame = {
-      playerId: getAuthData().userId,
+      playerId: process.env[EnvironmentVariableName.INT_TEST_USER_ID_2]!,
       gameId,
+      email: process.env[EnvironmentVariableName.INT_TEST_USERNAME_2]!,
       participationState: 'invited',
       timestamp
     };})
 
-  test('authenticated users can add games which creates player entries', async ({ request, getAuthData }) => {
-    const userId = getAuthData().userId
+  test('authenticated users can add games that create player entries for those without accounts',
+      async ({ user2Request, getAuthData }) => {
+    const userId = getAuthData().users[1].userId
+    const gameDto: GameDTO = {
+      gameId: randomUUID(),
+      ownerId: userId,
+      name: 'game',
+      players: [ 'email@email.email' ],
+      timestamp,
+      active: true
+    };
+    const response = await user2Request.put('./game', {
+      headers: {
+        'x-api-key': getAuthData().apiKey.game
+      },
+      data: gameDto
+    });
+    expect(response.ok()).toBeTruthy();
+
+    const actual = await assertDynamo.getWithRetries('player#email@email.email', `game#${gameDto.gameId}`)
+    expect(actual).toEqual(expect.objectContaining({
+      playerId: 'email@email.email',
+      gameId: gameDto.gameId,
+      email: 'email@email.email',
+      participationState: 'invited',
+      timestamp: expect.anything()
+    }));
+  });
+
+  test('authenticated users can add games that create player entries for existing accounts',
+      async ({ request, getAuthData }) => {
+    const userId = getAuthData().users[0].userId
     const gameDto: GameDTO = {
       gameId: playerGame.gameId,
       ownerId: userId,
       name: 'game',
-      players: [ userId ],
+      players: [ process.env[EnvironmentVariableName.INT_TEST_USERNAME_2]! ],
       timestamp,
       active: true
     };
@@ -43,13 +73,24 @@ test.describe('when getting user info', () => {
       data: gameDto
     });
     expect(response.ok()).toBeTruthy();
-  });
 
-  test('authenticated users can retrieve a game in which they are a player', async ({ request, getAuthData }) => {
-    const response = await request.get(`./user/player-game/${playerGame.gameId}`, {
+    const user2Id = process.env[EnvironmentVariableName.INT_TEST_USER_ID_2];
+    const actual = await assertDynamo.getWithRetries(`player#${user2Id}`, `game#${gameDto.gameId}`)
+    expect(actual).toEqual(expect.objectContaining({
+      ...playerGame,
+      gameId: gameDto.gameId,
+      timestamp: expect.anything()
+    }));
+  })
+
+  test('authenticated users can retrieve a game in which they are a player', async ({ user2Request, getAuthData }) => {
+    const response = await user2Request.get(`./user/player-game/${playerGame.gameId}`, {
       headers: { 'x-api-key': getAuthData().apiKey.user }
     });
-    expect(await response.json()).toEqual(playerGame);
+    expect(await response.json()).toEqual({
+      ...playerGame,
+      timestamp: expect.anything()
+    });
   });
 
   test('authenticated users receive "forbidden" when they request a game that does not exist', async ({ request, getAuthData }) => {
@@ -59,39 +100,45 @@ test.describe('when getting user info', () => {
     expect(await response.status()).toEqual(403);
   });
   
-  test('authenticated users can retrieve a list of games in which they are a player', async ({ request, getAuthData }) => {
-    const response = await request.get('./user/player-game/list', {
+  test('authenticated users can retrieve a list of games in which they are a player', async ({ user2Request, getAuthData }) => {
+    const response = await user2Request.get('./user/player-game/list', {
       headers: { 'x-api-key': getAuthData().apiKey.user },
     });
-    expect(await response.json()).toEqual([playerGame]);
+    expect(await response.json()).toEqual([{ ...playerGame, timestamp: expect.anything() }]);
   });
 
-  test('authenticated users can accept game invitations', async ({ request, getAuthData }) => {
-    const response = await request.patch(`./user/player-game/${playerGame.gameId}/accept`,{
+  test('authenticated users can accept game invitations', async ({ user2Request, getAuthData }) => {
+    const response = await user2Request.patch(`./user/player-game/${playerGame.gameId}/accept`,{
       headers: { 'x-api-key': getAuthData().apiKey.user },
     });
     expect(response.ok()).toBeTruthy();
     playerGame.participationState = 'accepted';
-    const verify = await request.get(`./user/player-game/${playerGame.gameId}`, {
+    const verify = await user2Request.get(`./user/player-game/${playerGame.gameId}`, {
       headers: { 'x-api-key': getAuthData().apiKey.user }
     });
-    expect(await verify.json()).toEqual(playerGame);
+    expect(await verify.json()).toEqual({
+      ...playerGame,
+      timestamp: expect.anything()
+    });
   });
 
-  test('authenticated users can decline game invitations', async ({ request, getAuthData }) => {
-    const response = await request.patch(`./user/player-game/${playerGame.gameId}/decline`,{
+  test('authenticated users can decline game invitations', async ({ user2Request, getAuthData }) => {
+    const response = await user2Request.patch(`./user/player-game/${playerGame.gameId}/decline`,{
       headers: { 'x-api-key': getAuthData().apiKey.user },
     });
     expect(response.ok()).toBeTruthy();
     playerGame.participationState = 'declined';
-    const verify = await request.get(`./user/player-game/${playerGame.gameId}`, {
+    const verify = await user2Request.get(`./user/player-game/${playerGame.gameId}`, {
       headers: { 'x-api-key': getAuthData().apiKey.user }
     });
-    expect(await verify.json()).toEqual(playerGame);
+    expect(await verify.json()).toEqual({
+      ...playerGame,
+      timestamp: expect.anything()
+    });
   });
 
-  test('users cannot submit improper participant states', async ({ request, getAuthData }) => {
-    const response = await request.patch(`./user/player-game/${playerGame.gameId}/other`,{
+  test('users cannot submit improper participant states', async ({ user2Request, getAuthData }) => {
+    const response = await user2Request.patch(`./user/player-game/${playerGame.gameId}/other`,{
       headers: { 'x-api-key': getAuthData().apiKey.user },
     });
     expect(response.status()).toBe(400);

@@ -14,11 +14,13 @@ The following resources are leveraged by this micro-app:
 
 - **DynamoDB table**: Managed by the [central-infra package](../central-infra/README.md)
 - **Cognito User Pool**: Managed by the [user package](../user/README.md) and used to authorize access to the *game* API
+- **EventBridge Event Bus**: Managed by the [central-infra package](../central-infra/README.md)
 
 The following resources are managed within this micro-app, and leverage a SingleHandlerApi construct provided by **stepinto-aws-tools**:
 
 - **ApiGateway REST API** and related resources such as usage plans, API keys, stages, deployments and logging (included in the SingleHandlerApi construct)
-- **Lambda function** for handling calls to the API (included in the SingleHandlerApi construct)
+- **API Lambda function** for handling calls to the API (included in the SingleHandlerApi construct)
+- **Event Lambda function** for processing events from the central event bus
 - **IAM Roles and Policies** which provide required permissions for the application to function 
 
 ## API Definition

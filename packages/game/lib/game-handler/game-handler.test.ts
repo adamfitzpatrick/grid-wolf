@@ -2,6 +2,9 @@ import { APIGatewayProxyEvent } from "aws-lambda";
 import { handler } from ".";
 import { DynamoItemDao } from "stepinto-aws-tools/clients";
 import { GameItem, GameDTO } from "../game-dto";
+import { gameInviteDetailType } from '@grid-wolf/user/lib/user-event';
+
+process.env['EVENT_BUS'] = 'arn';
 
 jest.mock('stepinto-aws-tools/clients');
 jest.mock('jsonwebtoken', () => {
@@ -9,6 +12,18 @@ jest.mock('jsonwebtoken', () => {
     decode: () => ({ username: 'user' })
   };
 });
+const sendEventSpy = jest.fn();
+const putEventsSpy = jest.fn();
+jest.mock('@aws-sdk/client-eventbridge', () => {
+  return {
+    EventBridgeClient: function () {
+      return {
+        send: (...args: any[]) => sendEventSpy(...args)
+      }
+    },
+    PutEventsCommand: function (...args: any[]) { putEventsSpy(...args); }
+  }
+})
 
 describe('game handler', () => {
   let oldConsole: Console;
@@ -39,7 +54,7 @@ describe('game handler', () => {
       gameId: 'id',
       ownerId: 'user',
       name: 'name',
-      players: [],
+      players: ['email@email.com'],
       timestamp: 1234,
       active: true
     };
@@ -67,6 +82,8 @@ describe('game handler', () => {
     daoGet.mockClear();
     daoGetAll.mockClear();
     daoDelete.mockClear();
+    putEventsSpy.mockClear();
+    sendEventSpy.mockClear();
   })
 
   test('/ PUT should save game data to dynamodb', async () => {
@@ -80,6 +97,33 @@ describe('game handler', () => {
       }
     });
     expect(daoPut).toHaveBeenCalledWith(gameDTO);
+    expect(putEventsSpy).toHaveBeenCalledWith({
+      Entries: [{
+        DetailType: gameInviteDetailType,
+        Detail: expect.stringContaining('email@email.com'),
+        EventBusName: 'arn',
+        Source: 'grid-wolf.game'
+      }]
+    });
+    expect(sendEventSpy).toHaveBeenCalled();
+  });
+
+  test('/ PUT should not dispatch GameInviteEvent if no players are included', async () => {
+    gameDTO.players = [];
+    event.body = JSON.stringify(gameDTO);
+
+    await expect(handler(event)).resolves.toEqual({
+      statusCode: 202,
+      body: 'accepted',
+      headers: {
+        'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key',
+        'Access-Control-Allow-Methods': '*',
+        'Access-Control-Allow-Origin': '*',
+      }
+    });
+    expect(daoPut).toHaveBeenCalledWith(gameDTO);
+    expect(putEventsSpy).not.toHaveBeenCalled();
+    expect(sendEventSpy).not.toHaveBeenCalled();
   });
 
   test('/ PUT should return 400 if Authorized user does not match request body user', async () => {
@@ -97,6 +141,8 @@ describe('game handler', () => {
     });
 
     expect(daoPut).not.toHaveBeenCalled();
+    expect(putEventsSpy).not.toHaveBeenCalled();
+    expect(sendEventSpy).not.toHaveBeenCalled();
   });
 
   test('/{gameId} GET should return data obtained from dynamodb', async () => {

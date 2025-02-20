@@ -3,9 +3,14 @@ import { decode, JwtPayload } from 'jsonwebtoken';
 import { DynamoItemDao } from 'stepinto-aws-tools/clients';
 import { gameMapper, GameItem, GameDTO } from "../game-dto";
 import { EnvironmentVariableName } from "stepinto-aws-tools/utils";
+import { EventBridgeClient, PutEventsCommand } from '@aws-sdk/client-eventbridge';
+import { GameInviteDetail, gameInviteDetailType } from "@grid-wolf/user/lib/user-event";
+import { gameEventSource } from "../game-event";
 
-let tableName = process.env[EnvironmentVariableName.DATA_TABLE_NAME];
-let dao = new DynamoItemDao<GameItem, GameDTO>(tableName!, gameMapper);
+let tableName = process.env[EnvironmentVariableName.DATA_TABLE_NAME]!;
+let dao = new DynamoItemDao<GameItem, GameDTO>(tableName, gameMapper);
+
+let eventsClient = new EventBridgeClient();
 
 const addCORS = (baseResponse: object) => {
   return {
@@ -43,7 +48,29 @@ const handlePutGameOperation = async (event: APIGatewayProxyEvent) => {
   if (username !== gameDTO.ownerId) {
     return handleUsernameMismatch(username, gameDTO.ownerId);
   }
-  return dao.put(gameDTO).then(() => {
+  const promises: Promise<unknown>[] =  [dao.put(gameDTO)];
+  
+  if (gameDTO.players.length > 0) {
+    const details: GameInviteDetail[] = gameDTO.players.map(email => {
+      return {
+        email,
+        gameId: gameDTO.gameId
+      }
+    });
+    const command = new PutEventsCommand({
+      Entries: details.map(detail => {
+        return {
+          DetailType: gameInviteDetailType,
+          Detail: JSON.stringify(detail),
+          EventBusName: process.env['EVENT_BUS']!,
+          Source: gameEventSource
+        }
+      })
+    });
+    promises.push(eventsClient.send(command));
+}
+  
+  return Promise.all(promises).then(() => {
     return addCORS({
       statusCode: 202,
       body: 'accepted'

@@ -53,7 +53,7 @@ describe('CentralInfraStack', () => {
   test('should create a custom API Gateway domain and related records', () => {
     template.hasResourceProperties('AWS::ApiGateway::DomainName', {
       RegionalCertificateArn: 'arn',
-      DomainName: 'tst.grid-wolf.zone',
+      DomainName: 'tst.api.grid-wolf.zone',
     });
     template.hasResourceProperties('AWS::Route53::RecordSet', {
       Type: 'A'
@@ -61,5 +61,9 @@ describe('CentralInfraStack', () => {
     template.hasResourceProperties('AWS::Route53::RecordSet', {
       Type: 'AAAA'
     });
+  });
+
+  test('should create an application-wide event bus', () => {
+    template.hasResourceProperties('AWS::Events::EventBus', {});
   })
 });

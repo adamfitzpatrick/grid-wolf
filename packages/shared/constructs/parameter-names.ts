@@ -4,3 +4,4 @@ export const SHARED_LAYER_PARAMETER     = '/grid-wolf/layer-arn/shared';
 export const DEPENDENCY_LAYER_PARAMETER = '/grid-wolf/layer-arn/dependency';
 export const USER_POOL_ARN              = '/grid-wolf/user-pool-arn';
 export const CDN_PUBLIC_KEY_PARAM       = '/grid-wolf/cdn-public-key';
+export const EVENT_BUS_ARN              = '/grid-wolf/event-bus-arn';

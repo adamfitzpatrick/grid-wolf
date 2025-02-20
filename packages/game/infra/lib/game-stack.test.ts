@@ -42,7 +42,7 @@ describe('game-stack', () => {
           '/list': Match.anyValue()
         }
       }
-    })
+    });
   });
 
   test('should add a base path mapping', () => {

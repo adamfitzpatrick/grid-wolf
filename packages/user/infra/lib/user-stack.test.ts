@@ -13,6 +13,7 @@ describe('UserStack', () => {
         region: 'region',
         prefix: 'tst'
       },
+      dataTableName: 'table',
       certificateArn: 'arn',
       hostedZone: 'zone',
       subdomain: 'subdomain'
@@ -64,9 +65,25 @@ describe('UserStack', () => {
     });
   });
 
-  test('should create a REST API and related handler', () => {});
+  test('should create a REST API and related handler', () => {
+    template.hasResourceProperties('AWS::ApiGateway::RestApi', {
+      Body: {
+        paths: {
+          '/player-game/{gameId}': Match.anyValue(),
+          '/player-game/{gameId}/{participantAction}': Match.anyValue(),
+          '/player-game/list': Match.anyValue()
+        }
+      }
+    });
+  });
 
-  test('should create a player notification topic and related handler', () => {
-    
+  test('should add a base path mapping', () => {
+    template.hasResourceProperties('AWS::ApiGateway::BasePathMapping', {});
+  });
+
+  test('should create a user event handler', () => {
+    template.hasResourceProperties('AWS::Lambda::Function', {
+      FunctionName: Match.stringLikeRegexp('event-handler')
+    });
   });
 });

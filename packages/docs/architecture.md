@@ -19,6 +19,35 @@ provide redundancy, and eliminate maintenance down-times.
 - **Maintainability**: Application components feature built-in metrics and alarms, are discrete and
 of minimal complexity, and manual interventions are nearly eliminated.
 
+The application is broken into a collection of related microservices, all of which are maintained
+within this monorepo:
+
+- [central-infra](../central-infra/) Manages "central infrastructure", resources that are leveraged
+by multiple microservices within the application, including a shared DynamoDB table and EventBridge
+event bus
+- [shared](../shared/) Utility code and shared resources used by multiple microservices
+- [user](../user/) Infrastrucutre and code allowing for user account creation, authentication and
+management of game participants
+- [game](../game/) Infrastructure and code related to creation of *Games*, the cohesive
+central data structure of the application
+- [map](../map/) Infrastructure and code related to the creation and management of *Maps*, which
+provide a visual guide to gameplay
+- [entity](../entity) Infrastructure and code for managing gameplay characters, enemies and other
+non-player characters
+- [session](../session) Resources for live online gameplay with your friends!
+
+`grid-wolf` features a double-layer pattern for data flow. One flow provides external
+communication via REST APIs and makes direct calls between resources within a single microservices.
+A second flow is event-based and allows communication between microservices within AWS, but
+provides no public-facing APIs.  Note in the image below that REST API handlers can publish events
+to the central event bus, but events are only processed by event handlers in each microservice.
+
+<center>
+    <img alt='Internal and external data flows'
+        src='./assets/app-data-flow.drawio.svg'
+        width='700px'>
+</center>
+
 ### Scenarios
 
 1. 

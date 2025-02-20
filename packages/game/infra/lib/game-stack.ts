@@ -5,6 +5,7 @@ import { SingleHandlerApi } from 'stepinto-aws-tools/constructs';
 import { CfnBasePathMapping } from "aws-cdk-lib/aws-apigateway";
 import { StepintoBaseProps, StepintoBaseStack } from 'stepinto-aws-tools/constructs';
 import { StringParameter } from "aws-cdk-lib/aws-ssm";
+import { Effect, PolicyDocument, PolicyStatement } from "aws-cdk-lib/aws-iam";
 
 const APP_NAME = 'grid-wolf-game';
 const BASE_PATH = 'game';
@@ -23,7 +24,16 @@ export class GameStack extends StepintoBaseStack {
     super(scope, id, { appName: APP_NAME, ...props });
 
     const userPoolArn = StringParameter.valueForStringParameter(this, `/${props.env.prefix}${parameterNames.USER_POOL_ARN}`);
-    
+    const eventsBusArn = StringParameter.valueForStringParameter(this, `/${props.env.prefix}${parameterNames.EVENT_BUS_ARN}`);
+    const eventsPolicy = new PolicyStatement({
+        effect: Effect.ALLOW,
+        actions: [
+          'events:PutEvents'
+        ],
+        resources: [
+          eventsBusArn
+        ]
+      });
     const api = new SingleHandlerApi(this, this.generateId('api'), {
       ...props,
       appName: this.appName,
@@ -35,10 +45,12 @@ export class GameStack extends StepintoBaseStack {
       authArnTemplateKey: 'authArn',
       handlerTemplateKey: 'handler',
       additionalEnvironmentVariables: {
-        PARAMETERS_SECRETS_EXTENSION_LOG_LEVEL: 'error'
+        PARAMETERS_SECRETS_EXTENSION_LOG_LEVEL: 'error',
+        EVENT_BUS: eventsBusArn
       },
       layers: {},
-      userPoolArn
+      userPoolArn,
+      additionalHandlerPolicies: [ eventsPolicy ]
     });
 
     let domainName = `${API_SUBDOMAIN_PART}.${props.subdomain}.${props.hostedZone}`;
