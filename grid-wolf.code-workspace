@@ -22,6 +22,9 @@
             "name": "map",
             "path": "./packages/map"
         }, {
+            "name": "entity",
+            "path": "./packages/entity"
+        }, {
             "name": "user",
             "path": "./packages/user"
         }, {

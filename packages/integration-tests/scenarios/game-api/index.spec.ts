@@ -107,7 +107,7 @@ test.describe('when managing games', () => {
     // Other tests may add games in the meantime.  We're only concerned about ones that we deleted
     const failedDelete = (await response.json() as GameDTO[])
       .filter(game => existingGames.some(existing => existing.gameId === game.gameId));
-    expect(await response.json()).toEqual([]);
+    expect(failedDelete).toEqual([]);
   });
 
   test('authenticated users can attempt to delete non-existent games without error', async ({ request, getAuthData }) => {

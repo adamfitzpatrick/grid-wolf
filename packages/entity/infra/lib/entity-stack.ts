@@ -5,22 +5,22 @@ import { SingleHandlerApi } from 'stepinto-aws-tools/constructs';
 import { CfnBasePathMapping } from "aws-cdk-lib/aws-apigateway";
 import { StepintoBaseProps, StepintoBaseStack } from 'stepinto-aws-tools/constructs';
 import { StringParameter } from "aws-cdk-lib/aws-ssm";
-import { Effect, PolicyDocument, PolicyStatement } from "aws-cdk-lib/aws-iam";
+import { Effect, PolicyStatement } from "aws-cdk-lib/aws-iam";
 
-const APP_NAME = 'grid-wolf-game';
-const BASE_PATH = 'game';
+const APP_NAME = 'grid-wolf-entity';
+const BASE_PATH = 'entity';
 const SPEC_PATH = resolve(__dirname, '../api-spec.yaml');
-const HANDLER_PATH = resolve(__dirname, '../../lib/game-handler');
+const HANDLER_PATH = resolve(__dirname, '../../lib/entity-handler');
 const API_SUBDOMAIN_PART = 'api';
 
-export interface GameStackProps extends Omit<StepintoBaseProps, 'appName'> {
+export interface EntityStackProps extends Omit<StepintoBaseProps, 'appName'> {
   dataTableName: string;
   hostedZone: string;
   subdomain: string;
 }
 
-export class GameStack extends StepintoBaseStack {
-  constructor(scope: Construct, id: string, props: GameStackProps) {
+export class EntityStack extends StepintoBaseStack {
+  constructor(scope: Construct, id: string, props: EntityStackProps) {
     super(scope, id, { appName: APP_NAME, ...props });
 
     const userPoolArn = StringParameter.valueForStringParameter(this, `/${props.env.prefix}${parameterNames.USER_POOL_ARN}`);
@@ -63,7 +63,5 @@ export class GameStack extends StepintoBaseStack {
       restApiId: api.getApi().restApiId,
       stage: api.getStage().stageName
     });
-
-    // TODO Need infrastructure for game-event-handler
   }
 }

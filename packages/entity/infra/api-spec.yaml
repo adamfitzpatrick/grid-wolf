@@ -1,0 +1,276 @@
+openapi: 3.0.0
+info:
+  title: Entity data API for grid-wolf
+  description: |-
+    This API provides endpoints for updating entity data for users of grid-wolf.
+  version: 0.1.0
+security: 
+  - apiKey: []
+  - cognitoPool:
+    - openid
+paths:
+  '/':
+    options:
+      security: []
+      responses:
+        '200':
+          description: Enable CORS support
+          headers:
+            Access-Control-Allow-Origin:
+              schema:
+                type: "string"
+            Access-Control-Allow-Methods:
+              schema:
+                type: "string"
+            Access-Control-Allow-Headers:
+              schema:
+                type: "string"
+          content: {}
+      x-amazon-apigateway-integration:
+        type: mock
+        requestTemplates:
+          application/json: "{\"statusCode\": 200}"
+        passthroughBehavior: "never"
+        responses:
+          default:
+            statusCode: "200"
+            responseParameters:
+              method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key'"
+              method.response.header.Access-Control-Allow-Methods: "'OPTIONS,GET,PUT,DELETE'"
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+    put:
+      description: Upload a new or replacement entity entry
+      operationId: putEntity
+      security: 
+        - apiKey: []
+        - cognitoPool:
+          - openid
+      requestBody: 
+        $ref: '#/components/requestBodies/PutEntityRequest'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        '400':
+          description: Bad request
+      x-amazon-apigateway-request-validator: "Validate body"
+      x-amazon-apigateway-integration:
+        type: aws_proxy
+        uri: arn:aws:apigateway:{{region}}:lambda:path/2015-03-31/functions/{{handler}}/invocations
+        httpMethod: POST
+  '/{entityId}':
+    options:
+      security: []
+      responses:
+        '200':
+          description: Enable CORS support
+          headers:
+            Access-Control-Allow-Origin:
+              schema:
+                type: "string"
+            Access-Control-Allow-Methods:
+              schema:
+                type: "string"
+            Access-Control-Allow-Headers:
+              schema:
+                type: "string"
+          content: {}
+      x-amazon-apigateway-integration:
+        type: mock
+        requestTemplates:
+          application/json: "{\"statusCode\": 200}"
+        passthroughBehavior: "never"
+        responses:
+          default:
+            statusCode: "200"
+            responseParameters:
+              method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key'"
+              method.response.header.Access-Control-Allow-Methods: "'OPTIONS,GET'"
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+    get:
+      description: Retrieve an existing entity entry
+      operationId: getEntity
+      parameters: 
+        - in: path
+          name: entityId
+          required: true
+          schema:
+            type: string
+      responses:
+        '202':
+          description: accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+      x-amazon-apigateway-integration:
+        type: aws_proxy
+        uri: arn:aws:apigateway:{{region}}:lambda:path/2015-03-31/functions/{{handler}}/invocations
+        httpMethod: POST
+    delete:
+      description: Remove an existing entity entry
+      operationId: deleteEntity
+      security: 
+        - apiKey: []
+        - cognitoPool:
+          - openid
+      parameters: 
+        - in: path
+          name: entityId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        '400':
+          description: Bad request
+      x-amazon-apigateway-integration:
+        type: aws_proxy
+        uri: arn:aws:apigateway:{{region}}:lambda:path/2015-03-31/functions/{{handler}}/invocations
+        httpMethod: POST
+  '/list':
+    options:
+      security: []
+      responses:
+        '200':
+          description: Enable CORS support
+          headers:
+            Access-Control-Allow-Origin:
+              schema:
+                type: "string"
+            Access-Control-Allow-Methods:
+              schema:
+                type: "string"
+            Access-Control-Allow-Headers:
+              schema:
+                type: "string"
+          content: {}
+      x-amazon-apigateway-integration:
+        type: mock
+        requestTemplates:
+          application/json: "{\"statusCode\": 200}"
+        passthroughBehavior: "never"
+        responses:
+          default:
+            statusCode: "200"
+            responseParameters:
+              method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key'"
+              method.response.header.Access-Control-Allow-Methods: "'OPTIONS,GET'"
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+    get:
+      description: Retrieve a list of all entitys belonging to the authorized user
+      operationId: getEntitys
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+      x-amazon-apigateway-integration:
+        type: aws_proxy
+        uri: arn:aws:apigateway:{{region}}:lambda:path/2015-03-31/functions/{{handler}}/invocations
+        httpMethod: POST
+components:
+  schemas:
+    StringAttribute:
+      type: object
+      required:
+        - name
+        - value
+      additionalProperties: false
+      properties:
+        name:
+          type: string
+        value:
+          type: string
+    NumberAttribute:
+      type: object
+      required:
+        - name
+        - value
+      additionalProperties: false
+      properties:
+        name:
+          type: string
+        value:
+          type: number
+    Entity:
+      type: object
+      required:
+        - entityId
+        - ownerId
+        - name
+        - maxHealth
+        - movementSpeed
+        - timestamp
+        - active
+      additionalProperties: false
+      properties:
+        entityId:
+          type: string
+        ownerId:
+          type: string
+        name:
+          type: string
+        maxHealth:
+          type: number
+        movementSpeed:
+          type: number
+        attributes:
+          type: array
+          items:
+            oneOf:
+              - $ref: '#/components/schemas/StringAttribute'
+              - $ref: '#/components/schemas/NumberAttribute'
+        timestamp:
+          type: number
+        active:
+          type: boolean
+    ApiResponse:
+      type: object
+      properties:
+        statusCode:
+          type: integer
+        message:
+          type: string
+  requestBodies:
+    PutEntityRequest:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Entity'
+  securitySchemes:
+    apiKey:
+      type: apiKey
+      name: x-api-key
+      in: header
+    cognitoPool:
+      type: apiKey
+      name: Authorization
+      in: header
+      x-amazon-apigateway-authtype: cognito_user_pools
+      x-amazon-apigateway-authorizer:
+        type: cognito_user_pools
+        identitySource: Authorization
+        authorizerResultTtlInSeconds: 300
+        providerARNs:
+          - {{authArn}}
+x-amazon-apigateway-request-validators:
+  Validate body:
+    validateRequestParameters: false
+    validateRequestBody: true
