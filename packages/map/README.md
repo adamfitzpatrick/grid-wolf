@@ -56,6 +56,12 @@ The following resources are managed within this micro-app, and leverage a Single
 
 *TODO Discuss infrastructure requirements for obtaining signed URLs both for saving and retrieving images*
 
+<center>
+    <img alt='user microservice infrastructure'
+        src='./docs/map-infra.drawio.svg'
+        width='300px'>
+</center>
+
 ## API Definition
 
 <details >

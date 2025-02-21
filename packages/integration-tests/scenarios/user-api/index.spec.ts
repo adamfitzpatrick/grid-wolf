@@ -1,5 +1,4 @@
 import { EnvironmentVariableName } from '@grid-wolf/shared/utils';
-import { test as baseTest } from '@playwright/test';
 import { test, expect } from '../authenticated-test';
 import { randomUUID } from 'crypto'
 import { PlayerGameDTO } from '@grid-wolf/user/lib/player-game-dto'

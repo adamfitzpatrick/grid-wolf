@@ -135,7 +135,7 @@ paths:
               - accept
               - decline
       responses:
-        '200':
+        '202':
           description: Successful operation
           content:
             application/json:
