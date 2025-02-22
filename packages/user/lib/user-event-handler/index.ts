@@ -39,6 +39,7 @@ const handleGameInviteEvent = async (event: GameInviteEvent) => {
     playerId: userId! || detail.email,
     email: detail.email,
     gameId: detail.gameId,
+    gameOwnerId: detail.gameOwnerId,
     participationState: 'invited',
     timestamp: new Date().getTime()
   }
@@ -52,7 +53,7 @@ const handleConfirmSignUpEvent = async (event: PostConfirmationTriggerEvent) => 
   const email = event.request.userAttributes.email;
 
   const emailPlayerGames = await dao.getAll(email);
-  if (!emailPlayerGames) {
+  if (emailPlayerGames.length === 0) {
     return event;
   }
   
@@ -70,10 +71,10 @@ const handleConfirmSignUpEvent = async (event: PostConfirmationTriggerEvent) => 
       return {
         DetailType: invitationUpdateDetailType,
         Detail: JSON.stringify({
-          gameId: 'game',
+          gameId: pg.gameId,
           playerGame: pg
         }),
-        EventBusName: 'arn',
+        EventBusName: process.env['EVENT_BUS'],
         Source: 'grid-wolf.user'
       }
     })

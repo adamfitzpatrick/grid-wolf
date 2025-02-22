@@ -1,10 +1,12 @@
 import { expect } from '@playwright/test';
-import { DeleteItemCommand, DynamoDBClient, GetItemCommand, GetItemCommandOutput, QueryCommand } from "@aws-sdk/client-dynamodb";
+import { AttributeValue, DeleteItemCommand, DynamoDBClient, GetItemCommand, GetItemCommandOutput, QueryCommand } from "@aws-sdk/client-dynamodb";
 import { EnvironmentVariableName } from "@grid-wolf/shared/utils";
 import { unmarshall } from '@aws-sdk/util-dynamodb';
 
 const RETRY_TIMING_BASE = 2;
 const BASE_RETRY_COUNT = 3;
+
+type Predicate = (Item: Record<string, AttributeValue> | undefined) => boolean;
 
 export class DynamoHelper {
   tableName: string;
@@ -33,11 +35,11 @@ export class DynamoHelper {
     return this.client.send(command);
   }
 
-  async getWithRetries(pk: string, sk: string) {
+  async getWithRetries(pk: string, sk: string, predicate: Predicate = Item => !!Item) {
     for (let k = 0; k < BASE_RETRY_COUNT; k++) {
       const response = await this.#getWithDelay(pk, sk, Math.pow(RETRY_TIMING_BASE, k));
-      if (response.Item) {
-        return unmarshall(response.Item)
+      if (predicate(response.Item)) {
+        return unmarshall(response.Item!)
       }
     }
     throw new Error('Item not found');

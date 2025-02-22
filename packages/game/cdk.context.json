@@ -2,5 +2,8 @@
   "hosted-zone:account=913697957162:domainName=stepinto.io:region=us-west-2": {
     "Id": "/hostedzone/ZA4XGNGREIOCM",
     "Name": "stepinto.io."
-  }
+  },
+  "acknowledged-issue-numbers": [
+    32775
+  ]
 }

@@ -27,7 +27,8 @@ describe('game-stack', () => {
       FunctionName: 'tst-grid-wolf-game-api-handler',
       Environment: {
         Variables: {
-          STEPINTO_APP_DATA_TABLE_NAME: 'tst-table'
+          STEPINTO_APP_DATA_TABLE_NAME: 'tst-table',
+          EVENT_BUS: Match.anyValue()
         }
       }
     });
@@ -47,5 +48,12 @@ describe('game-stack', () => {
 
   test('should add a base path mapping', () => {
     template.hasResourceProperties('AWS::ApiGateway::BasePathMapping', {});
+  });
+
+  test('should create an event handler lambda', () => {
+    template.hasResourceProperties('AWS::Lambda::Function', {
+      FunctionName: 'tst-grid-wolf-game-event-handler'
+    });
+    template.hasResourceProperties('AWS::Events::Rule', {});
   });
 });

@@ -158,7 +158,10 @@ export class UserStack extends StepintoBaseStack {
         new PolicyStatement({
           effect: Effect.ALLOW,
           actions: [
-            'dynamodb:PutItem'
+            'dynamodb:PutItem',
+            'dynamodb:Query',
+            'dynamodb:BatchWriteItem',
+            'dynamodb:DeleteItem'
           ],
           resources: [`arn:aws:dynamodb:${props.env.region}:${props.env.account}:table/${props.env.prefix}-${props.dataTableName}`]
         }),

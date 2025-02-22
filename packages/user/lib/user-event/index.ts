@@ -7,6 +7,7 @@ export const userEventSource = 'grid-wolf.user';
 export interface GameInviteDetail {
   email: string;
   gameId: string;
+  gameOwnerId: string;
 }
 export type GameInviteEvent = EventBridgeEvent<string, GameInviteDetail>;
 

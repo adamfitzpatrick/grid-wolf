@@ -54,7 +54,8 @@ const handlePutGameOperation = async (event: APIGatewayProxyEvent) => {
     const details: GameInviteDetail[] = gameDTO.players.map(email => {
       return {
         email,
-        gameId: gameDTO.gameId
+        gameId: gameDTO.gameId,
+        gameOwnerId: gameDTO.ownerId
       }
     });
     const command = new PutEventsCommand({

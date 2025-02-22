@@ -2,7 +2,9 @@
   "name": "@grid-wolf/game",
   "packageManager": "yarn@4.4.1",
   "scripts": {
-    "build": "esbuild ./lib/game-handler/index.ts --bundle --platform=node \"--external:@aws-sdk/*\" --outfile=./lib/game-handler/index.js",
+    "build:api-handler": "esbuild ./lib/game-handler/index.ts --bundle --platform=node \"--external:@aws-sdk/*\" --outfile=./lib/game-handler/index.js",
+    "build:event-handler": "esbuild ./lib/game-event-handler/index.ts --bundle --platform=node \"--external:@aws-sdk/*\" --outfile=./lib/game-event-handler/index.js",
+    "build": "yarn build:api-handler && yarn build:event-handler",
     "test": "jest",
     "cdk": "cdk",
     "clean": "rm **/*.js",

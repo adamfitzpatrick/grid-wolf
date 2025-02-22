@@ -37,6 +37,7 @@ describe('user handler', () => {
     playerGameDTO = {
       gameId: 'id',
       playerId: 'user',
+      gameOwnerId: 'owner',
       email: 'email@email.com',
       participationState: 'invited',
       timestamp: 1234

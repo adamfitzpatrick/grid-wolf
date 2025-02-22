@@ -1,6 +1,13 @@
-import { test, expect, getAuthData } from '../authenticated-test';
+import { test, expect } from '../authenticated-test';
 import { GameDTO } from '@grid-wolf/game/lib/game-dto';
 import { randomUUID } from 'crypto'
+import { LambdaClient, InvokeCommand } from '@aws-sdk/client-lambda';
+import { DynamoHelper } from '../../lib/dynamo-helper';
+import { EnvironmentVariableName } from '@grid-wolf/shared/utils';
+import { AttributeValue } from '@aws-sdk/client-dynamodb';
+import { unmarshall } from '@aws-sdk/util-dynamodb';
+
+const dynamoHelper = new DynamoHelper(`dev-${process.env[EnvironmentVariableName.DATA_TABLE_NAME]}`);
 
 test.describe('when managing games', () => {
   let gameId1: string;
@@ -20,7 +27,7 @@ test.describe('when managing games', () => {
       gameId: gameId1,
       ownerId: getAuthData().users[0].userId,
       name: 'test-game-1',
-      players: [],
+      players: ['email@email.email'],
       timestamp,
       active: true
     };
@@ -88,6 +95,34 @@ test.describe('when managing games', () => {
       }
     });
     expect((await response.json()).length).toBeGreaterThanOrEqual(2);
+  });
+
+  test('user confirmation events should update game player lists', async ({ getAuthData }) => {
+    const lambdaClient = new LambdaClient({
+      profile: process.env[EnvironmentVariableName.AWS_SSO_PROFILE]
+    });
+    const command = new InvokeCommand({
+      FunctionName: `dev-grid-wolf-user-event-handler`,
+      InvocationType: 'Event',
+      Payload: Buffer.from(JSON.stringify({
+        triggerSource: 'PostConfirmation_ConfirmSignUp',
+        userName: getAuthData().users[1].userId,
+        request: {
+          userAttributes: {
+            email: 'email@email.email'
+          }
+        }
+      }))
+    });
+    await lambdaClient.send(command);
+
+    const pk = `user#${getAuthData().users[0].userId}`;
+    const sk = `game#${gameId1}`;
+    const predicate = (item: Record<string, AttributeValue> | undefined) => {
+      return !!item && unmarshall(item).players[0] === getAuthData().users[1].userId;
+    }
+    const game = await dynamoHelper.getWithRetries(pk, sk, predicate);
+    expect(game.players).toEqual([getAuthData().users[1].userId]);
   });
 
   test('authenticated users can delete games they have created', async ({ request, getAuthData }) => {

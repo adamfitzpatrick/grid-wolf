@@ -65,6 +65,7 @@ describe('user-event-handler', () => {
     playerGame = {
       playerId: 'email@email.email',
       email: 'email@email.email',
+      gameOwnerId: 'owner',
       gameId: 'game',
       participationState: 'invited',
       timestamp: 1
@@ -96,7 +97,8 @@ describe('user-event-handler', () => {
         "detail-type": gameInviteDetailType,
         detail: {
           email: 'email@email.email',
-          gameId: 'game'
+          gameId: 'game',
+          gameOwnerId: 'owner'
         }
       };
       await handler(event);
@@ -130,7 +132,8 @@ describe('user-event-handler', () => {
         "detail-type": gameInviteDetailType,
         detail: {
           email: 'email@email.email',
-          gameId: 'game'
+          gameId: 'game',
+          gameOwnerId: 'owner'
         }
       };
       await handler(event);
@@ -175,6 +178,7 @@ describe('user-event-handler', () => {
       playerGame2 = {
         playerId: 'email@email.email',
         gameId: 'game2',
+        gameOwnerId: 'owner',
         email: 'email@email.email',
         timestamp: 2,
         participationState: 'invited'
@@ -221,7 +225,7 @@ describe('user-event-handler', () => {
     });
 
     test('should not attempt to make a replacement if no PlayerGame has a matching email ID', async () => {
-      getAllSpy.mockResolvedValue(null);
+      getAllSpy.mockResolvedValue([]);
 
       const response = await handler(event);
 

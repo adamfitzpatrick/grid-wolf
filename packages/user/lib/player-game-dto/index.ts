@@ -6,6 +6,7 @@ export type ParticipationState = InvitationState | 'invited' | 'joined' | 'remov
 export interface PlayerGameItem extends DynamoItem {
   playerId: string;
   gameId: string;
+  gameOwnerId: string;
   email: string;
   participationState: ParticipationState;
   timestamp: number;
@@ -14,6 +15,7 @@ export interface PlayerGameItem extends DynamoItem {
 export interface PlayerGameDTO {
   playerId: string;
   gameId: string;
+  gameOwnerId: string;
   email: string;
   participationState: ParticipationState;
   timestamp: number;

@@ -6,7 +6,7 @@ import { GameDTO } from '@grid-wolf/game/lib/game-dto';
 import { DynamoHelper } from '../../lib/dynamo-helper';
 
 
-const assertDynamo = new DynamoHelper(`dev-${process.env[EnvironmentVariableName.DATA_TABLE_NAME]}`);
+const dynamoHelper = new DynamoHelper(`dev-${process.env[EnvironmentVariableName.DATA_TABLE_NAME]}`);
 
 test.describe('when getting user info', () => {
   let gameId: string;
@@ -22,6 +22,7 @@ test.describe('when getting user info', () => {
     playerGame = {
       playerId: process.env[EnvironmentVariableName.INT_TEST_USER_ID_2]!,
       gameId,
+      gameOwnerId: process.env[EnvironmentVariableName.INT_TEST_USER_ID]!,
       email: process.env[EnvironmentVariableName.INT_TEST_USERNAME_2]!,
       participationState: 'invited',
       timestamp
@@ -46,10 +47,11 @@ test.describe('when getting user info', () => {
     });
     expect(response.ok()).toBeTruthy();
 
-    const actual = await assertDynamo.getWithRetries('player#email@email.email', `game#${gameDto.gameId}`)
+    const actual = await dynamoHelper.getWithRetries('player#email@email.email', `game#${gameDto.gameId}`)
     expect(actual).toEqual(expect.objectContaining({
       playerId: 'email@email.email',
       gameId: gameDto.gameId,
+      gameOwnerId: getAuthData().users[1].userId,
       email: 'email@email.email',
       participationState: 'invited',
       timestamp: expect.anything()
@@ -74,7 +76,7 @@ test.describe('when getting user info', () => {
     expect(response.ok()).toBeTruthy();
 
     const user2Id = process.env[EnvironmentVariableName.INT_TEST_USER_ID_2];
-    const actual = await assertDynamo.getWithRetries(`player#${user2Id}`, `game#${gameDto.gameId}`)
+    const actual = await dynamoHelper.getWithRetries(`player#${user2Id}`, `game#${gameDto.gameId}`);
     expect(actual).toEqual(expect.objectContaining({
       ...playerGame,
       gameId: gameDto.gameId,
@@ -103,7 +105,7 @@ test.describe('when getting user info', () => {
     const response = await user2Request.get('./user/player-game/list', {
       headers: { 'x-api-key': getAuthData().apiKey.user },
     });
-    expect(await response.json()).toEqual([{ ...playerGame, timestamp: expect.anything() }]);
+    expect(await response.json()).toEqual(expect.arrayContaining([{ ...playerGame, timestamp: expect.anything() }]));
   });
 
   test('authenticated users can accept game invitations', async ({ user2Request, getAuthData }) => {
