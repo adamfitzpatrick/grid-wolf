@@ -1,9 +1,15 @@
-import { expect } from '@playwright/test';
-import { AttributeValue, DeleteItemCommand, DynamoDBClient, GetItemCommand, GetItemCommandOutput, QueryCommand } from "@aws-sdk/client-dynamodb";
+import {
+  AttributeValue,
+  DeleteItemCommand,
+  DynamoDBClient,
+  GetItemCommand,
+  GetItemCommandOutput,
+  QueryCommand
+} from "@aws-sdk/client-dynamodb";
 import { EnvironmentVariableName } from "@grid-wolf/shared/utils";
 import { unmarshall } from '@aws-sdk/util-dynamodb';
 
-const RETRY_TIMING_BASE = 2;
+const RETRY_TIMING_BASE = 4;
 const BASE_RETRY_COUNT = 3;
 
 type Predicate = (Item: Record<string, AttributeValue> | undefined) => boolean;
@@ -15,7 +21,7 @@ export class DynamoHelper {
   constructor(tableName: string) {
     this.tableName = tableName;
     this.client = new DynamoDBClient({
-      profile: process.env[EnvironmentVariableName.AWS_SSO_PROFILE]
+      profile: 'stepinto' // process.env[EnvironmentVariableName.AWS_SSO_PROFILE]
     });
   }
 

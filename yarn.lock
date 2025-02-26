@@ -3785,6 +3785,35 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@grid-wolf/encounter@workspace:^, @grid-wolf/encounter@workspace:packages/encounter":
+  version: 0.0.0-use.local
+  resolution: "@grid-wolf/encounter@workspace:packages/encounter"
+  dependencies:
+    "@aws-sdk/client-dynamodb": "npm:^3.741.0"
+    "@aws-sdk/client-eventbridge": "npm:^3.749.0"
+    "@grid-wolf/entity": "workspace:^"
+    "@grid-wolf/game": "workspace:^"
+    "@grid-wolf/shared": "workspace:^"
+    "@grid-wolf/user": "workspace:^"
+    "@types/aws-lambda": "npm:^8.10.145"
+    "@types/jest": "npm:^29.5.12"
+    "@types/jsonwebtoken": "npm:^9"
+    "@types/node": "npm:^22.5.4"
+    aws-cdk-lib: "npm:2.160.0"
+    aws-xray-sdk: "npm:^3.9.0"
+    cdk: "npm:2.160.0"
+    constructs: "npm:10.3.0"
+    dotenv: "npm:^16.4.7"
+    esbuild: "npm:^0.24.2"
+    jest: "npm:^29.7.0"
+    jsonwebtoken: "npm:^9.0.2"
+    stepinto-aws-tools: "npm:^0.7.14"
+    ts-jest: "npm:^29.2.5"
+    ts-node: "npm:^10.9.2"
+    typescript: "npm:5.5.4"
+  languageName: unknown
+  linkType: soft
+
 "@grid-wolf/entity@workspace:^, @grid-wolf/entity@workspace:packages/entity":
   version: 0.0.0-use.local
   resolution: "@grid-wolf/entity@workspace:packages/entity"
@@ -8149,6 +8178,7 @@ __metadata:
     "@aws-sdk/client-lambda": "npm:^3.750.0"
     "@aws-sdk/credential-providers": "npm:^3.749.0"
     "@aws-sdk/util-dynamodb": "npm:^3.751.0"
+    "@grid-wolf/encounter": "workspace:^"
     "@grid-wolf/entity": "workspace:^"
     "@grid-wolf/game": "workspace:^"
     "@grid-wolf/map": "workspace:^"

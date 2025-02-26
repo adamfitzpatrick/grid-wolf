@@ -5,22 +5,23 @@ import { setAuthData, getAuthData } from './authenticated-test';
 
 export const AUTH_FILE_PATH = resolve(__dirname, '../auth');
 
-const USERNAME       = process.env[EnvironmentVariableName.INT_TEST_USERNAME]!;
-const PASSWORD       = process.env[EnvironmentVariableName.INT_TEST_PASSWORD]!;
-const USER_ID        = process.env[EnvironmentVariableName.INT_TEST_USER_ID]!;
-const USERNAME_2     = process.env[EnvironmentVariableName.INT_TEST_USERNAME_2]!;
-const PASSWORD_2     = process.env[EnvironmentVariableName.INT_TEST_PASSWORD_2]!;
-const USER_ID_2      = process.env[EnvironmentVariableName.INT_TEST_USER_ID_2]!;
-const GAME_API_KEY   = process.env[EnvironmentVariableName.INT_TEST_GAME_API_KEY]!;
-const MAP_API_KEY    = process.env[EnvironmentVariableName.INT_TEST_MAP_API_KEY]!;
-const USER_API_KEY   = process.env[EnvironmentVariableName.INT_TEST_USER_API_KEY]!;
-const ENTITY_API_KEY = process.env[EnvironmentVariableName.INT_TEST_ENTITY_API_KEY]!;
-const AUTH_HOST      = process.env[EnvironmentVariableName.USER_AUTH_DOMAIN]!;
-const CLIENT_ID      = process.env[EnvironmentVariableName.USER_AUTH_CLIENT_ID]!;
-const REDIRECT_URI   = process.env[EnvironmentVariableName.USER_AUTH_REDIRECT_URI]!;
-const LOGIN_PATH     = '/login';
-const RESPONSE_TYPE  = 'token'
-const SCOPE          = 'openid'
+const USERNAME          = process.env[EnvironmentVariableName.INT_TEST_USERNAME]!;
+const PASSWORD          = process.env[EnvironmentVariableName.INT_TEST_PASSWORD]!;
+const USER_ID           = process.env[EnvironmentVariableName.INT_TEST_USER_ID]!;
+const USERNAME_2        = process.env[EnvironmentVariableName.INT_TEST_USERNAME_2]!;
+const PASSWORD_2        = process.env[EnvironmentVariableName.INT_TEST_PASSWORD_2]!;
+const USER_ID_2         = process.env[EnvironmentVariableName.INT_TEST_USER_ID_2]!;
+const GAME_API_KEY      = process.env[EnvironmentVariableName.INT_TEST_GAME_API_KEY]!;
+const MAP_API_KEY       = process.env[EnvironmentVariableName.INT_TEST_MAP_API_KEY]!;
+const USER_API_KEY      = process.env[EnvironmentVariableName.INT_TEST_USER_API_KEY]!;
+const ENTITY_API_KEY    = process.env[EnvironmentVariableName.INT_TEST_ENTITY_API_KEY]!;
+const ENCOUNTER_API_KEY = process.env[EnvironmentVariableName.INT_TEST_ENCOUNTER_API_KEY]!;
+const AUTH_HOST         = process.env[EnvironmentVariableName.USER_AUTH_DOMAIN]!;
+const CLIENT_ID         = process.env[EnvironmentVariableName.USER_AUTH_CLIENT_ID]!;
+const REDIRECT_URI      = process.env[EnvironmentVariableName.USER_AUTH_REDIRECT_URI]!;
+const LOGIN_PATH        = '/login';
+const RESPONSE_TYPE     = 'token'
+const SCOPE             = 'openid'
 
 const doLogin = async (page: Page, username: string, password: string) => {
   const loginUrl = `https://dev.${AUTH_HOST}${LOGIN_PATH}?client_id=${CLIENT_ID}&response_type=${RESPONSE_TYPE}` +
@@ -44,7 +45,8 @@ setup('set API keys', async () => {
       game: GAME_API_KEY,
       map: MAP_API_KEY,
       user: USER_API_KEY,
-      entity: ENTITY_API_KEY
+      entity: ENTITY_API_KEY,
+      encounter: ENCOUNTER_API_KEY
     }
   });
 });

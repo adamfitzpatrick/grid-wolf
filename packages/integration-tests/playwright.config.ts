@@ -2,6 +2,7 @@ import { defineConfig, devices } from '@playwright/test';
 import dotenv from 'dotenv';
 import { resolve } from 'path';
 
+dotenv.config({ path: [ './.env.local' ]});
 dotenv.config({ path: [ '../../.env.local', '../../.env.dev', '../../.env' ]});
 
 /**

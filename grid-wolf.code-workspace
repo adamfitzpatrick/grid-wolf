@@ -24,6 +24,9 @@
         }, {
             "name": "entity",
             "path": "./packages/entity"
+        },{
+            "name": "encounter",
+            "path": "./packages/encounter"
         }, {
             "name": "user",
             "path": "./packages/user"

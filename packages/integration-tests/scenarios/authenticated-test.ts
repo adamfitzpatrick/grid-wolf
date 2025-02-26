@@ -11,7 +11,8 @@ export interface ApiKeys {
   game: string;
   map: string;
   user: string;
-  entity: string
+  entity: string;
+  encounter: string;
 }
 
 export interface AuthData {

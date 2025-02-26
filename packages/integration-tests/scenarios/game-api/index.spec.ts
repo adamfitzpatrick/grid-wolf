@@ -6,6 +6,7 @@ import { DynamoHelper } from '../../lib/dynamo-helper';
 import { EnvironmentVariableName } from '@grid-wolf/shared/utils';
 import { AttributeValue } from '@aws-sdk/client-dynamodb';
 import { unmarshall } from '@aws-sdk/util-dynamodb';
+import { LambdaHelper } from '../../lib/lambda-helper';
 
 const dynamoHelper = new DynamoHelper(`dev-${process.env[EnvironmentVariableName.DATA_TABLE_NAME]}`);
 
@@ -98,23 +99,16 @@ test.describe('when managing games', () => {
   });
 
   test('user confirmation events should update game player lists', async ({ getAuthData }) => {
-    const lambdaClient = new LambdaClient({
-      profile: process.env[EnvironmentVariableName.AWS_SSO_PROFILE]
-    });
-    const command = new InvokeCommand({
-      FunctionName: `dev-grid-wolf-user-event-handler`,
-      InvocationType: 'Event',
-      Payload: Buffer.from(JSON.stringify({
-        triggerSource: 'PostConfirmation_ConfirmSignUp',
-        userName: getAuthData().users[1].userId,
-        request: {
-          userAttributes: {
-            email: 'email@email.email'
-          }
+    const lambdaHelper = new LambdaHelper(`dev-${process.env[EnvironmentVariableName.APP_SUBDOMAIN]}-user-event-handler`);
+    await lambdaHelper.invoke({
+      triggerSource: 'PostConfirmation_ConfirmSignUp',
+      userName: getAuthData().users[1].userId,
+      request: {
+        userAttributes: {
+          email: 'email@email.email'
         }
-      }))
+      }
     });
-    await lambdaClient.send(command);
 
     const pk = `user#${getAuthData().users[0].userId}`;
     const sk = `game#${gameId1}`;
