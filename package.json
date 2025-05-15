@@ -5,7 +5,6 @@
     "./packages/**"
   ],
   "scripts": {
-    "preinstall": "perl ./preinstall.pl",
     "clean": "yarn workspace @grid-wolf/shared clean && yarn",
     "deploy:shared": "yarn clean && yarn workspace @grid-wolf/shared deploy",
     "deploy:central-infra": "yarn clean && yarn workspace @grid-wolf/central-infra deploy",
