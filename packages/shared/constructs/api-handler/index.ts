@@ -1,15 +1,28 @@
 import { Construct } from "constructs";
-import { Effect, PolicyDocument, PolicyStatement, Role, ServicePrincipal } from "aws-cdk-lib/aws-iam";
-import { ApplicationLogLevel, Code, Function as LambdaFunction, LayerVersion, LoggingFormat, Runtime, SystemLogLevel, Tracing } from 'aws-cdk-lib/aws-lambda'
+import {
+  Effect,
+  PolicyDocument,
+  PolicyStatement,
+  Role,
+  ServicePrincipal,
+} from "aws-cdk-lib/aws-iam";
+import {
+  ApplicationLogLevel,
+  Code,
+  Function as LambdaFunction,
+  LayerVersion,
+  LoggingFormat,
+  Runtime,
+  Tracing,
+} from "aws-cdk-lib/aws-lambda";
 import { Duration, Fn } from "aws-cdk-lib";
 import { parameterNames } from "..";
-import { EnvironmentVariableName } from "../../utils";
+import { FunctionalEnvironmentVariableName, LambdaEnvironmentVariableName } from "../../utils";
 import { GridWolfConstruct, GridWolfConstructProps } from "../grid-wolf-construct";
 import { StringParameter } from "aws-cdk-lib/aws-ssm";
-import { LogLevel } from "aws-cdk-lib/aws-lambda-nodejs";
 
 const SECRETS_LAMBDA_EXTENSION_ARN =
-  'arn:aws:lambda:us-west-2:345057560386:layer:AWS-Parameters-and-Secrets-Lambda-Extension:12';
+  "arn:aws:lambda:us-west-2:345057560386:layer:AWS-Parameters-and-Secrets-Lambda-Extension:12";
 
 export interface ApiHandlerProps extends GridWolfConstructProps {
   handlerPath: string;
@@ -17,7 +30,7 @@ export interface ApiHandlerProps extends GridWolfConstructProps {
   dataTableName: string;
   usesSecrets?: boolean;
   additionalEnvironmentVariables?: { [key: string]: string };
-  additionalHandlerPolicies?: PolicyStatement[]
+  additionalHandlerPolicies?: PolicyStatement[];
 }
 
 export class ApiHandler extends GridWolfConstruct {
@@ -27,72 +40,79 @@ export class ApiHandler extends GridWolfConstruct {
     super(scope, id, props);
 
     const loggingPolicy = new PolicyDocument({
-      statements: [new PolicyStatement({
-        effect: Effect.ALLOW,
-        actions: [
-          'logs:CreateLogGroup',
-          'logs:CreateLogStream',
-          'logs:DescribeLogStreams',
-          'logs:PutLogEvents'
-        ],
-        resources: ['*']
-      })]
+      statements: [
+        new PolicyStatement({
+          effect: Effect.ALLOW,
+          actions: [
+            "logs:CreateLogGroup",
+            "logs:CreateLogStream",
+            "logs:DescribeLogStreams",
+            "logs:PutLogEvents",
+          ],
+          resources: ["*"],
+        }),
+      ],
     });
     const additionalPolicies = props.additionalHandlerPolicies || [];
     const statements = [
       new PolicyStatement({
         effect: Effect.ALLOW,
-        actions: [
-          'dynamodb:GetItem',
-          'dynamodb:PutItem',
-          'dynamodb:Query'
-        ],
-        resources: ['*']
+        actions: ["dynamodb:GetItem", "dynamodb:PutItem", "dynamodb:Query"],
+        resources: ["*"],
       }),
-      ...additionalPolicies
+      ...additionalPolicies,
     ];
     const workingPolicy = new PolicyDocument({
-      statements
+      statements,
     });
 
-    const role = new Role(this, this.generateId('exec-role'), {
-      roleName: this.generateName('exec-role'),
-      assumedBy: new ServicePrincipal('lambda.amazonaws.com'),
+    const role = new Role(this, this.generateId("exec-role"), {
+      roleName: this.generateName("exec-role"),
+      assumedBy: new ServicePrincipal("lambda.amazonaws.com"),
       inlinePolicies: {
         loggingPolicy,
-        workingPolicy
-      }
+        workingPolicy,
+      },
     });
 
-    const sharedLayerArn = StringParameter.valueForStringParameter(this,
-      parameterNames.SHARED_LAYER_PARAMETER);
-    const dependencyLayerArn = StringParameter.valueForStringParameter(this,
-      parameterNames.DEPENDENCY_LAYER_PARAMETER);
-    const sharedLayer = LayerVersion.fromLayerVersionArn(this, this.generateId('shared-layer'),
-      sharedLayerArn);
-    const dependencyLayer = LayerVersion.fromLayerVersionArn(this, this.generateId('dep-layer'),
-      dependencyLayerArn);
-    const layers = [
-      sharedLayer,
-      dependencyLayer
-    ];
+    const sharedLayerArn = StringParameter.valueForStringParameter(
+      this,
+      parameterNames.SHARED_LAYER_PARAMETER
+    );
+    const dependencyLayerArn = StringParameter.valueForStringParameter(
+      this,
+      parameterNames.DEPENDENCY_LAYER_PARAMETER
+    );
+    const sharedLayer = LayerVersion.fromLayerVersionArn(
+      this,
+      this.generateId("shared-layer"),
+      sharedLayerArn
+    );
+    const dependencyLayer = LayerVersion.fromLayerVersionArn(
+      this,
+      this.generateId("dep-layer"),
+      dependencyLayerArn
+    );
+    const layers = [sharedLayer, dependencyLayer];
     if (props.usesSecrets) {
       const secretsExtensionsLayer = LayerVersion.fromLayerVersionArn(
         this,
-        this.generateId('secrets-layer'),
+        this.generateId("secrets-layer"),
         SECRETS_LAMBDA_EXTENSION_ARN
       );
       layers.push(secretsExtensionsLayer);
     }
-    
+
     const additionalEnvironmentVariables = props.additionalEnvironmentVariables || {};
     const environment = {
-      PARAMETERS_SECRETS_EXTENSION_LOG_LEVEL: 'warn',
-      [EnvironmentVariableName.DATA_TABLE_NAME]: this.generateEnvGeneralName(props.dataTableName),
-      ...additionalEnvironmentVariables
-    }
-    this._lambda = new LambdaFunction(this, this.generateId('handler'), {
-      functionName: this.generateName('handler'),
+      [LambdaEnvironmentVariableName.SECRETS_EXT_LOG_LEVEL]: "warn",
+      [LambdaEnvironmentVariableName.DATA_TABLE_NAME]: this.generateEnvGeneralName(
+        props.dataTableName
+      ),
+      ...additionalEnvironmentVariables,
+    };
+    this._lambda = new LambdaFunction(this, this.generateId("handler"), {
+      functionName: this.generateName("handler"),
       runtime: Runtime.NODEJS_20_X,
       code: Code.fromAsset(props.handlerPath),
       handler: props.handler,
@@ -102,7 +122,7 @@ export class ApiHandler extends GridWolfConstruct {
       role,
       timeout: Duration.minutes(1),
       applicationLogLevelV2: ApplicationLogLevel.INFO,
-      loggingFormat: LoggingFormat.JSON
+      loggingFormat: LoggingFormat.JSON,
     });
   }
 
@@ -111,9 +131,9 @@ export class ApiHandler extends GridWolfConstruct {
   }
 
   setLambdaPermission(principalStr: string) {
-    this._lambda.addPermission(this.generateId('lambda-perm'), {
-      action: 'lambda:InvokeFunction',
-      principal: new ServicePrincipal(principalStr)
+    this._lambda.addPermission(this.generateId("lambda-perm"), {
+      action: "lambda:InvokeFunction",
+      principal: new ServicePrincipal(principalStr),
     });
   }
 }

@@ -1,74 +1,76 @@
 {
-    "folders": [
-        {
-            "name": "grid-wolf",
-            "path": "."
-        },
-        {
-            "name": "docs",
-            "path": "./packages/docs"
-        },
-        {
-            "name": "shared",
-            "path": "./packages/shared"
-        },
-        {
-            "name": "central-infra",
-            "path": "./packages/central-infra"
-        }, {
-            "name": "game",
-            "path": "./packages/game"
-        }, {
-            "name": "map",
-            "path": "./packages/map"
-        }, {
-            "name": "entity",
-            "path": "./packages/entity"
-        },{
-            "name": "encounter",
-            "path": "./packages/encounter"
-        }, {
-            "name": "user",
-            "path": "./packages/user"
-        }, {
-            "name": "integration-tests",
-            "path": "./packages/integration-tests"
-        }
-    ],
-    "settings": {
-        "search.exclude": {
-            "**/.yarn": true,
-            "**/.pnp.*": true
-        },
-        "typescript.tsdk": "grid-wolf/.yarn/sdks/typescript/lib",
-        "typescript.enablePromptUseWorkspaceTsdk": true,
-        "files.exclude": {
-            "**/.git": true,
-            "**/.svn": true,
-            "**/.hg": true,
-            "**/CVS": true,
-            "**/.DS_Store": true,
-            "**/Thumbs.db": true,
-            "**/*.d.ts": true,
-            "**/*.js": true,
-            ".yarn": true
-        },
-        "markdown-preview-github-styles.colorTheme": "light",
-        "jest.disabledWorkspaceFolders": [
-            "grid-wolf",
-            "docs",
-            "integration-tests"
-        ],
-        "emmet.showExpandedAbbreviation": "never",
-        "[cucumber]": {
-            "editor.semanticHighlighting.enabled": true
-        },
+  "folders": [
+    {
+      "name": "grid-wolf",
+      "path": "."
     },
-    "extensions": {
-        "recommendations": [
-            "arcanis.vscode-zipfs",
-            "hediet.vscode-drawio",
-            "bierner.markdown-preview-github-styles"
-        ]
+    {
+      "name": "docs",
+      "path": "./packages/docs"
+    },
+    {
+      "name": "shared",
+      "path": "./packages/shared"
+    },
+    {
+      "name": "central-infra",
+      "path": "./packages/central-infra"
+    },
+    {
+      "name": "game",
+      "path": "./packages/game"
+    },
+    {
+      "name": "map",
+      "path": "./packages/map"
+    },
+    {
+      "name": "entity",
+      "path": "./packages/entity"
+    },
+    {
+      "name": "encounter",
+      "path": "./packages/encounter"
+    },
+    {
+      "name": "user",
+      "path": "./packages/user"
+    },
+    {
+      "name": "int-tests",
+      "path": "./packages/int-tests"
     }
+  ],
+  "settings": {
+    "search.exclude": {
+      "**/.yarn": true,
+      "**/.pnp.*": true
+    },
+    "typescript.tsdk": "grid-wolf/.yarn/sdks/typescript/lib",
+    "typescript.enablePromptUseWorkspaceTsdk": true,
+    "files.exclude": {
+      "**/.git": true,
+      "**/.svn": true,
+      "**/.hg": true,
+      "**/CVS": true,
+      "**/.DS_Store": true,
+      "**/Thumbs.db": true,
+      "**/*.d.ts": true,
+      "**/*.js": true,
+      ".yarn": true
+    },
+    "markdown-preview-github-styles.colorTheme": "light",
+    "jest.disabledWorkspaceFolders": ["grid-wolf", "docs", "int-tests"],
+    "emmet.showExpandedAbbreviation": "never",
+    "[cucumber]": {
+      "editor.semanticHighlighting.enabled": true
+    }
+  },
+  "extensions": {
+    "recommendations": [
+      "arcanis.vscode-zipfs",
+      "hediet.vscode-drawio",
+      "bierner.markdown-preview-github-styles"
+    ]
+  }
 }

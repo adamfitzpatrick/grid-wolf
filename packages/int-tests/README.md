@@ -9,10 +9,14 @@ Two user accounts must be established in the
 ## Accounts and Authentication
 
 Testing user authentication, as well as acquiring access tokens for testing API endpoints,
-currently requires a pre-configured testing user.  Credentials for the user can be provided via
-environment variables, along with variable values required for client ID and redirect URI:
+currently requires two pre-configured users.  Credentials for the user can be provided via
+environment variables:
 
-- GRID_WOLF_USER_AUTH_DOMAIN
-- GRID_WOLF_USER_AUTH_CLIENT_ID
 - GRID_WOLF_INT_TEST_USERNAME
 - GRID_WOLF_INT_TEST_PASSWORD
+- GRID_WOLF_INT_TEST_USER_ID
+- GRID_WOLF_INT_TEST_USERNAME_2
+- GRID_WOLF_INT_TEST_PASSWORD_2
+- GRID_WOLF_INT_TEST_USER_ID_2
+
+Additionally, the following details provide configuration values th

@@ -1,0 +1,202 @@
+import { FunctionalEnvironmentVariableName, StandardEnvironment } from "@grid-wolf/shared/utils";
+import { test, expect } from "../authenticated-test";
+import { MapDTO } from "@grid-wolf/map/lib/map-dto";
+import { randomUUID } from "crypto";
+import { readFileSync } from "fs";
+import { resolve } from "path";
+
+const TEST_IMAGE_FILENAME = "test-image.webp";
+const TEST_IMAGE_PATH = resolve(__dirname, TEST_IMAGE_FILENAME);
+const SUBDOMAIN = process.env[FunctionalEnvironmentVariableName.APP_SUBDOMAIN];
+const ENV = process.env[StandardEnvironment.PREFIX];
+
+test.describe("when managing maps", () => {
+  let mapId1: string;
+  let mapId2: string;
+  let map1: MapDTO;
+  let map2: MapDTO;
+  let timestamp: number;
+
+  test.beforeAll(() => {
+    mapId1 = randomUUID();
+    mapId2 = randomUUID();
+    timestamp = new Date().getTime();
+  });
+
+  test.beforeEach(({ getAuthData }) => {
+    map1 = {
+      mapId: mapId1,
+      ownerId: getAuthData().users[0].userId,
+      name: "test-game-1",
+      timestamp,
+      imageUrl: "image",
+      gridData: {
+        origin: {
+          x: 0,
+          y: 0,
+        },
+        cellWidth: 0,
+        difficult: [],
+        impassable: [],
+      },
+      active: true,
+    };
+    map2 = {
+      mapId: mapId2,
+      ownerId: getAuthData().users[0].userId,
+      name: "test-game-2",
+      imageUrl: "image",
+      gridData: {
+        origin: {
+          x: 0,
+          y: 0,
+        },
+        cellWidth: 0,
+        difficult: [],
+        impassable: [],
+      },
+      timestamp,
+      active: true,
+    };
+  });
+
+  test("authenticated users can save map data", async ({ request, getAuthData }) => {
+    const response = await request.put("./map", {
+      headers: { "x-api-key": getAuthData().apiKey.map },
+      data: map1,
+    });
+    expect(response.ok()).toBeTruthy();
+  });
+
+  test("users cannot save invalid game data", async ({ request, getAuthData }) => {
+    const invalid = {
+      ...map1,
+      badField: "bad",
+    };
+    const response = await request.put("./map", {
+      headers: { "x-api-key": getAuthData().apiKey.map },
+      data: invalid,
+    });
+    expect(response.ok()).toBeFalsy();
+  });
+
+  test("users cannot save map data owned by another user", async ({ request, getAuthData }) => {
+    map1.ownerId = "somebody-else";
+    const response = await request.put("./map", {
+      headers: { "x-api-key": getAuthData().apiKey.map },
+      data: map1,
+    });
+    expect(response.ok()).toBeFalsy();
+  });
+
+  test("authenticated users can retrieve saved map data", async ({ request, getAuthData }) => {
+    const response = await request.get(`./map/${mapId1}`, {
+      headers: { "x-api-key": getAuthData().apiKey.map },
+    });
+    expect(await response.json()).toEqual(map1);
+  });
+
+  test('authenticated users receive "access denied" when requesting non-existent map data', async ({
+    request,
+    getAuthData,
+  }) => {
+    const response = await request.get(`./map/not-a-map`, {
+      headers: { "x-api-key": getAuthData().apiKey.map },
+    });
+    expect(await response.status()).toBe(403);
+  });
+
+  test("authenticated users can retrieve a list of maps", async ({ request, getAuthData }) => {
+    await request.put("./map", {
+      headers: { "x-api-key": getAuthData().apiKey.map },
+      data: map2,
+    });
+    const response = await request.get("./map/list", {
+      headers: {
+        "x-api-key": getAuthData().apiKey.map,
+      },
+    });
+    expect((await response.json()).length).toBe(2);
+  });
+
+  test("authenticated users can delete maps they have created", async ({
+    request,
+    getAuthData,
+  }) => {
+    const existingGames = await request.get("./map/list", {
+      headers: { "x-api-key": getAuthData().apiKey.map },
+    });
+
+    const promises = (await existingGames.json()).map(async (map: MapDTO) => {
+      await request.delete(`./map/${map.mapId}`, {
+        headers: { "x-api-key": getAuthData().apiKey.map },
+      });
+    });
+    await Promise.all(promises);
+    const response = await request.get("./map/list", {
+      headers: { "x-api-key": getAuthData().apiKey.map },
+    });
+    expect(await response.json()).toEqual([]);
+  });
+
+  test("authenticated users can obtain a URI for saving a map image", async ({
+    playwright,
+    request,
+    getAuthData,
+  }) => {
+    const userId = getAuthData().users[0].userId;
+    const saveUriResponse = await request.get(
+      `./map/save-image-url/${userId}/${TEST_IMAGE_FILENAME}`,
+      {
+        headers: { "x-api-key": getAuthData().apiKey.map },
+      }
+    );
+    const saveInfo = await saveUriResponse.json();
+    expect(saveInfo).toEqual({
+      userId,
+      filename: TEST_IMAGE_FILENAME,
+      url: expect.stringContaining("PutObject"),
+    });
+
+    const testFile = readFileSync(TEST_IMAGE_PATH);
+    const saveRequestContext = await playwright.request.newContext();
+    const saveResponse = await saveRequestContext.put(saveInfo.url, {
+      data: testFile,
+    });
+    expect(saveResponse.ok()).toBeTruthy();
+  });
+
+  test("authenticated users can obtain a URI which works for map image retrieval", async ({
+    playwright,
+    request,
+    getAuthData,
+  }) => {
+    const userId = getAuthData().users[0].userId;
+    const getUriResponse = await request.get(`./map/image-url/${userId}`, {
+      headers: { "x-api-key": getAuthData().apiKey.map },
+    });
+    const getInfo = await getUriResponse.json();
+    expect(getInfo).toEqual({
+      userId,
+      policy: expect.anything(),
+      keyPairId: expect.anything(),
+      signature: expect.anything(),
+    });
+    const url =
+      `https://${ENV}.images.${SUBDOMAIN}.stepinto.io/${getInfo.userId}/${TEST_IMAGE_FILENAME}?Policy=${getInfo.policy}&` +
+      `Signature=${getInfo.signature}&Key-Pair-Id=${getInfo.keyPairId}`;
+    const getRequestContext = await playwright.request.newContext();
+    const response = await getRequestContext.get(url);
+    expect(response.ok()).toBeTruthy();
+  });
+
+  test("authenticated users can attempt to delete non-existent maps without error", async ({
+    request,
+    getAuthData,
+  }) => {
+    const response = await request.delete(`./map/non-existent`, {
+      headers: { "x-api-key": getAuthData().apiKey.map },
+    });
+    expect(response.ok()).toBeTruthy();
+  });
+});

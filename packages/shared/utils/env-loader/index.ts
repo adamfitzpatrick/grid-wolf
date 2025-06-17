@@ -1,77 +1,49 @@
-import { config } from 'dotenv';
-import { resolve } from 'path';
+import {
+  loadEnv as toolsLoadEnv,
+  EnvironmentVariableName as StandardEnvironment,
+} from "stepinto-aws-tools/utils";
 
-const ENV_PATH = resolve(__dirname, '../../../../');
-config({
-  path: [
-    resolve(ENV_PATH, '.env.local'),
-    resolve(ENV_PATH, '.env')
-  ]
-});
+export { EnvironmentVariableName as StandardEnvironment } from "stepinto-aws-tools/utils";
 
-export enum EnvironmentVariableName {
-  ACCOUNT                    = 'GRID_WOLF_COMMON_TARGET_ACCOUNT_ID',
-  REGION                     = 'GRID_WOLF_COMMON_TARGET_REGION',
-  PREFIX                     = 'GRID_WOLF_COMMON_TARGET_ENV_PREFIX',
-  API_DOMAIN                 = 'GRID_WOLF_API_DOMAIN',
-  USER_AUTH_DOMAIN           = 'GRID_WOLF_USER_AUTH_DOMAIN',
-  USER_AUTH_CLIENT_ID        = 'GRID_WOLF_USER_AUTH_CLIENT_ID',
-  USER_AUTH_REDIRECT_URI     = 'GRID_WOLF_USER_AUTH_REDIRECT_URI',
-  DATA_TABLE_NAME            = 'GRID_WOLF_DYNAMO_DATA_TABLE_NAME',
-  IMAGE_BUCKET_NAME          = 'GRID_WOLF_IMAGE_BUCKET_NAME',
-  CDN_HOST                   = 'GRID_WOLF_CDN_HOST',
-  CDN_PRIVATE_KEY_SECRET_ID  = 'GRID_WOLF_CDN_PRIVATE_KEY_SECRET_ID',
-  CDN_PUBLIC_KEY_ID          = 'GRID_WOLF_CDN_PUBLIC_KEY_ID',
-  API_CERTIFICATE_ARN        = 'GRID_WOLF_API_CERTIFICATE_ARN',
-  CDN_CERTIFICATE_ARN        = 'GRID_WOLF_CDN_CERTIFICATE_ARN',
-  USER_POOL_CERTIFICATE_ARN  = 'GRID_WOLF_USER_POOL_CERTIFICATE_ARN',
-  HOSTED_ZONE                = 'GRID_WOLF_HOSTED_ZONE',
-  APP_SUBDOMAIN              = 'GRID_WOLF_APP_SUBDOMAIN',
-  SECRETS_ARN                = 'GRID_WOLF_SECRETS_ARN',
-  INT_TEST_USERNAME          = 'GRID_WOLF_INT_TEST_USERNAME',
-  INT_TEST_PASSWORD          = 'GRID_WOLF_INT_TEST_PASSWORD',
-  INT_TEST_USER_ID           = 'GRID_WOLF_INT_TEST_USER_ID',
-  INT_TEST_USERNAME_2        = 'GRID_WOLF_INT_TEST_USERNAME_2',
-  INT_TEST_PASSWORD_2        = 'GRID_WOLF_INT_TEST_PASSWORD_2',
-  INT_TEST_USER_ID_2         = 'GRID_WOLF_INT_TEST_USER_ID_2',
-  INT_TEST_GAME_API_KEY      = 'GRID_WOLF_INT_TEST_GAME_API_KEY',
-  INT_TEST_MAP_API_KEY       = 'GRID_WOLF_INT_TEST_MAP_API_KEY',
-  INT_TEST_USER_API_KEY      = 'GRID_WOLF_INT_TEST_USER_API_KEY',
-  INT_TEST_ENTITY_API_KEY    = 'GRID_WOLF_INT_TEST_ENTITY_API_KEY',
-  INT_TEST_ENCOUNTER_API_KEY = 'GRID_WOLF_INT_TEST_ENCOUNTER_API_KEY',
-  AWS_SSO_PROFILE            = 'GRID_WOLF_INT_TEST_AWS_SSO_PROFILE'
+export enum FunctionalEnvironmentVariableName {
+  HOSTED_ZONE = "GRID_WOLF_HOSTED_ZONE",
+  API_CERTIFICATE_ARN = "GRID_WOLF_API_CERTIFICATE_ARN",
+  CDN_CERTIFICATE_ARN = "GRID_WOLF_CDN_CERTIFICATE_ARN",
+  USER_POOL_CERTIFICATE_ARN = "GRID_WOLF_USER_POOL_CERTIFICATE_ARN",
+  APP_SUBDOMAIN = "GRID_WOLF_APP_SUBDOMAIN",
+  SECRETS_ARN = "GRID_WOLF_SECRETS_ARN",
 }
 
-const standardEnvironmentVars = [
-  EnvironmentVariableName.ACCOUNT,
-  EnvironmentVariableName.REGION,
-  EnvironmentVariableName.PREFIX
-]
-
-interface EnvironmentMap {
-  [key: string]: string
+export enum IntegrationTestEnvironmentVariableName {
+  USERNAME = "GRID_WOLF_INT_TEST_USERNAME",
+  PASSWORD = "GRID_WOLF_INT_TEST_PASSWORD",
+  USER_ID = "GRID_WOLF_INT_TEST_USER_ID",
+  USERNAME_2 = "GRID_WOLF_INT_TEST_USERNAME_2",
+  PASSWORD_2 = "GRID_WOLF_INT_TEST_PASSWORD_2",
+  USER_ID_2 = "GRID_WOLF_INT_TEST_USER_ID_2",
+  API_DOMAIN = "GRID_WOLF_INT_TEST_API_DOMAIN",
+  USER_AUTH_DOMAIN = "GRID_WOLF_INT_TEST_USER_AUTH_DOMAIN",
+  USER_AUTH_CLIENT_ID = "GRID_WOLF_INT_TEST_USER_AUTH_CLIENT_ID",
+  USER_AUTH_REDIRECT_URI = "GRID_WOLF_INT_TEST_USER_AUTH_REDIRECT_URI",
+  GAME_API_KEY = "GRID_WOLF_INT_TEST_GAME_API_KEY",
+  MAP_API_KEY = "GRID_WOLF_INT_TEST_MAP_API_KEY",
+  USER_API_KEY = "GRID_WOLF_INT_TEST_USER_API_KEY",
+  ENTITY_API_KEY = "GRID_WOLF_INT_TEST_ENTITY_API_KEY",
+  ENCOUNTER_API_KEY = "GRID_WOLF_INT_TEST_ENCOUNTER_API_KEY",
+  AWS_SSO_PROFILE = "GRID_WOLF_INT_TEST_AWS_SSO_PROFILE",
 }
 
-export function loadEnv(variableNames?: EnvironmentVariableName[]) {
-  let envMap: EnvironmentMap = {};
-  let errors = [];
-  const names = standardEnvironmentVars.concat(variableNames || []);
-  
-  names.forEach(envVar => {
-    envMap[envVar] = process.env[envVar]!
-    if (!envMap[envVar]) { errors.push(envVar) }
-  });
+export const LambdaEnvironmentVariableName = {
+  SECRETS_EXT_LOG_LEVEL: "PARAMETERS_SECRETS_EXTENSION_LOG_LEVEL",
+  EVENT_BUS_ARN: "GRID_WOLF_EVENT_BUS_ARN",
+  DATA_TABLE_NAME: StandardEnvironment.DATA_TABLE_NAME,
+};
 
-  checkEnvironment(envMap);
-  return envMap;
-}
+type EnvironmentVariable =
+  StandardEnvironment
+  | FunctionalEnvironmentVariableName
+  | IntegrationTestEnvironmentVariableName;
 
-function checkEnvironment(envMap: EnvironmentMap) {
-  const message = Object.keys(envMap).reduce((missing, current) => {
-    if (!envMap[current]) { missing = `${current}, ${missing}` };
-    return missing;
-  }, '');
-  if (message.length > 0) {
-    throw new Error(`${message} environment value cannot be found`);
-  }
+export function loadEnv<E extends EnvironmentVariable>(variableNames?: E[]) {
+  return toolsLoadEnv(variableNames);
 }

@@ -3868,6 +3868,31 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@grid-wolf/int-tests@workspace:packages/int-tests":
+  version: 0.0.0-use.local
+  resolution: "@grid-wolf/int-tests@workspace:packages/int-tests"
+  dependencies:
+    "@aws-sdk/client-dynamodb": "npm:^3.738.0"
+    "@aws-sdk/client-lambda": "npm:^3.750.0"
+    "@aws-sdk/credential-providers": "npm:^3.749.0"
+    "@aws-sdk/util-dynamodb": "npm:^3.751.0"
+    "@grid-wolf/encounter": "workspace:^"
+    "@grid-wolf/entity": "workspace:^"
+    "@grid-wolf/game": "workspace:^"
+    "@grid-wolf/map": "workspace:^"
+    "@grid-wolf/shared": "workspace:^"
+    "@grid-wolf/user": "workspace:^"
+    "@playwright/test": "npm:^1.50.0"
+    "@types/jsonwebtoken": "npm:^9"
+    "@types/node": "npm:^22.12.0"
+    dotenv: "npm:^16.4.7"
+    jsonwebtoken: "npm:^9.0.2"
+    playwright: "npm:^1.50.0"
+    ts-node: "npm:^10.9.2"
+    typescript: "npm:^5.7.3"
+  languageName: unknown
+  linkType: soft
+
 "@grid-wolf/map@workspace:^, @grid-wolf/map@workspace:packages/map":
   version: 0.0.0-use.local
   resolution: "@grid-wolf/map@workspace:packages/map"
@@ -8169,31 +8194,6 @@ __metadata:
   checksum: 10c0/4e531f648b29039fb7426fb94075e6545faa1eb9fe83c29f0b6d9e7263aceb4289d2d4557db0d428188eeb449cc7c5e77b0a0b2c4e248ff2a65933a0dee49ef2
   languageName: node
   linkType: hard
-
-"integration-tests@workspace:packages/integration-tests":
-  version: 0.0.0-use.local
-  resolution: "integration-tests@workspace:packages/integration-tests"
-  dependencies:
-    "@aws-sdk/client-dynamodb": "npm:^3.738.0"
-    "@aws-sdk/client-lambda": "npm:^3.750.0"
-    "@aws-sdk/credential-providers": "npm:^3.749.0"
-    "@aws-sdk/util-dynamodb": "npm:^3.751.0"
-    "@grid-wolf/encounter": "workspace:^"
-    "@grid-wolf/entity": "workspace:^"
-    "@grid-wolf/game": "workspace:^"
-    "@grid-wolf/map": "workspace:^"
-    "@grid-wolf/shared": "workspace:^"
-    "@grid-wolf/user": "workspace:^"
-    "@playwright/test": "npm:^1.50.0"
-    "@types/jsonwebtoken": "npm:^9"
-    "@types/node": "npm:^22.12.0"
-    dotenv: "npm:^16.4.7"
-    jsonwebtoken: "npm:^9.0.2"
-    playwright: "npm:^1.50.0"
-    ts-node: "npm:^10.9.2"
-    typescript: "npm:^5.7.3"
-  languageName: unknown
-  linkType: soft
 
 "ip-address@npm:^9.0.5":
   version: 9.0.5

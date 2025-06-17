@@ -3,17 +3,21 @@ import { handler } from ".";
 import { DynamoItemDao } from "stepinto-aws-tools/clients";
 import { EncounterItem, EncounterDTO } from "../encounter-dto";
 import { GameDTO } from "@grid-wolf/game/lib/game-dto";
-import { EntityDTO } from '@grid-wolf/entity/lib/entity-dto';
+import { EncounterEnvironmentVariable } from "../../infra/lib/encounter-stack";
 
-jest.mock('stepinto-aws-tools/clients');
+process.env[EncounterEnvironmentVariable.DATA_TABLE_NAME] = "table";
+
+jest.mock("stepinto-aws-tools/clients");
 const decodeSpy = jest.fn();
-jest.mock('jsonwebtoken', () => {
+jest.mock("jsonwebtoken", () => {
   return {
-    decode: (token: string) => { return decodeSpy(token); }
+    decode: (token: string) => {
+      return decodeSpy(token);
+    },
   };
 });
 
-describe('encounter handler', () => {
+describe("encounter handler", () => {
   let oldConsole: Console;
   let Authorization: string;
   let gameDTO: GameDTO;
@@ -27,9 +31,9 @@ describe('encounter handler', () => {
 
   beforeAll(() => {
     oldConsole = { ...console };
-    console.warn = (message: string) => { };
-    console.debug = (message: string) => { };
-    console.info = (message: string) => { };
+    console.warn = (message: string) => {};
+    console.debug = (message: string) => {};
+    console.info = (message: string) => {};
   });
 
   afterAll(() => {
@@ -41,36 +45,36 @@ describe('encounter handler', () => {
   beforeEach(() => {
     Authorization = `Bearer TOKEN`;
     gameDTO = {
-      gameId: 'game',
-      ownerId: 'owner',
-      name: 'Game',
-      players: [
-        'player'
-      ],
+      gameId: "game",
+      ownerId: "owner",
+      name: "Game",
+      players: ["player"],
       timestamp: 1,
-      active: true
+      active: true,
     };
     encounterDTO = {
-      encounterId: 'id',
-      gameId: 'game',
-      name: 'name',
-      nonPlayerCharacters: [
-        'npc'
-      ],
+      encounterId: "id",
+      gameId: "game",
+      name: "name",
+      nonPlayerCharacters: ["npc"],
       timestamp: 1234,
-      active: true
+      active: true,
     };
     event = {
       body: JSON.stringify(encounterDTO),
       headers: {
-        Authorization
-      }
-    } as any as APIGatewayProxyEvent
+        Authorization,
+      },
+    } as any as APIGatewayProxyEvent;
 
     // The following is a bit fragile; if the instantiation order in the SUT were to swap everything would be thrown off.
     // Given that this is for unit tests the risk is minor and easily resolved.
-    const daoGameMock = (DynamoItemDao as unknown as jest.Mock<DynamoItemDao<EncounterItem, EncounterDTO>>).mock.instances[0];
-    const daoEncounterMock = (DynamoItemDao as unknown as jest.Mock<DynamoItemDao<EncounterItem, EncounterDTO>>).mock.instances[1];
+    const daoGameMock = (
+      DynamoItemDao as unknown as jest.Mock<DynamoItemDao<EncounterItem, EncounterDTO>>
+    ).mock.instances[0];
+    const daoEncounterMock = (
+      DynamoItemDao as unknown as jest.Mock<DynamoItemDao<EncounterItem, EncounterDTO>>
+    ).mock.instances[1];
     daoEncounterPut = daoEncounterMock.put as jest.Mock;
     daoEncounterPut.mockResolvedValue(undefined);
     daoEncounterGet = daoEncounterMock.get as jest.Mock;
@@ -78,7 +82,7 @@ describe('encounter handler', () => {
     daoEncounterDelete = daoEncounterMock.delete as jest.Mock;
     daoGameGet = daoGameMock.get as jest.Mock;
 
-    decodeSpy.mockReturnValue({ username: 'owner' })
+    decodeSpy.mockReturnValue({ username: "owner" });
   });
 
   afterEach(() => {
@@ -87,219 +91,218 @@ describe('encounter handler', () => {
     daoEncounterGetAll.mockClear();
     daoEncounterDelete.mockClear();
     daoGameGet.mockClear();
-  })
+  });
 
-  describe('/ PUT', () => {
+  describe("/ PUT", () => {
     beforeEach(() => {
       event.requestContext = {
-        httpMethod: 'PUT',
-        resourcePath: '/'
+        httpMethod: "PUT",
+        resourcePath: "/",
       } as any;
     });
 
-    test('should save encounter data to dynamodb', async () => {
+    test("should save encounter data to dynamodb", async () => {
       daoGameGet.mockResolvedValue(gameDTO);
       await expect(handler(event)).resolves.toEqual({
         statusCode: 202,
-        body: 'accepted',
+        body: "accepted",
         headers: {
-          'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key',
-          'Access-Control-Allow-Methods': '*',
-          'Access-Control-Allow-Origin': '*',
-        }
+          "Access-Control-Allow-Headers": "Content-Type,X-Amz-Date,Authorization,X-Api-Key",
+          "Access-Control-Allow-Methods": "*",
+          "Access-Control-Allow-Origin": "*",
+        },
       });
-      expect(daoGameGet).toHaveBeenCalledWith('owner', 'game');
+      expect(daoGameGet).toHaveBeenCalledWith("owner", "game");
       expect(daoEncounterPut).toHaveBeenCalledWith(encounterDTO);
     });
 
-    test('should return 403 if the attached game does not exist', async () => {
+    test("should return 403 if the attached game does not exist", async () => {
       daoGameGet.mockResolvedValue(null);
       await expect(handler(event)).resolves.toEqual({
         statusCode: 403,
-        body: 'forbidden',
+        body: "forbidden",
         headers: {
-          'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key',
-          'Access-Control-Allow-Methods': '*',
-          'Access-Control-Allow-Origin': '*',
-        }
+          "Access-Control-Allow-Headers": "Content-Type,X-Amz-Date,Authorization,X-Api-Key",
+          "Access-Control-Allow-Methods": "*",
+          "Access-Control-Allow-Origin": "*",
+        },
       });
     });
-  
-    test('should return 403 if Authorized user does not own the attached game', async () => {
+
+    test("should return 403 if Authorized user does not own the attached game", async () => {
       daoGameGet.mockResolvedValue({
         ...gameDTO,
-        ownerId: 'other'
+        ownerId: "other",
       });
-  
+
       expect(await handler(event)).toEqual({
         statusCode: 400,
-        body: 'bad request',
+        body: "bad request",
         headers: {
-          'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key',
-          'Access-Control-Allow-Methods': '*',
-          'Access-Control-Allow-Origin': '*',
-        }
+          "Access-Control-Allow-Headers": "Content-Type,X-Amz-Date,Authorization,X-Api-Key",
+          "Access-Control-Allow-Methods": "*",
+          "Access-Control-Allow-Origin": "*",
+        },
       });
-      expect(daoGameGet).toHaveBeenCalledWith('owner', 'game');
+      expect(daoGameGet).toHaveBeenCalledWith("owner", "game");
       expect(daoEncounterPut).not.toHaveBeenCalled();
     });
   });
 
-  describe('/{gameId}/{encounterId} GET', () => {
+  describe("/{gameId}/{encounterId} GET", () => {
     beforeEach(() => {
       event.requestContext = {
-        httpMethod: 'GET',
-        resourcePath: '/{gameId}/{encounterId}'
+        httpMethod: "GET",
+        resourcePath: "/{gameId}/{encounterId}",
       } as any;
       event.pathParameters = {
-        gameId: 'game',
-        encounterId: 'id'
+        gameId: "game",
+        encounterId: "id",
       };
       daoGameGet.mockResolvedValue(gameDTO);
       daoEncounterGet.mockResolvedValue(encounterDTO);
     });
 
-    test('should return the requested encounter data', async () => {
+    test("should return the requested encounter data", async () => {
       await expect(handler(event)).resolves.toEqual({
         statusCode: 200,
         body: JSON.stringify(encounterDTO),
         headers: {
-          'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key',
-          'Access-Control-Allow-Methods': '*',
-          'Access-Control-Allow-Origin': '*',
-        }
+          "Access-Control-Allow-Headers": "Content-Type,X-Amz-Date,Authorization,X-Api-Key",
+          "Access-Control-Allow-Methods": "*",
+          "Access-Control-Allow-Origin": "*",
+        },
       });
 
-      expect(daoGameGet).toHaveBeenCalledWith('owner', 'game');
-      expect(daoEncounterGet).toHaveBeenCalledWith('game', 'id');
+      expect(daoGameGet).toHaveBeenCalledWith("owner", "game");
+      expect(daoEncounterGet).toHaveBeenCalledWith("game", "id");
     });
-  
-    test('should return 403 when the authorized user does not own the attached game', async () => {
+
+    test("should return 403 when the authorized user does not own the attached game", async () => {
       daoGameGet.mockResolvedValue(null);
 
       await expect(handler(event)).resolves.toEqual({
         statusCode: 403,
-        body: 'forbidden',
+        body: "forbidden",
         headers: {
-          'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key',
-          'Access-Control-Allow-Methods': '*',
-          'Access-Control-Allow-Origin': '*',
-        }
+          "Access-Control-Allow-Headers": "Content-Type,X-Amz-Date,Authorization,X-Api-Key",
+          "Access-Control-Allow-Methods": "*",
+          "Access-Control-Allow-Origin": "*",
+        },
       });
 
-      expect(daoGameGet).toHaveBeenCalledWith('owner', 'game');
+      expect(daoGameGet).toHaveBeenCalledWith("owner", "game");
       expect(daoEncounterGet).not.toHaveBeenCalled();
     });
-  
-    test('should return 403 error when an encounter was not found', async () => {
+
+    test("should return 403 error when an encounter was not found", async () => {
       daoEncounterGet.mockResolvedValue(null);
-  
+
       await expect(handler(event)).resolves.toEqual({
         statusCode: 403,
-        body: 'forbidden',
+        body: "forbidden",
         headers: {
-          'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key',
-          'Access-Control-Allow-Methods': '*',
-          'Access-Control-Allow-Origin': '*',
-        }
+          "Access-Control-Allow-Headers": "Content-Type,X-Amz-Date,Authorization,X-Api-Key",
+          "Access-Control-Allow-Methods": "*",
+          "Access-Control-Allow-Origin": "*",
+        },
       });
 
-      expect(daoGameGet).toHaveBeenCalledWith('owner', 'game');
-      expect(daoEncounterGet).toHaveBeenCalledWith('game', 'id');
+      expect(daoGameGet).toHaveBeenCalledWith("owner", "game");
+      expect(daoEncounterGet).toHaveBeenCalledWith("game", "id");
     });
   });
 
-  describe('/list/{gameId} GET', () => {
+  describe("/list/{gameId} GET", () => {
     beforeEach(() => {
       event.pathParameters = {
-        gameId: 'game'
+        gameId: "game",
       };
       event.requestContext = {
-        resourcePath: '/list/{gameId}',
-        httpMethod: 'GET'
+        resourcePath: "/list/{gameId}",
+        httpMethod: "GET",
       } as any;
       daoGameGet.mockResolvedValue(gameDTO);
       daoEncounterGetAll.mockResolvedValue([encounterDTO]);
     });
 
-    test('should return a list of encounter data for the game', async () => {
+    test("should return a list of encounter data for the game", async () => {
       await expect(handler(event)).resolves.toEqual({
         statusCode: 200,
         body: JSON.stringify([encounterDTO]),
         headers: {
-          'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key',
-          'Access-Control-Allow-Methods': '*',
-          'Access-Control-Allow-Origin': '*',
-        }
+          "Access-Control-Allow-Headers": "Content-Type,X-Amz-Date,Authorization,X-Api-Key",
+          "Access-Control-Allow-Methods": "*",
+          "Access-Control-Allow-Origin": "*",
+        },
       });
-  
-      expect(daoGameGet).toHaveBeenCalledWith('owner', 'game');
-      expect(daoEncounterGetAll).toHaveBeenCalledWith('game');
+
+      expect(daoGameGet).toHaveBeenCalledWith("owner", "game");
+      expect(daoEncounterGetAll).toHaveBeenCalledWith("game");
     });
 
-    test('should return 403 if the authorized user does not own the attached game', async () => {
+    test("should return 403 if the authorized user does not own the attached game", async () => {
       daoGameGet.mockResolvedValue(null);
 
       await expect(handler(event)).resolves.toEqual({
         statusCode: 403,
-        body: 'forbidden',
+        body: "forbidden",
         headers: {
-          'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key',
-          'Access-Control-Allow-Methods': '*',
-          'Access-Control-Allow-Origin': '*',
-        }
+          "Access-Control-Allow-Headers": "Content-Type,X-Amz-Date,Authorization,X-Api-Key",
+          "Access-Control-Allow-Methods": "*",
+          "Access-Control-Allow-Origin": "*",
+        },
       });
-  
-      expect(daoGameGet).toHaveBeenCalledWith('owner', 'game');
+
+      expect(daoGameGet).toHaveBeenCalledWith("owner", "game");
       expect(daoEncounterGetAll).not.toHaveBeenCalled();
     });
   });
 
-  describe('/{gameId}/{encounterId} DELETE', () => {
+  describe("/{gameId}/{encounterId} DELETE", () => {
     beforeEach(() => {
       event.requestContext = {
-        resourcePath: '/{gameId}/{encounterId}',
-        httpMethod: 'DELETE'
+        resourcePath: "/{gameId}/{encounterId}",
+        httpMethod: "DELETE",
       } as any;
       event.pathParameters = {
-        gameId: 'game',
-        encounterId: 'id'
+        gameId: "game",
+        encounterId: "id",
       };
       daoGameGet.mockResolvedValue(gameDTO);
       daoEncounterDelete.mockResolvedValue(null);
     });
 
-    test('should remove an encounter item from DynamoDB', async () => {
+    test("should remove an encounter item from DynamoDB", async () => {
       await expect(handler(event)).resolves.toEqual({
         statusCode: 202,
-        body: 'accepted',
+        body: "accepted",
         headers: {
-          'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key',
-          'Access-Control-Allow-Methods': '*',
-          'Access-Control-Allow-Origin': '*',
-        }
+          "Access-Control-Allow-Headers": "Content-Type,X-Amz-Date,Authorization,X-Api-Key",
+          "Access-Control-Allow-Methods": "*",
+          "Access-Control-Allow-Origin": "*",
+        },
       });
 
-      expect(daoGameGet).toHaveBeenCalledWith('owner', 'game');
-      expect(daoEncounterDelete).toHaveBeenCalledWith('game', 'id');
+      expect(daoGameGet).toHaveBeenCalledWith("owner", "game");
+      expect(daoEncounterDelete).toHaveBeenCalledWith("game", "id");
     });
 
-    test('should not remove an item and return no error if the authorized user does not own the attached game',
-        async () => {
+    test("should not remove an item and return no error if the authorized user does not own the attached game", async () => {
       // NOTE: Returning 202 when game does not exist maintains idepotemcy of DELETE operation
       daoGameGet.mockResolvedValue(null);
 
       await expect(handler(event)).resolves.toEqual({
         statusCode: 202,
-        body: 'accepted',
+        body: "accepted",
         headers: {
-          'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key',
-          'Access-Control-Allow-Methods': '*',
-          'Access-Control-Allow-Origin': '*',
-        }
+          "Access-Control-Allow-Headers": "Content-Type,X-Amz-Date,Authorization,X-Api-Key",
+          "Access-Control-Allow-Methods": "*",
+          "Access-Control-Allow-Origin": "*",
+        },
       });
 
-      expect(daoGameGet).toHaveBeenCalledWith('owner', 'game');
+      expect(daoGameGet).toHaveBeenCalledWith("owner", "game");
       expect(daoEncounterDelete).not.toHaveBeenCalled();
     });
   });

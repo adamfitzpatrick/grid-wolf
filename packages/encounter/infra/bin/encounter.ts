@@ -10,7 +10,6 @@ config({ path: [ '../../.env.local', '../../.env.dev', '../../.env']});
 const envMap = loadEnv([
   EnvironmentVariableName.DATA_TABLE_NAME,
   EnvironmentVariableName.HOSTED_ZONE,
-  EnvironmentVariableName.API_CERTIFICATE_ARN,
   EnvironmentVariableName.APP_SUBDOMAIN
 ]);
 const app = new cdk.App();

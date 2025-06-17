@@ -1,19 +1,23 @@
 import { parameterNames } from "@grid-wolf/shared/constructs";
 import { Construct } from "constructs";
 import { resolve } from "path";
-import { SingleHandlerApi } from 'stepinto-aws-tools/constructs';
+import { SingleHandlerApi } from "stepinto-aws-tools/constructs";
 import { CfnBasePathMapping } from "aws-cdk-lib/aws-apigateway";
-import { StepintoBaseProps, StepintoBaseStack } from 'stepinto-aws-tools/constructs';
+import { StepintoBaseProps, StepintoBaseStack } from "stepinto-aws-tools/constructs";
 import { StringParameter } from "aws-cdk-lib/aws-ssm";
-import { Effect, PolicyStatement } from "aws-cdk-lib/aws-iam";
+import { LambdaEnvironmentVariableName } from "@grid-wolf/shared/utils";
 
-const APP_NAME = 'grid-wolf-entity';
-const BASE_PATH = 'entity';
-const SPEC_PATH = resolve(__dirname, '../api-spec.yaml');
-const HANDLER_PATH = resolve(__dirname, '../../lib/entity-handler');
-const API_SUBDOMAIN_PART = 'api';
+const APP_NAME = "grid-wolf-entity";
+const BASE_PATH = "entity";
+const SPEC_PATH = resolve(__dirname, "../api-spec.yaml");
+const HANDLER_PATH = resolve(__dirname, "../../lib/entity-handler");
+const API_SUBDOMAIN_PART = "api";
 
-export interface EntityStackProps extends Omit<StepintoBaseProps, 'appName'> {
+export const EntityEnvironmentVariable = {
+  ...LambdaEnvironmentVariableName,
+};
+
+export interface EntityStackProps extends Omit<StepintoBaseProps, "appName"> {
   dataTableName: string;
   hostedZone: string;
   subdomain: string;
@@ -23,33 +27,36 @@ export class EntityStack extends StepintoBaseStack {
   constructor(scope: Construct, id: string, props: EntityStackProps) {
     super(scope, id, { appName: APP_NAME, ...props });
 
-    const userPoolArn = StringParameter.valueForStringParameter(this, `/${props.env.prefix}${parameterNames.USER_POOL_ARN}`);
-    const api = new SingleHandlerApi(this, this.generateId('api'), {
+    const userPoolArn = StringParameter.valueForStringParameter(
+      this,
+      `/${props.env.prefix}${parameterNames.USER_POOL_ARN}`
+    );
+    const api = new SingleHandlerApi(this, this.generateId("api"), {
       ...props,
       appName: this.appName,
-      constructName: 'api',
+      constructName: "api",
       apiSpecPath: SPEC_PATH,
       handlerPath: HANDLER_PATH,
       usesSecrets: false,
-      handler: 'index.handler',
-      authArnTemplateKey: 'authArn',
-      handlerTemplateKey: 'handler',
+      handler: "index.handler",
+      authArnTemplateKey: "authArn",
+      handlerTemplateKey: "handler",
       additionalEnvironmentVariables: {
-        PARAMETERS_SECRETS_EXTENSION_LOG_LEVEL: 'error'
+        [EntityEnvironmentVariable.SECRETS_EXT_LOG_LEVEL]: "error",
       },
       layers: {},
-      userPoolArn
+      userPoolArn,
     });
 
     let domainName = `${API_SUBDOMAIN_PART}.${props.subdomain}.${props.hostedZone}`;
-    if (props.env.prefix !== 'prd') {
+    if (props.env.prefix !== "prd") {
       domainName = `${props.env.prefix}.${domainName}`;
     }
-    new CfnBasePathMapping(this, this.generateId('api-path-mapping'), {
+    new CfnBasePathMapping(this, this.generateId("api-path-mapping"), {
       domainName,
       basePath: BASE_PATH,
       restApiId: api.getApi().restApiId,
-      stage: api.getStage().stageName
+      stage: api.getStage().stageName,
     });
   }
 }

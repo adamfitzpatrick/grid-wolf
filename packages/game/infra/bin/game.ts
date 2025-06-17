@@ -2,27 +2,26 @@
 import 'source-map-support/register';
 import * as cdk from 'aws-cdk-lib';
 import { GameStack, GameStackProps } from '../lib/game-stack';
-import { loadEnv, EnvironmentVariableName } from '@grid-wolf/shared/utils';
+import { loadEnv, StandardEnvironment, FunctionalEnvironmentVariableName } from '@grid-wolf/shared/utils';
 import { config } from 'dotenv';
 
 config({ path: [ '../../.env.local', '../../.env.dev', '../../.env']});
 
 const envMap = loadEnv([
-  EnvironmentVariableName.DATA_TABLE_NAME,
-  EnvironmentVariableName.HOSTED_ZONE,
-  EnvironmentVariableName.API_CERTIFICATE_ARN,
-  EnvironmentVariableName.APP_SUBDOMAIN
+  StandardEnvironment.DATA_TABLE_NAME,
+  FunctionalEnvironmentVariableName.HOSTED_ZONE,
+  FunctionalEnvironmentVariableName.APP_SUBDOMAIN
 ]);
 const app = new cdk.App();
 
 const props: GameStackProps = {
   env: {
-    account: envMap[EnvironmentVariableName.ACCOUNT],
-    region: envMap[EnvironmentVariableName.REGION],
-    prefix: envMap[EnvironmentVariableName.PREFIX]
+    account: envMap[StandardEnvironment.ACCOUNT],
+    region: envMap[StandardEnvironment.REGION],
+    prefix: envMap[StandardEnvironment.PREFIX]
   },
-  dataTableName: process.env[EnvironmentVariableName.DATA_TABLE_NAME]!,
-  hostedZone: envMap[EnvironmentVariableName.HOSTED_ZONE],
-  subdomain: envMap[EnvironmentVariableName.APP_SUBDOMAIN]
+  dataTableName: process.env[StandardEnvironment.DATA_TABLE_NAME]!,
+  hostedZone: envMap[FunctionalEnvironmentVariableName.HOSTED_ZONE],
+  subdomain: envMap[FunctionalEnvironmentVariableName.APP_SUBDOMAIN]
 };
 new GameStack(app, `${props.env.prefix}GameStack`, props);

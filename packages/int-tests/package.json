@@ -1,5 +1,5 @@
 {
-  "name": "integration-tests",
+  "name": "@grid-wolf/int-tests",
   "packageManager": "yarn@4.5.0",
   "dependencies": {
     "@aws-sdk/client-dynamodb": "^3.738.0",

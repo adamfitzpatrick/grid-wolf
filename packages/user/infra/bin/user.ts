@@ -4,7 +4,6 @@ import { UserStack, UserStackProps } from '../lib/user-stack';
 
 const environmentVars = loadEnv([
   EnvironmentVariableName.DATA_TABLE_NAME,
-  EnvironmentVariableName.USER_AUTH_DOMAIN,
   EnvironmentVariableName.USER_POOL_CERTIFICATE_ARN,
   EnvironmentVariableName.APP_SUBDOMAIN,
   EnvironmentVariableName.HOSTED_ZONE

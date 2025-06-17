@@ -3,127 +3,131 @@ import { App, Stack } from "aws-cdk-lib";
 import { Match, Template } from "aws-cdk-lib/assertions";
 import { Construct } from "constructs";
 import { TracingConfig } from "aws-cdk-lib/aws-sns";
-import { AssetCode, Code, LogFormat } from "aws-cdk-lib/aws-lambda";
-import { EnvironmentVariableName } from "../../utils";
+import { AssetCode, Code } from "aws-cdk-lib/aws-lambda";
+import { StandardEnvironment } from "../../utils";
 import { Effect, PolicyStatement } from "aws-cdk-lib/aws-iam";
 
 class TestStack extends Stack {
   constructor(scope: Construct, id: string, props: ApiHandlerProps) {
     super(scope, id, props);
 
-    new ApiHandler(this, 'TestConstruct', props);
+    new ApiHandler(this, "TestConstruct", props);
   }
 }
 
-describe('api-handler construct', () => {
-  let props: ApiHandlerProps
-  let template: Template
+describe("api-handler construct", () => {
+  let props: ApiHandlerProps;
+  let template: Template;
 
   function generateStack() {
     const app = new App();
-    const stack = new TestStack(app, 'TestStack', props);
+    const stack = new TestStack(app, "TestStack", props);
     template = Template.fromStack(stack);
   }
 
   beforeEach(() => {
-    jest.spyOn(Code, 'fromAsset').mockReturnValue(Code.fromInline('code') as any as AssetCode);
+    jest.spyOn(Code, "fromAsset").mockReturnValue(Code.fromInline("code") as any as AssetCode);
     props = {
       env: {
-        account: 'account',
-        region: 'us-west-2',
-        prefix: 'tst'
+        account: "account",
+        region: "us-west-2",
+        prefix: "tst",
       },
-      constructName: 'apihandler-test',
-      handlerPath: 'path',
-      dataTableName: 'table'
+      constructName: "apihandler-test",
+      handler: "path",
+      handlerPath: "path",
+      dataTableName: "table",
     };
     generateStack();
   });
 
-  test('should include an execution role', () => {
-    template.hasResourceProperties('AWS::IAM::Role', {
+  test("should include an execution role", () => {
+    template.hasResourceProperties("AWS::IAM::Role", {
       AssumeRolePolicyDocument: {
-        Statement: [{
-          Effect: 'Allow',
-          Principal: {
-            Service: 'lambda.amazonaws.com'
-          }
-        }]
+        Statement: [
+          {
+            Effect: "Allow",
+            Principal: {
+              Service: "lambda.amazonaws.com",
+            },
+          },
+        ],
       },
-      Policies: [{
-        PolicyDocument: {
-          Statement: [{
-            Effect: 'Allow',
-            Action: [
-              'logs:CreateLogGroup',
-              'logs:CreateLogStream',
-              'logs:DescribeLogStreams',
-              'logs:PutLogEvents'
+      Policies: [
+        {
+          PolicyDocument: {
+            Statement: [
+              {
+                Effect: "Allow",
+                Action: [
+                  "logs:CreateLogGroup",
+                  "logs:CreateLogStream",
+                  "logs:DescribeLogStreams",
+                  "logs:PutLogEvents",
+                ],
+                Resource: "*",
+              },
             ],
-            Resource: '*'
-          }]
-        }
-      }, {
-        PolicyDocument: {
-          Statement: [{
-            Effect: 'Allow',
-            Action: [
-              'dynamodb:GetItem',
-              'dynamodb:PutItem',
-              'dynamodb:Query'
+          },
+        },
+        {
+          PolicyDocument: {
+            Statement: [
+              {
+                Effect: "Allow",
+                Action: ["dynamodb:GetItem", "dynamodb:PutItem", "dynamodb:Query"],
+                Resource: "*",
+              },
             ],
-            Resource: '*'
-          }]
-        }
-      }],
-      RoleName : 'tst-grid-wolf-apihandler-test-exec-role',
+          },
+        },
+      ],
+      RoleName: "tst-grid-wolf-apihandler-test-exec-role",
     });
   });
 
-  test('should create the handler lambda function', () => {
-    template.hasResourceProperties('AWS::Lambda::Function', {
-      FunctionName: 'tst-grid-wolf-apihandler-test-handler',
-      Runtime: 'nodejs20.x',
+  test("should create the handler lambda function", () => {
+    template.hasResourceProperties("AWS::Lambda::Function", {
+      FunctionName: "tst-grid-wolf-apihandler-test-handler",
+      Runtime: "nodejs20.x",
       TracingConfig: {
-        Mode: TracingConfig.ACTIVE
+        Mode: TracingConfig.ACTIVE,
       },
       Environment: {
         Variables: {
-          [EnvironmentVariableName.DATA_TABLE_NAME]: 'tst-table'
-        }
+          [StandardEnvironment.DATA_TABLE_NAME]: "tst-table",
+        },
       },
-      Layers: [
-        Match.anyValue(),
-        Match.anyValue(),
-        Match.anyValue()
-      ],
-      Role: Match.anyValue()
+      Layers: [Match.anyValue(), Match.anyValue(), Match.anyValue()],
+      Role: Match.anyValue(),
     });
   });
 
-  test('should include any additional environment variables', () => {
+  test("should include any additional environment variables", () => {
     props.additionalEnvironmentVariables = {
-      'FOO': 'bar'
+      FOO: "bar",
     };
     generateStack();
-    template.hasResourceProperties('AWS::Lambda::Function', {
+    template.hasResourceProperties("AWS::Lambda::Function", {
       Environment: {
         Variables: {
-          [EnvironmentVariableName.DATA_TABLE_NAME]: 'tst-table',
-          'FOO': 'bar'
-        }
+          [StandardEnvironment.DATA_TABLE_NAME]: "tst-table",
+          FOO: "bar",
+        },
       },
     });
   });
 
-  test('should include any additional handler policies', () => {
-    props.additionalHandlerPolicies = [new PolicyStatement({
-      effect: Effect.ALLOW,
-      actions: ['service:Action'],
-      resources: ['*']
-    })];
+  test("should include any additional handler policies", () => {
+    props.additionalHandlerPolicies = [
+      new PolicyStatement({
+        effect: Effect.ALLOW,
+        actions: ["service:Action"],
+        resources: ["*"],
+      }),
+    ];
     generateStack();
-    template.hasResourceProperties('AWS::IAM::Role', {
+    template.hasResourceProperties("AWS::IAM::Role", {
       Policies: [
         Match.anyValue(),
         {
@@ -131,14 +135,14 @@ describe('api-handler construct', () => {
             Statement: [
               Match.anyValue(),
               {
-                Effect: 'Allow',
-                Action: 'service:Action',
-                Resource: '*'
-              }
-            ]
-          }
-        }
-      ]
+                Effect: "Allow",
+                Action: "service:Action",
+                Resource: "*",
+              },
+            ],
+          },
+        },
+      ],
     });
   });
 });

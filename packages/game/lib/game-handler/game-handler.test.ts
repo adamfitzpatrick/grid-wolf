@@ -2,30 +2,34 @@ import { APIGatewayProxyEvent } from "aws-lambda";
 import { handler } from ".";
 import { DynamoItemDao } from "stepinto-aws-tools/clients";
 import { GameItem, GameDTO } from "../game-dto";
-import { gameInviteDetailType } from '@grid-wolf/user/lib/user-event';
+import { gameInviteDetailType } from "@grid-wolf/user/lib/user-event";
+import { GameEnvironmentVariables } from "../../infra/lib/game-stack";
 
-process.env['EVENT_BUS'] = 'arn';
+process.env[GameEnvironmentVariables.DATA_TABLE_NAME] = "table";
+process.env[GameEnvironmentVariables.EVENT_BUS] = "arn";
 
-jest.mock('stepinto-aws-tools/clients');
-jest.mock('jsonwebtoken', () => {
+jest.mock("stepinto-aws-tools/clients");
+jest.mock("jsonwebtoken", () => {
   return {
-    decode: () => ({ username: 'user' })
+    decode: () => ({ username: "user" }),
   };
 });
 const sendEventSpy = jest.fn();
 const putEventsSpy = jest.fn();
-jest.mock('@aws-sdk/client-eventbridge', () => {
+jest.mock("@aws-sdk/client-eventbridge", () => {
   return {
     EventBridgeClient: function () {
       return {
-        send: (...args: any[]) => sendEventSpy(...args)
-      }
+        send: (...args: any[]) => sendEventSpy(...args),
+      };
     },
-    PutEventsCommand: function (...args: any[]) { putEventsSpy(...args); }
-  }
-})
+    PutEventsCommand: function (...args: any[]) {
+      putEventsSpy(...args);
+    },
+  };
+});
 
-describe('game handler', () => {
+describe("game handler", () => {
   let oldConsole: Console;
   let Authorization: string;
   let gameDTO: GameDTO;
@@ -51,25 +55,26 @@ describe('game handler', () => {
   beforeEach(() => {
     Authorization = `Bearer TOKEN`;
     gameDTO = {
-      gameId: 'id',
-      ownerId: 'user',
-      name: 'name',
-      players: ['email@email.com'],
+      gameId: "id",
+      ownerId: "user",
+      name: "name",
+      players: ["email@email.com"],
       timestamp: 1234,
-      active: true
+      active: true,
     };
     event = {
       body: JSON.stringify(gameDTO),
       requestContext: {
-        httpMethod: 'PUT',
-        resourcePath: '/'
+        httpMethod: "PUT",
+        resourcePath: "/",
       },
       headers: {
-        Authorization
-      }
-    } as any as APIGatewayProxyEvent
+        Authorization,
+      },
+    } as any as APIGatewayProxyEvent;
 
-    const daoMock = (DynamoItemDao as unknown as jest.Mock<DynamoItemDao<GameItem, GameDTO>>).mock.instances[0];
+    const daoMock = (DynamoItemDao as unknown as jest.Mock<DynamoItemDao<GameItem, GameDTO>>).mock
+      .instances[0];
     daoPut = daoMock.put as jest.Mock;
     daoPut.mockResolvedValue(undefined);
     daoGet = daoMock.get as jest.Mock;
@@ -84,60 +89,62 @@ describe('game handler', () => {
     daoDelete.mockClear();
     putEventsSpy.mockClear();
     sendEventSpy.mockClear();
-  })
+  });
 
-  test('/ PUT should save game data to dynamodb', async () => {
+  test("/ PUT should save game data to dynamodb", async () => {
     await expect(handler(event)).resolves.toEqual({
       statusCode: 202,
-      body: 'accepted',
+      body: "accepted",
       headers: {
-        'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key',
-        'Access-Control-Allow-Methods': '*',
-        'Access-Control-Allow-Origin': '*',
-      }
+        "Access-Control-Allow-Headers": "Content-Type,X-Amz-Date,Authorization,X-Api-Key",
+        "Access-Control-Allow-Methods": "*",
+        "Access-Control-Allow-Origin": "*",
+      },
     });
     expect(daoPut).toHaveBeenCalledWith(gameDTO);
     expect(putEventsSpy).toHaveBeenCalledWith({
-      Entries: [{
-        DetailType: gameInviteDetailType,
-        Detail: expect.stringContaining('email@email.com'),
-        EventBusName: 'arn',
-        Source: 'grid-wolf.game'
-      }]
+      Entries: [
+        {
+          DetailType: gameInviteDetailType,
+          Detail: expect.stringContaining("email@email.com"),
+          EventBusName: "arn",
+          Source: "grid-wolf.game",
+        },
+      ],
     });
     expect(sendEventSpy).toHaveBeenCalled();
   });
 
-  test('/ PUT should not dispatch GameInviteEvent if no players are included', async () => {
+  test("/ PUT should not dispatch GameInviteEvent if no players are included", async () => {
     gameDTO.players = [];
     event.body = JSON.stringify(gameDTO);
 
     await expect(handler(event)).resolves.toEqual({
       statusCode: 202,
-      body: 'accepted',
+      body: "accepted",
       headers: {
-        'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key',
-        'Access-Control-Allow-Methods': '*',
-        'Access-Control-Allow-Origin': '*',
-      }
+        "Access-Control-Allow-Headers": "Content-Type,X-Amz-Date,Authorization,X-Api-Key",
+        "Access-Control-Allow-Methods": "*",
+        "Access-Control-Allow-Origin": "*",
+      },
     });
     expect(daoPut).toHaveBeenCalledWith(gameDTO);
     expect(putEventsSpy).not.toHaveBeenCalled();
     expect(sendEventSpy).not.toHaveBeenCalled();
   });
 
-  test('/ PUT should return 400 if Authorized user does not match request body user', async () => {
-    gameDTO.ownerId = 'otherperson';
+  test("/ PUT should return 400 if Authorized user does not match request body user", async () => {
+    gameDTO.ownerId = "otherperson";
     event.body = JSON.stringify(gameDTO);
 
     expect(await handler(event)).toEqual({
       statusCode: 400,
-      body: 'bad request',
+      body: "bad request",
       headers: {
-        'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key',
-        'Access-Control-Allow-Methods': '*',
-        'Access-Control-Allow-Origin': '*',
-      }
+        "Access-Control-Allow-Headers": "Content-Type,X-Amz-Date,Authorization,X-Api-Key",
+        "Access-Control-Allow-Methods": "*",
+        "Access-Control-Allow-Origin": "*",
+      },
     });
 
     expect(daoPut).not.toHaveBeenCalled();
@@ -145,11 +152,11 @@ describe('game handler', () => {
     expect(sendEventSpy).not.toHaveBeenCalled();
   });
 
-  test('/{gameId} GET should return data obtained from dynamodb', async () => {
-    event.requestContext.httpMethod = 'GET';
-    event.requestContext.resourcePath = '/{gameId}';
+  test("/{gameId} GET should return data obtained from dynamodb", async () => {
+    event.requestContext.httpMethod = "GET";
+    event.requestContext.resourcePath = "/{gameId}";
     event.pathParameters = {
-      gameId: 'id'
+      gameId: "id",
     };
     daoGet.mockResolvedValue(gameDTO);
 
@@ -157,71 +164,71 @@ describe('game handler', () => {
       statusCode: 200,
       body: JSON.stringify(gameDTO),
       headers: {
-        'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key',
-        'Access-Control-Allow-Methods': '*',
-        'Access-Control-Allow-Origin': '*',
-      }
+        "Access-Control-Allow-Headers": "Content-Type,X-Amz-Date,Authorization,X-Api-Key",
+        "Access-Control-Allow-Methods": "*",
+        "Access-Control-Allow-Origin": "*",
+      },
     });
-    expect(daoGet).toHaveBeenCalledWith('user', 'id');
+    expect(daoGet).toHaveBeenCalledWith("user", "id");
   });
 
-  test('/{gameId} GET should return 403 error when game not found', async () => {
-    event.requestContext.httpMethod = 'GET';
-    event.requestContext.resourcePath = '/{gameId}';
+  test("/{gameId} GET should return 403 error when game not found", async () => {
+    event.requestContext.httpMethod = "GET";
+    event.requestContext.resourcePath = "/{gameId}";
     event.pathParameters = {
-      gameId: 'id'
+      gameId: "id",
     };
     daoGet.mockResolvedValue(null);
 
     await expect(handler(event)).resolves.toEqual({
       statusCode: 403,
-      body: 'forbidden',
+      body: "forbidden",
       headers: {
-        'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key',
-        'Access-Control-Allow-Methods': '*',
-        'Access-Control-Allow-Origin': '*',
-      }
+        "Access-Control-Allow-Headers": "Content-Type,X-Amz-Date,Authorization,X-Api-Key",
+        "Access-Control-Allow-Methods": "*",
+        "Access-Control-Allow-Origin": "*",
+      },
     });
-    expect(daoGet).toHaveBeenCalledWith('user', 'id');
+    expect(daoGet).toHaveBeenCalledWith("user", "id");
   });
 
-  test('/list GET should return a list of game data for the user', async () => {
-    event.requestContext.resourcePath = '/list';
-    event.requestContext.httpMethod = 'GET';
-    daoGetAll.mockResolvedValue([ gameDTO ]);
+  test("/list GET should return a list of game data for the user", async () => {
+    event.requestContext.resourcePath = "/list";
+    event.requestContext.httpMethod = "GET";
+    daoGetAll.mockResolvedValue([gameDTO]);
 
     await expect(handler(event)).resolves.toEqual({
       statusCode: 200,
-      body: JSON.stringify([ gameDTO ]),
+      body: JSON.stringify([gameDTO]),
       headers: {
-        'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key',
-        'Access-Control-Allow-Methods': '*',
-        'Access-Control-Allow-Origin': '*',
-      }
+        "Access-Control-Allow-Headers": "Content-Type,X-Amz-Date,Authorization,X-Api-Key",
+        "Access-Control-Allow-Methods": "*",
+        "Access-Control-Allow-Origin": "*",
+      },
     });
 
-    expect(daoGetAll).toHaveBeenCalledWith('user');
+    expect(daoGetAll).toHaveBeenCalledWith("user");
   });
 
-  test('/{gameId} DELETE should remove an item from DynamoDB', async () => {
-    event.body = '';
-    event.requestContext.resourcePath = '/{gameId}'
-    event.requestContext.httpMethod = 'DELETE';
+  test("/{gameId} DELETE should remove an item from DynamoDB", async () => {
+    event.body = "";
+    event.requestContext.resourcePath = "/{gameId}";
+    event.requestContext.httpMethod = "DELETE";
     event.pathParameters = {
-      gameId: 'id'
+      gameId: "id",
     };
     daoDelete.mockResolvedValue({});
 
     await expect(handler(event)).resolves.toEqual({
       statusCode: 202,
-      body: 'accepted',
+      body: "accepted",
       headers: {
-        'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key',
-        'Access-Control-Allow-Methods': '*',
-        'Access-Control-Allow-Origin': '*',
-      }
+        "Access-Control-Allow-Headers": "Content-Type,X-Amz-Date,Authorization,X-Api-Key",
+        "Access-Control-Allow-Methods": "*",
+        "Access-Control-Allow-Origin": "*",
+      },
     });
 
-    expect(daoDelete).toHaveBeenCalledWith('user', 'id');
+    expect(daoDelete).toHaveBeenCalledWith("user", "id");
   });
 });

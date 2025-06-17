@@ -1,14 +1,14 @@
 import { GameItem, GameDTO, gameMapper } from "../game-dto";
 import { GameEvent } from "../game-event";
 import { DynamoItemDao } from "stepinto-aws-tools/clients";
-import { EnvironmentVariableName } from "stepinto-aws-tools/utils";
+import { FunctionalEnvironmentVariableName } from "@grid-wolf/shared/utils";
 
-let tableName = process.env[EnvironmentVariableName.DATA_TABLE_NAME]!;
+let tableName = process.env[FunctionalEnvironmentVariableName.DATA_TABLE_NAME]!;
 const dao = new DynamoItemDao<GameItem, GameDTO>(tableName, gameMapper);
 
 export async function handler(event: GameEvent) {
   console.info(JSON.stringify(event));
-  console.debug({ operationHandled: event['detail-type']});
+  console.debug({ operationHandled: event["detail-type"] });
 
   const gameOwnerId = event.detail.playerGame.gameOwnerId;
   const gameId = event.detail.gameId;
@@ -21,14 +21,14 @@ export async function handler(event: GameEvent) {
     console.warn(`No game found for owner ${gameOwnerId} and gameId ${gameId}`);
     return;
   }
-  
+
   let found = false;
-  game.players = game.players.map(player => {
+  game.players = game.players.map((player) => {
     if (player === email) {
       found = true;
       return playerId;
     }
-    return player
+    return player;
   });
 
   if (found) {

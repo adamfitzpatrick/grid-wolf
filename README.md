@@ -15,3 +15,27 @@ resources for map creation or video conferencing amongst participants.
 
 This application is in early development. Refer to
 [architecture documentation](./packages/docs/architecture.md) for more information.
+
+## General Environment Configuration
+
+A standard set of environment variables is required for any component of this application.  At a minimum, the following variables must be set:
+
+```
+STEPINTO_APP_TARGET_ACCOUNT_ID
+STEPINTO_APP_TARGET_REGION
+STEPINTO_APP_TARGET_ENV_PREFIX
+STEPINTO_APP_DATA_TABLE_NAME
+```
+
+Additionally, the following variables may be required depending on which AWS services are utilized by a particular application:
+
+```
+GRID_WOLF_HOSTED_ZONE
+GRID_WOLF_API_CERTIFICATE_ARN
+GRID_WOLF_CDN_CERTIFICATE_ARN
+GRID_WOLF_USER_POOL_CERTIFICATE_ARN
+GRID_WOLF_APP_SUBDOMAIN
+GRID_WOLF_SECRETS_ARN
+```
+
+Integration tests also require a [distinct set of environment variables](./packages/int-tests/README.md).
